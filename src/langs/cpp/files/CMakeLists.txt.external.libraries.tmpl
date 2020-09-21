@@ -1,0 +1,26 @@
+find_package(${package_name} ${${package_name}_MINIMUM_REQUIRED} QUIET COMPONENTS ${${package_name}_COMPONENTS_REQUIRED})
+
+if(${package_name}_FOUND)
+  message(STATUS "Found ${package_name} version ${${package_name}_MAJOR_VERSION}.${${package_name}_MINOR_VERSION}.${${package_name}_SUBMINOR_VERSION}")
+  add_library(${package_name}_external INTERFACE)
+else()
+  message(STATUS "${package_name} ${${package_name}_MINIMUM_REQUIRED} could not be located, Building ${package_name} instead.")
+  include(FetchContent)
+
+  FetchContent_Declare(
+    _${package_name}
+    GIT_REPOSITORY ${git_link}
+    GIT_TAG ${git_tag})
+  
+  FetchContent_GetProperties(_${package_name})
+  if(NOT _${package_name}_POPULATED)
+    FetchContent_Populate(_${package_name})
+    message(STATUS "Added ${package_name} source : ${_${package_name}_SOURCE_DIR}")
+    message(STATUS "Added ${package_name} binary : ${_${package_name}_BINARY_DIR}")
+    add_subdirectory(
+      ${_${package_name}_SOURCE_DIR} 
+      ${_${package_name}_BINARY_DIR}
+    )
+    target_include_directories(${project_name} PRIVATE "${_${package_name}_SOURCE_DIR}/include")
+  endif()
+endif()

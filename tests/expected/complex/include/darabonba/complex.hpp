@@ -149,7 +149,7 @@ vec_part.push_back(boost::any(item.toMap()));
   }
 
   string *accessKey{};
-  concurrency::streams::ostream *body{};
+  concurrency::streams::istream *body{};
   vector<string> *strs{};
   ComplexRequestHeader *header{};
   int *Num{};

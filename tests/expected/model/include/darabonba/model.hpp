@@ -147,7 +147,7 @@ vec_subarray.push_back(boost::any(item.toMap()));
   vector<map<string, boost::any>> *maparray{};
   map<string, boost::any> *object{};
   int *numberfield{};
-  concurrency::streams::ostream *readable{};
+  concurrency::streams::istream *readable{};
   M *existModel{};
 
   ~MyModel() {

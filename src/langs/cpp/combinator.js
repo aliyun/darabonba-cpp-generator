@@ -484,7 +484,7 @@ class Combinator extends CombinatorBase {
       return `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
     } else if (type instanceof TypeStream) {
       this.pushInclude('stream');
-      return 'concurrency::streams::ostream';
+      return 'concurrency::streams::istream';
     } else if (type instanceof TypeObject) {
       if (!type.objectName) {
         return 'class';

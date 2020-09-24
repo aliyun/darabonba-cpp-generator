@@ -11,7 +11,7 @@
 using namespace std;
 
 namespace Darabonba_Comment {
-class Test1 : public Model {
+class Test1 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -21,7 +21,7 @@ protected:
   }
 public:
   Test1() {_init();};
-  explicit Test1(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit Test1(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -42,10 +42,12 @@ public:
 
   ~Test1() {
     delete test;
+    test = nullptr;
     delete test2;
+    test2 = nullptr;
   };
 };
-class Test2 : public Model {
+class Test2 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -55,7 +57,7 @@ protected:
   }
 public:
   Test2() {_init();};
-  explicit Test2(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit Test2(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -76,10 +78,12 @@ public:
 
   ~Test2() {
     delete test;
+    test = nullptr;
     delete test2;
+    test2 = nullptr;
   };
 };
-class Test3 : public Model {
+class Test3 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -89,7 +93,7 @@ protected:
   }
 public:
   Test3() {_init();};
-  explicit Test3(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit Test3(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -112,7 +116,9 @@ public:
 
   ~Test3() {
     delete test;
+    test = nullptr;
     delete test1;
+    test1 = nullptr;
   };
 };
 class Client {
@@ -127,6 +133,7 @@ public:
 
   ~Client() {
     delete _a;
+    _a = nullptr;
   };
 };
 } // namespace Darabonba_Comment

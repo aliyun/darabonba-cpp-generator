@@ -2,7 +2,7 @@
 
 basepath=$(cd `dirname $0`/../; pwd)
 
-cd $basepath/
+cd "$basepath/" || exit
 
 main() {
     mkdir -p cmake_build/
@@ -13,7 +13,7 @@ main() {
     cmake --build . || {
         error_exit "Failed to make."
     }
-    ./tests_${package} || {
+    ./tests_${project_name} || {
         error_exit "Failed to test."
     }
 }

@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/${param_scope}_${param_package}Targets.cmake")
+check_required_components("${param_scope}_${param_package}")

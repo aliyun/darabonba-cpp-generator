@@ -47,11 +47,11 @@ Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(ComplexReque
       request_.port = 80;
       request_.method = "GET";
       request_.pathname = string("/" + *_pathname + "");
-      request_.query = Darabonba_Import::Client::query(Darabonba::Converter::mapPointer(Darabonba::Converter::merge(new map<string, boost::any>({
+      request_.query = Darabonba_Import::Client::query(Darabonba::Converter::mapPointer(Darabonba::Converter::merge(map<string, boost::any>({
         {"date", boost::any("2019")},
         {"access", boost::any(mapAccess)},
         {"test", boost::any(mapVal["test"])}
-      }), request->header)));
+      }), *request->header)));
       request_.body = Darabonba_Import::Client::body();
       _lastRequest = request_;
       Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
@@ -119,7 +119,7 @@ ComplexRequest Darabonba_Complex::Client::Complex3(ComplexRequest *request) {
   Darabonba::Response response_= Darabonba::Core::doAction(request_);
   Darabonba::Response resp = Darabonba::Response response_;
   Darabonba_Source::Request req = Darabonba_Source::Request(new map<string, string>({
-    {"accesskey", *request->accessKey},
+    {"accesskey", request->accessKey == nullptr ? NULL : *request->accessKey},
     {"region", resp.statusMessage}
   }));
   Client::array0(new ComplexRequest(request));
@@ -128,7 +128,7 @@ ComplexRequest Darabonba_Complex::Client::Complex3(ComplexRequest *request) {
   Darabonba_Import::Client::parse(new class(ComplexRequest::class));
   Darabonba_Import::Client::array(new ComplexRequest(request), new string("1"));
   Darabonba_Import::Client::asyncFunc();
-  return behavior.expected::fromMap(Darabonba::Converter::merge(new map<string, string>(request_.query)));
+  return behavior.expected::fromMap(Darabonba::Converter::merge(map<string, string>(request_.query)));
 }
 
 vector<string> Darabonba_Complex::Client::hello(map<string, boost::any> *request, vector<string> *strs) {
@@ -218,7 +218,7 @@ string Darabonba_Complex::Client::mapAccess2(Darabonba_Source::Request *request)
 
 string Darabonba_Complex::Client::mapAccess3() {
   map<string, map<string, string>> data = {
-    {"configs", new map<string, string>({
+    {"configs", map<string, string>({
       {"value", "string"}
     })}
   };

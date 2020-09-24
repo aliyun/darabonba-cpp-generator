@@ -15,8 +15,8 @@ class Test1 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"test" , "test",
-      {"test2" , "test2",
+      {"test" , "test"},
+      {"test2" , "test2"},
     });
   }
 public:
@@ -51,8 +51,8 @@ class Test2 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"test" , "test",
-      {"test2" , "test2",
+      {"test" , "test"},
+      {"test2" , "test2"},
     });
   }
 public:
@@ -87,8 +87,8 @@ class Test3 : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"test" , "test",
-      {"test1" , "test1",
+      {"test" , "test"},
+      {"test1" , "test1"},
     });
   }
 public:

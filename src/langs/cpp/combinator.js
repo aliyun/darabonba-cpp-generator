@@ -509,7 +509,7 @@ class Combinator extends CombinatorBase {
       this.levelUp();
       notes['name'].forEach(note => {
         if (note.key === 'name') {
-          emitter.emitln(`{"${note.prop}" , "${note.value}",`, this.level);
+          emitter.emitln(`{"${note.prop}" , "${note.value}"},`, this.level);
         }
       });
       this.levelDown();

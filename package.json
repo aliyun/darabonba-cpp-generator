@@ -20,8 +20,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@darabonba/parser": "^1.2",
-    "camelcase": "^5.3.1",
-    "enum": "^2.5"
+    "enum": "^3"
   },
   "devDependencies": {
     "chai": "^4.2.0",

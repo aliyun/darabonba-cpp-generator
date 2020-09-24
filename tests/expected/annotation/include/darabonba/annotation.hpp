@@ -13,7 +13,7 @@ class Test : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"test" , "test",
+      {"test" , "test"},
     });
   }
 public:

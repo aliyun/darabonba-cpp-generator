@@ -71,7 +71,7 @@ class MyModel : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"name" , "realName",
+      {"name" , "realName"},
     });
   }
 public:

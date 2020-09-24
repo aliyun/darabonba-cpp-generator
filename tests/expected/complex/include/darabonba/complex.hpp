@@ -19,7 +19,7 @@ class ComplexRequestHeader : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"content" , "Content",
+      {"content" , "Content"},
     });
   }
 public:
@@ -82,7 +82,7 @@ class ComplexRequestPart : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"partNumber" , "PartNumber",
+      {"partNumber" , "PartNumber"},
     });
   }
 public:
@@ -109,10 +109,10 @@ class ComplexRequest : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
-      {"body" , "Body",
-      {"strs" , "Strs",
-      {"header" , "header",
-      {"part" , "Part",
+      {"body" , "Body"},
+      {"strs" , "Strs"},
+      {"header" , "header"},
+      {"part" , "Part"},
     });
   }
 public:

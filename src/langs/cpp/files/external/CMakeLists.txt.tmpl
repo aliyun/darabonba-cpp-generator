@@ -8,19 +8,19 @@ else()
   include(FetchContent)
 
   FetchContent_Declare(
-    ${project_name}_${package_name}
+    _${package_name}
     GIT_REPOSITORY ${git_link}
     GIT_TAG ${git_tag})
   
-  FetchContent_GetProperties(${project_name}_${package_name})
-  if(NOT ${project_name}_${package_name}_POPULATED)
-    FetchContent_Populate(${project_name}_${package_name})
-    message(STATUS "Added ${package_name} source : ${${project_name}_${package_name}_SOURCE_DIR}")
-    message(STATUS "Added ${package_name} binary : ${${project_name}_${package_name}_BINARY_DIR}")
+  FetchContent_GetProperties(_${package_name})
+  if(NOT _${package_name}_POPULATED)
+    FetchContent_Populate(_${package_name})
+    message(STATUS "Added ${package_name} source : ${_${package_name}_SOURCE_DIR}")
+    message(STATUS "Added ${package_name} binary : ${_${package_name}_BINARY_DIR}")
     add_subdirectory(
-      ${${project_name}_${package_name}_SOURCE_DIR} 
-      ${${project_name}_${package_name}_BINARY_DIR}
+      ${_${package_name}_SOURCE_DIR} 
+      ${_${package_name}_BINARY_DIR}
     )
-    target_include_directories(${project_name} PRIVATE "${${project_name}_${package_name}_SOURCE_DIR}/include")
+    target_include_directories(${project_name} PRIVATE "${_${package_name}_SOURCE_DIR}/include")
   endif()
 endif()

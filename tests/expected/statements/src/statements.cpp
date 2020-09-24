@@ -48,7 +48,7 @@ void Darabonba_Statements::Client::helloIf() {
 }
 
 void Darabonba_Statements::Client::helloThrow() {
-  BOOST_THROW_EXCEPTION(Darabonba::Error(boost::any(map<string, boost::any>(map<string, boost::any>()))));
+  BOOST_THROW_EXCEPTION(Darabonba::Error(map<string, boost::any>(map<string, boost::any>())));
 }
 
 void Darabonba_Statements::Client::helloForBreak() {

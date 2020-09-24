@@ -15,15 +15,15 @@ void Darabonba_Function::Client::hello() {
 
 map<string, string> Darabonba_Function::Client::helloMap() {
   map<string, string> m = map<string, string>();
-  return Darabonba::Converter::merge(new map<string, string>({
+  return Darabonba::Converter::merge(map<string, string>({
     {"key", "value"},
     {"key-1", "value-1"}
-  }), new map<string, string>(m));
+  }), map<string, string>(m));
 }
 
 vector<map<string, string>> Darabonba_Function::Client::helloArrayMap() {
   return vector<map<string, string>>({
-    new map<string, string>({
+    map<string, string>({
       {"key", "value"}
     })
   });

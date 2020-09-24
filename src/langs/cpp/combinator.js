@@ -255,7 +255,7 @@ class Combinator extends CombinatorBase {
     /***************************** emit class header ******************************/
     emitter.emit(`class ${className} `);
     if (object.type === 'model') {
-      emitter.emit(': public Model ');
+      emitter.emit(`: public ${this.config.tea.model.name} `);
     } else if (object.extends.length) {
       emitter.emit(`: ${object.extends[0]} `);
     }
@@ -327,6 +327,7 @@ class Combinator extends CombinatorBase {
       this.levelUp();
       properties.forEach(node => {
         emitter.emitln(`delete ${node.name};`, this.level);
+        emitter.emitln(`${node.name} = nullptr;`, this.level);
       });
       this.levelDown();
       emitter.emitln('};', this.level);
@@ -352,7 +353,7 @@ class Combinator extends CombinatorBase {
     emitter.emitln('public:');
     this.levelUp();
     emitter.emitln(`${className}() {_init();};`, this.level);
-    emitter.emitln(`explicit ${className}(const std::map<string, boost::any> &config) : Model(config) {_init();};`, this.level);
+    emitter.emitln(`explicit ${className}(const std::map<string, boost::any> &config) : ${this.config.tea.model.name}(config) {_init();};`, this.level);
     emitter.emitln();
 
     // emit toMap&fromMap method
@@ -429,7 +430,7 @@ class Combinator extends CombinatorBase {
   }
 
   emitFromMap(emitter, modelName, props, notes) {
-   
+
   }
 
   emitParams(emitter, params = []) {
@@ -441,7 +442,7 @@ class Combinator extends CombinatorBase {
     let emit = new Emitter(this.config);
     let str;
     if (tmp.length > 3) {
-      let curr_row_len = emitter.currRow().length - 1;
+      let curr_row_len = emitter.currRow().length;
       str = tmp.join(`,${emit.eol}${' '.repeat(curr_row_len)}`);
     } else {
       str = tmp.join(', ');
@@ -777,7 +778,7 @@ class Combinator extends CombinatorBase {
     // emit map
     if (items.length) {
       if (gram.needCast || layer !== 0) {
-        emitter.emitln(`new map<${keyType}, ${valType}>({`);
+        emitter.emitln(`map<${keyType}, ${valType}>({`);
       } else {
         emitter.emitln('{');
       }
@@ -792,9 +793,14 @@ class Combinator extends CombinatorBase {
           emitter.emit('boost::any(');
         }
         if (this.isPointerVar(item)) {
-          emitter.emit('*');
+          let emit = new Emitter(this.config);
+          this.grammerValue(emit, item, layer + 1);
+          let emitItem = emit.output;
+          emitter.emit(`${emitItem} == nullptr ? NULL : *${emitItem}`);
+        } else {
+          this.grammerValue(emitter, item, layer + 1);
         }
-        this.grammerValue(emitter, item, layer + 1);
+        
         if (gram.dataType.valType instanceof TypeGeneric) {
           emitter.emit(')');
         }
@@ -819,9 +825,10 @@ class Combinator extends CombinatorBase {
       expandItems.forEach(item => {
         let emit = new Emitter(this.config);
         if (this.isPointerVar(item)) {
+          emit.emit('*');
           this.grammer(emit, item, false, false);
         } else {
-          emit.emit(`new map<${keyType}, ${valType}>(`);
+          emit.emit(`map<${keyType}, ${valType}>(`);
           this.grammer(emit, item, false, false);
           emit.emit(')');
         }
@@ -1087,7 +1094,7 @@ class Combinator extends CombinatorBase {
         let isError = gram.exception instanceof TypeObject && gram.exception.objectName === '$Error';
         let dataType = this.resolveDataType(gram.params[0]);
         if (isError) {
-          emitter.emit(`boost::any(${dataType}(`);
+          emitter.emit(`${dataType}(`);
         }
         if (gram.params.length === 1) {
           this.grammerValue(emitter, gram.params[0]);
@@ -1101,7 +1108,7 @@ class Combinator extends CombinatorBase {
           emitter.emit(tmp.join(', '));
         }
         if (isError) {
-          emitter.emit('))'); // close boost::any
+          emitter.emit(')'); // close map
         }
         emitter.emit('))');
       } else {
@@ -1148,6 +1155,9 @@ class Combinator extends CombinatorBase {
     if (gram.type === 'null') {
       this.grammerValue(emitter, new GrammerValue('null'), false, false);
     } else if (gram.type === 'grammer') {
+      if (this.isPointerVar(gram.expr)) {
+        emitter.emit('*');
+      }
       this.grammer(emitter, gram.expr, false, false);
     } else if (gram.type === 'string') {
       emitter.emit('string("")');

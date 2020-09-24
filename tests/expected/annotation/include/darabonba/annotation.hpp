@@ -9,7 +9,7 @@
 using namespace std;
 
 namespace Darabonba_Annotation {
-class Test : public Model {
+class Test : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -18,7 +18,7 @@ protected:
   }
 public:
   Test() {_init();};
-  explicit Test(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit Test(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -33,6 +33,7 @@ public:
 
   ~Test() {
     delete test;
+    test = nullptr;
   };
 };
 class Client {
@@ -44,6 +45,7 @@ public:
 
   ~Client() {
     delete _a;
+    _a = nullptr;
   };
 };
 } // namespace Darabonba_Annotation

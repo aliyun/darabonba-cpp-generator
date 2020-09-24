@@ -15,7 +15,7 @@
 using namespace std;
 
 namespace Darabonba_Complex {
-class ComplexRequestHeader : public Model {
+class ComplexRequestHeader : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -24,7 +24,7 @@ protected:
   }
 public:
   ComplexRequestHeader() {_init();};
-  explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -39,15 +39,16 @@ public:
 
   ~ComplexRequestHeader() {
     delete content;
+    content = nullptr;
   };
 };
-class ComplexRequestConfigs : public Model {
+class ComplexRequestConfigs : public Darabonba::Model {
 protected:
   void _init(){
   }
 public:
   ComplexRequestConfigs() {_init();};
-  explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -70,11 +71,14 @@ public:
 
   ~ComplexRequestConfigs() {
     delete key;
+    key = nullptr;
     delete value;
+    value = nullptr;
     delete extra;
+    extra = nullptr;
   };
 };
-class ComplexRequestPart : public Model {
+class ComplexRequestPart : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -83,7 +87,7 @@ protected:
   }
 public:
   ComplexRequestPart() {_init();};
-  explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -98,9 +102,10 @@ public:
 
   ~ComplexRequestPart() {
     delete partNumber;
+    partNumber = nullptr;
   };
 };
-class ComplexRequest : public Model {
+class ComplexRequest : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -112,7 +117,7 @@ protected:
   }
 public:
   ComplexRequest() {_init();};
-  explicit ComplexRequest(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -158,12 +163,19 @@ vec_part.push_back(boost::any(item.toMap()));
 
   ~ComplexRequest() {
     delete accessKey;
+    accessKey = nullptr;
     delete body;
+    body = nullptr;
     delete strs;
+    strs = nullptr;
     delete header;
+    header = nullptr;
     delete Num;
+    Num = nullptr;
     delete configs;
+    configs = nullptr;
     delete part;
+    part = nullptr;
   };
 };
 class Client : Darabonba_Import::Client {
@@ -196,6 +208,7 @@ public:
 
   ~Client() {
     delete _configs;
+    _configs = nullptr;
   };
 };
 } // namespace Darabonba_Complex

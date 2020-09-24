@@ -14,10 +14,10 @@ using namespace std;
 Darabonba_Import::Client::Client(vector<string> *id, string *str) {
   _id = id;
   _str = str;
-  BOOST_THROW_EXCEPTION(Darabonba::Error(boost::any(map<string, string>({
+  BOOST_THROW_EXCEPTION(Darabonba::Error(map<string, string>({
     {"code", "SomeError"},
     {"messge", "ErrorMessage"}
-  }))));
+  })));
 };
 
 void Darabonba_Import::Client::Sample(Darabonba_Source::Client *client) {

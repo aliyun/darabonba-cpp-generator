@@ -13,11 +13,11 @@
 using namespace std;
 
 namespace Darabonba_Model {
-class M : public Model {
+class M : public Darabonba::Model {
 protected:
 public:
   M() {_init();};
-  explicit M(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit M(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -28,13 +28,13 @@ public:
 
   ~M() {};
 };
-class MyModelSubmodel : public Model {
+class MyModelSubmodel : public Darabonba::Model {
 protected:
   void _init(){
   }
 public:
   MyModelSubmodel() {_init();};
-  explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -49,13 +49,14 @@ public:
 
   ~MyModelSubmodel() {
     delete stringfield;
+    stringfield = nullptr;
   };
 };
-class MyModelSubarraymodel : public Model {
+class MyModelSubarraymodel : public Darabonba::Model {
 protected:
 public:
   MyModelSubarraymodel() {_init();};
-  explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -66,7 +67,7 @@ public:
 
   ~MyModelSubarraymodel() {};
 };
-class MyModel : public Model {
+class MyModel : public Darabonba::Model {
 protected:
   void _init(){
     _name = map<string, string>({
@@ -75,7 +76,7 @@ protected:
   }
 public:
   MyModel() {_init();};
-  explicit MyModel(const std::map<string, boost::any> &config) : Model(config) {_init();};
+  explicit MyModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
 
   map<string, boost::any> toMap() {
@@ -152,18 +153,31 @@ vec_subarray.push_back(boost::any(item.toMap()));
 
   ~MyModel() {
     delete stringfield;
+    stringfield = nullptr;
     delete bytesfield;
+    bytesfield = nullptr;
     delete stringarrayfield;
+    stringarrayfield = nullptr;
     delete mapfield;
+    mapfield = nullptr;
     delete name;
+    name = nullptr;
     delete submodel;
+    submodel = nullptr;
     delete subarraymodel;
+    subarraymodel = nullptr;
     delete subarray;
+    subarray = nullptr;
     delete maparray;
+    maparray = nullptr;
     delete object;
+    object = nullptr;
     delete numberfield;
+    numberfield = nullptr;
     delete readable;
+    readable = nullptr;
     delete existModel;
+    existModel = nullptr;
   };
 };
 class Client {

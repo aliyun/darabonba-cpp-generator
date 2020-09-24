@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(darabonba_package VERSION "0.1.0")
+project(${param_scope}_${param_package} VERSION "0.1.0")
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< General set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 set(CMAKE_CXX_STANDARD 11)
@@ -23,10 +23,10 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Target set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_library(${PROJECT_NAME} SHARED "")
 set(headers
-        include/darabonba/package.hpp)
+        include/${param_scope}/${param_package}.hpp)
 target_sources(${PROJECT_NAME}
         PRIVATE
-        src/package.cpp
+        src/${param_package}.cpp
         ${headers})
 target_include_directories(${PROJECT_NAME}
         PRIVATE
@@ -51,25 +51,25 @@ if (ENABLE_UNIT_TESTS)
     endif ()
     include(CTest)
     enable_testing()
-    add_executable(tests_darabonba_package
+    add_executable(tests_${param_scope}_${param_package}
             tests/main.cpp)
 endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core )
+target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core ${param_import})
 
 if (ENABLE_UNIT_TESTS)
-    target_include_directories(tests_darabonba_package
+    target_include_directories(tests_${param_scope}_${param_package}
             PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(tests_darabonba_package
+    target_link_libraries(tests_${param_scope}_${param_package}
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main )
+            gmock_main ${param_import})
     add_test(NAME google_test
-            COMMAND $<TARGET_FILE:tests_darabonba_package>)
+            COMMAND $<TARGET_FILE:tests_${param_scope}_${param_package}>)
 endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Install set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
@@ -118,7 +118,7 @@ install(
         TARGETS
           ${PROJECT_NAME}
         EXPORT
-          darabonba_packageTargets
+          ${param_scope}_${param_package}Targets
         ARCHIVE
           DESTINATION ${INSTALL_LIBDIR}
           COMPONENT lib
@@ -129,16 +129,16 @@ install(
           DESTINATION ${INSTALL_LIBDIR}
           COMPONENT lib
         PUBLIC_HEADER
-          DESTINATION ${INSTALL_INCLUDEDIR}/darabonba
+          DESTINATION ${INSTALL_INCLUDEDIR}/${param_scope}
           COMPONENT dev
 )
 
 # Install cmake config
 install(
         EXPORT
-          darabonba_packageTargets
+          ${param_scope}_${param_package}Targets
         NAMESPACE
-          "darabonba_package::"
+          "${param_scope}_${param_package}::"
         DESTINATION
           ${INSTALL_CMAKEDIR}
         COMPONENT

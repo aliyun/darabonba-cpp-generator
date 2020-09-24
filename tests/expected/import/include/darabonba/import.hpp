@@ -19,7 +19,9 @@ public:
 
   ~Client() {
     delete _id;
+    _id = nullptr;
     delete _str;
+    _str = nullptr;
   };
 };
 } // namespace Darabonba_Import

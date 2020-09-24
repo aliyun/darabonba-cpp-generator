@@ -766,6 +766,7 @@ class Combinator extends CombinatorBase {
     let valType = this.emitType(gram.dataType.valType);
 
     if (gram.needCast) {
+      this.pushInclude('darabonba_core');
       emitter.emit(`${this.config.tea.converter.name}::merge(`);
     }
     items = gram.value.filter(i => !i.isExpand);
@@ -800,7 +801,7 @@ class Combinator extends CombinatorBase {
         } else {
           this.grammerValue(emitter, item, layer + 1);
         }
-        
+
         if (gram.dataType.valType instanceof TypeGeneric) {
           emitter.emit(')');
         }
@@ -826,6 +827,8 @@ class Combinator extends CombinatorBase {
         let emit = new Emitter(this.config);
         if (this.isPointerVar(item)) {
           emit.emit('*');
+          this.grammer(emit, item, false, false);
+        } else if (item.type === 'var') {
           this.grammer(emit, item, false, false);
         } else {
           emit.emit(`map<${keyType}, ${valType}>(`);
@@ -923,6 +926,7 @@ class Combinator extends CombinatorBase {
             tmp.push(`${emit.output}`);
           } else if (p instanceof GrammerValue && p.type === 'map' && p.needCast) {
             let emit = new Emitter(this.config);
+            this.pushInclude('darabonba_core');
             emit.emit(`${this.config.tea.converter.name}::mapPointer(`);
             this.grammerValue(emit, p);
             emit.emit(')');
@@ -1084,38 +1088,47 @@ class Combinator extends CombinatorBase {
 
   grammerThrows(emitter, gram) {
     this.pushInclude('throw_exception');
-    if (gram.exception === null) {
-      emitter.emit('BOOST_THROW_EXCEPTION(');
-      this.grammerValue(emitter, gram.params[0]);
-      emitter.emit(')');
-    } else {
-      if (gram.params.length > 0) {
-        emitter.emit(`BOOST_THROW_EXCEPTION(${this.emitType(gram.exception)}(`);
-        let isError = gram.exception instanceof TypeObject && gram.exception.objectName === '$Error';
-        let dataType = this.resolveDataType(gram.params[0]);
-        if (isError) {
-          emitter.emit(`${dataType}(`);
-        }
-        if (gram.params.length === 1) {
-          this.grammerValue(emitter, gram.params[0]);
-        } else {
-          let tmp = [];
-          gram.params.forEach(p => {
-            let emit = new Emitter(this.config);
-            this.grammerValue(emit, p);
-            tmp.push(emit.output);
-          });
-          emitter.emit(tmp.join(', '));
-        }
-        if (isError) {
-          emitter.emit(')'); // close map
-        }
-        emitter.emit('))');
+    emitter.emit('BOOST_THROW_EXCEPTION(');
+    // emit exception_begin
+    if (gram.exception) {
+      let isException = gram.exception instanceof TypeObject && gram.exception.objectName === '$Exception';
+      if (isException) {
+        emitter.emit('std::runtime_error(');
       } else {
-        let msg = gram.message ? `'${gram.message}'` : '';
-        emitter.emit(`BOOST_THROW_EXCEPTION(${this.emitType(gram.exception)}(${msg}))`);
+        emitter.emit(`${this.emitType(gram.exception)}(`);
       }
     }
+
+    // emit exception_body
+    if (!gram.params.length) {
+      let msg = gram.message ? `"${gram.message}"` : '';
+      emitter.emit(msg);
+    } else if (gram.params.length === 1) {
+      let isError = gram.exception instanceof TypeObject && gram.exception.objectName === '$Error';
+      if (isError) {
+        let dataType = this.resolveDataType(gram.params[0]);
+        emitter.emit(`${dataType}(`);
+        this.grammerValue(emitter, gram.params[0]);
+        emitter.emit(')');
+      } else {
+        this.grammerValue(emitter, gram.params[0]);
+      }
+    } else {
+      let tmp = [];
+      gram.params.forEach(p => {
+        let emit = new Emitter(this.config);
+        this.grammerValue(emit, p);
+        tmp.push(emit.output);
+      });
+      emitter.emit(tmp.join(', '));
+    }
+
+    // emit exception_end
+    if (gram.exception) {
+      emitter.emit(')');
+    }
+
+    emitter.emit(')'); // close BOOST_THROW_EXCEPTION
   }
 
   grammerNewObject(emitter, gram) {
@@ -1229,6 +1242,7 @@ class Combinator extends CombinatorBase {
       if (item.dataType instanceof TypeString) {
         this.grammer(emit, item, false, false);
       } else if (item.dataType instanceof TypeGeneric) {
+        this.pushInclude('darabonba_core');
         emit.emit(`${this.config.tea.converter.name}::toString(`);
         this.grammer(emit, item, false, false);
         emit.emit(')');

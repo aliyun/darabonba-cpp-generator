@@ -160,6 +160,7 @@ module.exports = {
     exceptionUnretryable: { name: 'Darabonba::UnretryableError' },
   },
   third: {
+    darabonba_core: { import: 'darabonba_core', alias: null, includeFileName: '<darabonba/core.hpp>', using: null },
     map: { import: 'map', alias: null, includeFileName: '<map>', using: null },
     iostream: { import: 'iostream', alias: null, includeFileName: '<iostream>', using: 'std' },
     vector: { import: 'vector', alias: null, includeFileName: '<vector>', using: null },
@@ -167,6 +168,6 @@ module.exports = {
     algorithm: { import: 'algorithm', alias: null, includeFileName: '<algorithm>', using: null },
     boost_any: { import: 'boost_any', alias: null, includeFileName: '<boost/any.hpp>', using: null },
     throw_exception: { import: 'throw_exception', alias: null, includeFileName: '<boost/throw_exception.hpp>', using: null },
-    cast: {import: 'boost_lexical_cast', alias: null, includeFileName: '<boost/lexical_cast.hpp>', using: null}
+    cast: { import: 'boost_lexical_cast', alias: null, includeFileName: '<boost/lexical_cast.hpp>', using: null }
   }
 };

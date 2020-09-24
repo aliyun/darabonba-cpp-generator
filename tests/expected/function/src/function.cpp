@@ -18,7 +18,7 @@ map<string, string> Darabonba_Function::Client::helloMap() {
   return Darabonba::Converter::merge(map<string, string>({
     {"key", "value"},
     {"key-1", "value-1"}
-  }), map<string, string>(m));
+  }), m);
 }
 
 vector<map<string, string>> Darabonba_Function::Client::helloArrayMap() {
@@ -33,6 +33,6 @@ void Darabonba_Function::Client::helloParams(string *a, string *b) {
 }
 
 void Darabonba_Function::Client::helloInterface() {
-  BOOST_THROW_EXCEPTION(std::exception('Un-implemented'));
+  BOOST_THROW_EXCEPTION(std::runtime_error("Un-implemented"));
 }
 

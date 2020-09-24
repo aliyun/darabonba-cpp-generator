@@ -10,5 +10,8 @@
                 "project": "pack"
             }
         }
+    },
+    "releases": {
+        "cpp": "darabonba/cpp:master"
     }
 }

@@ -1,5 +1,8 @@
 'use strict';
 
+// const mm = require('mm');
+// const expect = require('chai').expect;
+require('mocha-sinon');
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
@@ -18,7 +21,7 @@ const outputDir = path.join(__dirname, '../', 'output/tests/');
 const extCode = '.cpp';
 const extHead = '.hpp';
 
-function check(moduleName, expectedFiles = []) {
+function check(moduleName, expectedFiles = [], options = {}) {
   const mainFilePath = path.join(fixturesDir, moduleName, 'main.dara');
   const moduleOutputDir = path.join(outputDir, moduleName);
   const prefixDir = path.join(fixturesDir, moduleName);
@@ -28,7 +31,8 @@ function check(moduleName, expectedFiles = []) {
   const config = {
     outputDir: moduleOutputDir,
     pkgDir: path.join(fixturesDir, moduleName),
-    ...pkgInfo
+    ...pkgInfo,
+    ...options
   };
   const generator = new Generator(config, lang);
 
@@ -142,6 +146,30 @@ describe('C++ Generator', function () {
       'include/darabonba/package.hpp',
       'external/CMakeLists.txt',
       '.gitignore'
-    ]);
+    ], {
+      withTest: 1
+    });
+  });
+});
+
+const PackageInfo = require('../src/langs/cpp/package_info');
+const pack = new PackageInfo();
+describe('C++ Generator generate package files should ok', function () {
+  beforeEach(function () {
+    this.sinon.stub(pack, 'renderAuto');
+  });
+  it('package generateFiles', function () {
+    pack.config = {
+      dir: '',
+      packageInfo: {
+        files: {
+          'readme': {
+            tmpl: path.join(__dirname, '../README.md'),
+            path: 'README.md',
+          }
+        }
+      }
+    };
+    pack.generateFiles();
   });
 });

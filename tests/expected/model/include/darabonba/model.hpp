@@ -4,7 +4,6 @@
 #define DARABONBA_MODEL_H_
 
 #include <boost/any.hpp>
-#include <cpprest/streams.h>
 #include <darabonba/core.hpp>
 #include <iostream>
 #include <map>
@@ -45,12 +44,9 @@ public:
     return res;
   }
 
-  string *stringfield{};
+  shared_ptr<string> stringfield{};
 
-  ~MyModelSubmodel() {
-    delete stringfield;
-    stringfield = nullptr;
-  };
+  ~MyModelSubmodel() {};
 };
 class MyModelSubarraymodel : public Darabonba::Model {
 protected:
@@ -137,48 +133,21 @@ vec_subarray.push_back(boost::any(item.toMap()));
     return res;
   }
 
-  string *stringfield{};
-  vector<uint8_t> *bytesfield{};
-  vector<string> *stringarrayfield{};
-  map<string, string> *mapfield{};
-  string *name{};
-  MyModelSubmodel *submodel{};
-  vector<MyModelSubarraymodel> *subarraymodel{};
-  vector<M> *subarray{};
-  vector<map<string, boost::any>> *maparray{};
-  map<string, boost::any> *object{};
-  int *numberfield{};
-  concurrency::streams::istream *readable{};
-  M *existModel{};
+  shared_ptr<string> stringfield{};
+  shared_ptr<vector<uint8_t>> bytesfield{};
+  shared_ptr<vector<string>> stringarrayfield{};
+  shared_ptr<map<string, string>> mapfield{};
+  shared_ptr<string> name{};
+  shared_ptr<MyModelSubmodel> submodel{};
+  shared_ptr<vector<MyModelSubarraymodel>> subarraymodel{};
+  shared_ptr<vector<M>> subarray{};
+  shared_ptr<vector<map<string, boost::any>>> maparray{};
+  shared_ptr<map<string, boost::any>> object{};
+  shared_ptr<int> numberfield{};
+  shared_ptr<istream> readable{};
+  shared_ptr<M> existModel{};
 
-  ~MyModel() {
-    delete stringfield;
-    stringfield = nullptr;
-    delete bytesfield;
-    bytesfield = nullptr;
-    delete stringarrayfield;
-    stringarrayfield = nullptr;
-    delete mapfield;
-    mapfield = nullptr;
-    delete name;
-    name = nullptr;
-    delete submodel;
-    submodel = nullptr;
-    delete subarraymodel;
-    subarraymodel = nullptr;
-    delete subarray;
-    subarray = nullptr;
-    delete maparray;
-    maparray = nullptr;
-    delete object;
-    object = nullptr;
-    delete numberfield;
-    numberfield = nullptr;
-    delete readable;
-    readable = nullptr;
-    delete existModel;
-    existModel = nullptr;
-  };
+  ~MyModel() {};
 };
 class Client {
 public:

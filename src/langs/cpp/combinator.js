@@ -277,7 +277,7 @@ class Combinator extends CombinatorBase {
     object.body.forEach(node => {
       if (node instanceof PropItem) {
         // emit properties
-        emitter.emitln(`${this.emitType(node.type)} *${node.name}{};`, this.level);
+        emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${node.name}{};`, this.level);
       } else if (node instanceof AnnotationItem) {
         // emit annotation
         this.emitAnnotation(emitter, node);
@@ -323,14 +323,7 @@ class Combinator extends CombinatorBase {
     }
     let properties = object.body.filter(node => node instanceof PropItem);
     if (properties.length) {
-      emitter.emitln(`~${className}() {`, this.level);
-      this.levelUp();
-      properties.forEach(node => {
-        emitter.emitln(`delete ${node.name};`, this.level);
-        emitter.emitln(`${node.name} = nullptr;`, this.level);
-      });
-      this.levelDown();
-      emitter.emitln('};', this.level);
+      emitter.emitln(`~${className}() {};`, this.level);
     } else {
       emitter.emitln(`~${className}() {};`, this.level);
     }
@@ -436,7 +429,7 @@ class Combinator extends CombinatorBase {
   emitParams(emitter, params = []) {
     let tmp = [];
     params.forEach(param => {
-      tmp.push(`${this.emitType(param.type)} *${_avoidKeywords(param.key)}`);
+      tmp.push(`shared_ptr<${this.emitType(param.type)}> ${_avoidKeywords(param.key)}`);
       this.statements[param.key] = 'pointer';
     });
     let emit = new Emitter(this.config);
@@ -484,8 +477,8 @@ class Combinator extends CombinatorBase {
       this.pushInclude('map');
       return `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
     } else if (type instanceof TypeStream) {
-      this.pushInclude('stream');
-      return 'concurrency::streams::istream';
+      // this.pushInclude('stream');
+      return type.writable ? 'ostream' : 'istream';
     } else if (type instanceof TypeObject) {
       if (!type.objectName) {
         return 'class';
@@ -935,7 +928,7 @@ class Combinator extends CombinatorBase {
             let emit = new Emitter(this.config);
             this.grammer(emit, p, false, false);
             let dataType = this.resolveDataType(p);
-            tmp.push(`new ${dataType}(${emit.output})`);
+            tmp.push(`shared_ptr<${dataType}>(new ${dataType}(${emit.output}))`);
           } else {
             let emit = new Emitter(this.config);
             this.grammerValue(emit, p);
@@ -973,9 +966,9 @@ class Combinator extends CombinatorBase {
       emitter.emit(` ${symbol} `);
       if (this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
-        emitter.emit(`new ${dataType}(`);
+        emitter.emit(`shared_ptr<${dataType}>(new ${dataType}(`);
         this.grammer(emitter, gram.right, false, false);
-        emitter.emit(')');
+        emitter.emit('))');
       } else if (!this.isPointerVar(gram.left) && this.isPointerVar(gram.right)) {
         emitter.emit('*');
         this.grammer(emitter, gram.right, false, false);
@@ -1146,9 +1139,9 @@ class Combinator extends CombinatorBase {
         let emit = new Emitter(this.config);
         if (!this.isPointerVar(p)) {
           let dataType = this.resolveDataType(p);
-          emit.emit(`new ${dataType}(`);
+          emit.emit(`shared_ptr<${dataType}>(new ${dataType}(`);
           this.grammer(emit, p, false, false);
-          emit.emit(')');
+          emit.emit('))');
         } else {
           this.grammer(emit, p, false, false);
         }

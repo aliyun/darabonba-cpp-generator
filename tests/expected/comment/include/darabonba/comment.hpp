@@ -35,17 +35,12 @@ public:
     return res;
   }
 
-  string *test{};
+  shared_ptr<string> test{};
   // model的test back comment
-  string *test2{};
+  shared_ptr<string> test2{};
   // model的test2 back comment
 
-  ~Test1() {
-    delete test;
-    test = nullptr;
-    delete test2;
-    test2 = nullptr;
-  };
+  ~Test1() {};
 };
 class Test2 : public Darabonba::Model {
 protected:
@@ -72,16 +67,11 @@ public:
   }
 
   // model的test front comment
-  string *test{};
+  shared_ptr<string> test{};
   // model的test front comment
-  string *test2{};
+  shared_ptr<string> test2{};
 
-  ~Test2() {
-    delete test;
-    test = nullptr;
-    delete test2;
-    test2 = nullptr;
-  };
+  ~Test2() {};
 };
 class Test3 : public Darabonba::Model {
 protected:
@@ -108,33 +98,25 @@ public:
   }
 
   // model的test front comment
-  string *test{};
+  shared_ptr<string> test{};
   // empty comment1
   // empy comment2
-  string *test1{};
+  shared_ptr<string> test1{};
   // model的test back comment
 
-  ~Test3() {
-    delete test;
-    test = nullptr;
-    delete test1;
-    test1 = nullptr;
-  };
+  ~Test3() {};
 };
 class Client {
 public:
   // type's comment
-  vector<string> *_a{};
+  shared_ptr<vector<string>> _a{};
   Client();
   void testAPI();
   void testAPI2();
   static void staticFunc();
-  static void testFunc(string *str, bool *val);
+  static void testFunc(shared_ptr<string> str, shared_ptr<bool> val);
 
-  ~Client() {
-    delete _a;
-    _a = nullptr;
-  };
+  ~Client() {};
 };
 } // namespace Darabonba_Comment
 

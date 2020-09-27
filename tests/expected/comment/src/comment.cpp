@@ -15,12 +15,12 @@ Darabonba_Comment::Client::Client() {
   // string declate comment
   string str = "sss";
   // new model instance comment
-  Test1 modelInstance = Test1(new map<string, string>({
+  Test1 modelInstance = Test1(shared_ptr<map<string, string>>(new map<string, string>({
     {"test", "test"},
     // test declare back comment
     {"test2", "test2"},
     // test2 declare back comment
-  }));
+  })));
   vector<boost::any> array = vector<boost::any>({
     // array string comment
     "string",
@@ -38,23 +38,23 @@ void Darabonba_Comment::Client::testAPI() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(new boost::any(runtime_["retry"]), new int(_retryTimes), new int(_now))) {
+  while (Darabonba::Core::allowRetry(shared_ptr<boost::any>(new boost::any(runtime_["retry"])), shared_ptr<int>(new int(_retryTimes)), shared_ptr<int>(new int(_now)))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(new boost::any(runtime_["backoff"]), new int(_retryTimes));
+      int _backoffTime = Darabonba::Core::getBackoffTime(shared_ptr<boost::any>(new boost::any(runtime_["backoff"])), shared_ptr<int>(new int(_retryTimes)));
       if (_backoffTime > 0) {
-        Darabonba::Core::sleep(new int(_backoffTime));
+        Darabonba::Core::sleep(shared_ptr<int>(new int(_backoffTime)));
       }
     }
     _retryTimes = _retryTimes + 1;
     try {
       Darabonba::Request request_ = Darabonba::Request();
       // new model instance comment
-      Test1 modelInstance = Test1(new map<string, string>({
+      Test1 modelInstance = Test1(shared_ptr<map<string, string>>(new map<string, string>({
         // test declare front comment
         {"test", "test"},
         // test2 declare front comment
         {"test2", "test2"}
-      }));
+      })));
       // number declare comment
       int num = 123;
       // static function call comment
@@ -62,7 +62,7 @@ void Darabonba_Comment::Client::testAPI() {
       _lastRequest = request_;
       Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
       // static async function call
-      Client::testFunc(new string("test"), new bool(true));
+      Client::testFunc(shared_ptr<string>(new string("test")), shared_ptr<bool>(new bool(true)));
       // return comment
       return;
     }
@@ -88,20 +88,20 @@ void Darabonba_Comment::Client::testAPI2() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(new boost::any(runtime_["retry"]), new int(_retryTimes), new int(_now))) {
+  while (Darabonba::Core::allowRetry(shared_ptr<boost::any>(new boost::any(runtime_["retry"])), shared_ptr<int>(new int(_retryTimes)), shared_ptr<int>(new int(_now)))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(new boost::any(runtime_["backoff"]), new int(_retryTimes));
+      int _backoffTime = Darabonba::Core::getBackoffTime(shared_ptr<boost::any>(new boost::any(runtime_["backoff"])), shared_ptr<int>(new int(_retryTimes)));
       if (_backoffTime > 0) {
-        Darabonba::Core::sleep(new int(_backoffTime));
+        Darabonba::Core::sleep(shared_ptr<int>(new int(_backoffTime)));
       }
     }
     _retryTimes = _retryTimes + 1;
     try {
       Darabonba::Request request_ = Darabonba::Request();
       // new model instance comment
-      Test3 modelInstance = Test3(new map<string, boost::any>({
+      Test3 modelInstance = Test3(shared_ptr<map<string, boost::any>>(new map<string, boost::any>({
         // empty model
-      }));
+      })));
       // boolean declare comment
       bool bool_ = true;
       if (bool_) {
@@ -134,7 +134,7 @@ void Darabonba_Comment::Client::staticFunc() {
   });
 }
 
-void Darabonba_Comment::Client::testFunc(string *str, bool *val) {
+void Darabonba_Comment::Client::testFunc(shared_ptr<string> str, shared_ptr<bool> val) {
   // empty comment1
   // empty comment2
 }

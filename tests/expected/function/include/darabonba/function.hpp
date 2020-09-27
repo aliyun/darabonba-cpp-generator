@@ -15,7 +15,7 @@ public:
   static void hello();
   static map<string, string> helloMap();
   static vector<map<string, string>> helloArrayMap();
-  static void helloParams(string *a, string *b);
+  static void helloParams(shared_ptr<string> a, shared_ptr<string> b);
   static void helloInterface();
 
   Client() {};

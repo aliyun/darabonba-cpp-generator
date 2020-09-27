@@ -29,24 +29,18 @@ public:
     return res;
   }
 
-  string *test{};
+  shared_ptr<string> test{};
 
-  ~Test() {
-    delete test;
-    test = nullptr;
-  };
+  ~Test() {};
 };
 class Client {
 public:
-  string *_a{};
+  shared_ptr<string> _a{};
   Client();
   void testAPI();
   static void testFunc();
 
-  ~Client() {
-    delete _a;
-    _a = nullptr;
-  };
+  ~Client() {};
 };
 } // namespace Darabonba_Annotation
 

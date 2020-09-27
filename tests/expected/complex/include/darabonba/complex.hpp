@@ -4,7 +4,6 @@
 #define DARABONBA_COMPLEX_H_
 
 #include <boost/any.hpp>
-#include <cpprest/streams.h>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
@@ -35,12 +34,9 @@ public:
     return res;
   }
 
-  string *content{};
+  shared_ptr<string> content{};
 
-  ~ComplexRequestHeader() {
-    delete content;
-    content = nullptr;
-  };
+  ~ComplexRequestHeader() {};
 };
 class ComplexRequestConfigs : public Darabonba::Model {
 protected:
@@ -65,18 +61,11 @@ public:
     return res;
   }
 
-  string *key{};
-  vector<string> *value{};
-  map<string, string> *extra{};
+  shared_ptr<string> key{};
+  shared_ptr<vector<string>> value{};
+  shared_ptr<map<string, string>> extra{};
 
-  ~ComplexRequestConfigs() {
-    delete key;
-    key = nullptr;
-    delete value;
-    value = nullptr;
-    delete extra;
-    extra = nullptr;
-  };
+  ~ComplexRequestConfigs() {};
 };
 class ComplexRequestPart : public Darabonba::Model {
 protected:
@@ -98,12 +87,9 @@ public:
     return res;
   }
 
-  string *partNumber{};
+  shared_ptr<string> partNumber{};
 
-  ~ComplexRequestPart() {
-    delete partNumber;
-    partNumber = nullptr;
-  };
+  ~ComplexRequestPart() {};
 };
 class ComplexRequest : public Darabonba::Model {
 protected:
@@ -153,63 +139,45 @@ vec_part.push_back(boost::any(item.toMap()));
     return res;
   }
 
-  string *accessKey{};
-  concurrency::streams::istream *body{};
-  vector<string> *strs{};
-  ComplexRequestHeader *header{};
-  int *Num{};
-  ComplexRequestConfigs *configs{};
-  vector<ComplexRequestPart> *part{};
+  shared_ptr<string> accessKey{};
+  shared_ptr<istream> body{};
+  shared_ptr<vector<string>> strs{};
+  shared_ptr<ComplexRequestHeader> header{};
+  shared_ptr<int> Num{};
+  shared_ptr<ComplexRequestConfigs> configs{};
+  shared_ptr<vector<ComplexRequestPart>> part{};
 
-  ~ComplexRequest() {
-    delete accessKey;
-    accessKey = nullptr;
-    delete body;
-    body = nullptr;
-    delete strs;
-    strs = nullptr;
-    delete header;
-    header = nullptr;
-    delete Num;
-    Num = nullptr;
-    delete configs;
-    configs = nullptr;
-    delete part;
-    part = nullptr;
-  };
+  ~ComplexRequest() {};
 };
 class Client : Darabonba_Import::Client {
 public:
-  vector<Darabonba_Source::Config> *_configs{};
-  explicit Client(Darabonba_Source::Config *config): Darabonba_Import::Client(Darabonba_Source::Config *config);
-  Darabonba_Source::RuntimeObject complex1(ComplexRequest *request, Darabonba_Import::Client *client);
-  map<string, boost::any> Complex2(ComplexRequest *request, vector<string> *str, map<string, string> *val);
-  ComplexRequest Complex3(ComplexRequest *request);
-  vector<string> hello(map<string, boost::any> *request, vector<string> *strs);
-  static Darabonba_Source::Request print(Darabonba::Request *reqeust,
-                                         vector<ComplexRequest> *reqs,
-                                         Darabonba::Response *response,
-                                         map<string, string> *val);
-  static vector<boost::any> array0(map<string, boost::any> *req);
+  shared_ptr<vector<Darabonba_Source::Config>> _configs{};
+  explicit Client(shared_ptr<Darabonba_Source::Config> config): Darabonba_Import::Client(shared_ptr<Darabonba_Source::Config> config);
+  Darabonba_Source::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
+  map<string, boost::any> Complex2(shared_ptr<ComplexRequest> request, shared_ptr<vector<string>> str, shared_ptr<map<string, string>> val);
+  ComplexRequest Complex3(shared_ptr<ComplexRequest> request);
+  vector<string> hello(shared_ptr<map<string, boost::any>> request, shared_ptr<vector<string>> strs);
+  static Darabonba_Source::Request print(shared_ptr<Darabonba::Request> reqeust,
+                                         shared_ptr<vector<ComplexRequest>> reqs,
+                                         shared_ptr<Darabonba::Response> response,
+                                         shared_ptr<map<string, string>> val);
+  static vector<boost::any> array0(shared_ptr<map<string, boost::any>> req);
   static vector<string> array1();
   static string arrayAccess();
   static string arrayAccess2();
-  static string arrayAccess3(ComplexRequest *request);
-  static vector<string> arrayAssign(string *config);
-  static vector<string> arrayAssign2(string *config);
-  static void arrayAssign3(ComplexRequest *request, string *config);
-  static string mapAccess(ComplexRequest *request);
-  static string mapAccess2(Darabonba_Source::Request *request);
+  static string arrayAccess3(shared_ptr<ComplexRequest> request);
+  static vector<string> arrayAssign(shared_ptr<string> config);
+  static vector<string> arrayAssign2(shared_ptr<string> config);
+  static void arrayAssign3(shared_ptr<ComplexRequest> request, shared_ptr<string> config);
+  static string mapAccess(shared_ptr<ComplexRequest> request);
+  static string mapAccess2(shared_ptr<Darabonba_Source::Request> request);
   static string mapAccess3();
-  static void mapAssign(ComplexRequest *request, string *name);
+  static void mapAssign(shared_ptr<ComplexRequest> request, shared_ptr<string> name);
   string TemplateString();
   void emptyModel();
   void tryCatch();
 
-  ~Client() {
-    delete _configs;
-    _configs = nullptr;
-  };
+  ~Client() {};
 };
 } // namespace Darabonba_Complex
 

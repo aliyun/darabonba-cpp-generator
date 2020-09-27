@@ -29,7 +29,7 @@ vector<map<string, string>> Darabonba_Function::Client::helloArrayMap() {
   });
 }
 
-void Darabonba_Function::Client::helloParams(string *a, string *b) {
+void Darabonba_Function::Client::helloParams(shared_ptr<string> a, shared_ptr<string> b) {
 }
 
 void Darabonba_Function::Client::helloInterface() {

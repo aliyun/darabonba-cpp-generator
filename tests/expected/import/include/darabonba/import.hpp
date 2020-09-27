@@ -12,17 +12,12 @@ using namespace std;
 namespace Darabonba_Import {
 class Client {
 public:
-  vector<string> *_id{};
-  string *_str{};
-  explicit Client(vector<string> *id, string *str);
-  static void Sample(Darabonba_Source::Client *client);
+  shared_ptr<vector<string>> _id{};
+  shared_ptr<string> _str{};
+  explicit Client(shared_ptr<vector<string>> id, shared_ptr<string> str);
+  static void Sample(shared_ptr<Darabonba_Source::Client> client);
 
-  ~Client() {
-    delete _id;
-    _id = nullptr;
-    delete _str;
-    _str = nullptr;
-  };
+  ~Client() {};
 };
 } // namespace Darabonba_Import
 

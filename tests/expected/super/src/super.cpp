@@ -4,4 +4,4 @@
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
 
-Darabonba_Super::Client::Client(Darabonba_Source::Config *config) : Darabonba_Import::Client(config) {};
+Darabonba_Super::Client::Client(shared_ptr<Darabonba_Source::Config> config) : Darabonba_Import::Client(config) {};

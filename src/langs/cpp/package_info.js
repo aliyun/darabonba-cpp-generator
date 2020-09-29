@@ -3,7 +3,7 @@
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-// const debug = require('../../lib/debug');
+const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
 const { _toSnakeCase, _upperFirst, _avoidKeywords } = require('../../lib/helper');
 
@@ -35,7 +35,20 @@ class PackageInfo extends BasePackageInfo {
     let git_link = '';
     let git_tag = 'master';
     const package_name = `${_toSnakeCase(config.scope)}_${_toSnakeCase(config.name)}`;
-    const package_info = config.packageInfo ? config.packageInfo : config.cpp.packageInfo;
+    let package_info;
+    if (config.packageInfo) {
+      package_info = config.packageInfo;
+    } else if (config.cpp && config.cpp.packageInfo) {
+      package_info = config.cpp.packageInfo;
+    } else {
+      debug.warning(config.name +' haven\'t define Darafile.cpp.packageInfo, use default instead.');
+      package_info = {
+        'git': {
+          'scope': 'darabonba',
+          'project': 'project'
+        }
+      };
+    }
     if (package_info.git && package_info.git.scope) {
       if (package_info.git.scope) {
         git_scope = package_info.git.scope;

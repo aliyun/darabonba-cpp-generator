@@ -31,7 +31,7 @@ void Darabonba_Annotation::Client::testAPI() {
       return;
     }
     catch (std::exception &e) {
-      if (Darabonba::Core::isRetryable(&e)) {
+      if (Darabonba::Core::isRetryable(e)) {
         _lastException = e;
         continue;
       }

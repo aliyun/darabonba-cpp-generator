@@ -899,7 +899,10 @@ class Combinator extends CombinatorBase {
       let params = '';
       if (gram.params.length > 0) {
         let tmp = [];
-        let ignoreMethod = ['isUnset', 'empty'];
+        let ignoreMethod = [
+          'isUnset',
+          // 'empty'
+        ];
         gram.params.forEach(p => {
           if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && gram.path[1].name === 'isUnset') {
             let emit = new Emitter(this.config);
@@ -914,7 +917,6 @@ class Combinator extends CombinatorBase {
             tmp.push(emit.output);
           } else if (p instanceof GrammerVar && p.type.objectName === '$Exception') {
             let emit = new Emitter(this.config);
-            emit.emit('&');
             this.grammer(emit, p, false, false);
             tmp.push(`${emit.output}`);
           } else if (p instanceof GrammerValue && p.type === 'map' && p.needCast) {

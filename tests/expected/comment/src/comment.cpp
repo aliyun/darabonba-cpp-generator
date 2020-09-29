@@ -67,7 +67,7 @@ void Darabonba_Comment::Client::testAPI() {
       return;
     }
     catch (std::exception &e) {
-      if (Darabonba::Core::isRetryable(&e)) {
+      if (Darabonba::Core::isRetryable(e)) {
         _lastException = e;
         continue;
       }
@@ -118,7 +118,7 @@ void Darabonba_Comment::Client::testAPI2() {
       // back comment
     }
     catch (std::exception &e) {
-      if (Darabonba::Core::isRetryable(&e)) {
+      if (Darabonba::Core::isRetryable(e)) {
         _lastException = e;
         continue;
       }

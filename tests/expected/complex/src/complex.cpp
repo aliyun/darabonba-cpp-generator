@@ -71,7 +71,7 @@ Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
       return behavior.expected::fromMap(map<string, boost::any>());
     }
     catch (std::exception &e) {
-      if (Darabonba::Core::isRetryable(&e)) {
+      if (Darabonba::Core::isRetryable(e)) {
         _lastException = e;
         continue;
       }

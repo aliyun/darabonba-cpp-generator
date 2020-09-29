@@ -48,7 +48,7 @@ void Darabonba_Api::Client::helloRuntime() {
       return;
     }
     catch (std::exception &e) {
-      if (Darabonba::Core::isRetryable(&e)) {
+      if (Darabonba::Core::isRetryable(e)) {
         _lastException = e;
         continue;
       }

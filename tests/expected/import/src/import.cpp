@@ -26,6 +26,6 @@ void Darabonba_Import::Client::Sample(shared_ptr<Darabonba_Source::Client> clien
     {"accesskey", "accesskey"},
     {"region", "region"}
   })));
-  client->print(shared_ptr<Darabonba_Source::RuntimeObject>(new Darabonba_Source::RuntimeObject(runtime)));
+  client->print(make_shared<Darabonba_Source::RuntimeObject>(runtime));
 }
 

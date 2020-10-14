@@ -127,7 +127,7 @@ class Combinator extends CombinatorBase {
   combine(objects = []) {
     if (this.config.packageInfo) {
       const packageInfo = new PackageInfo(this.config);
-      packageInfo.emit(this.thirdPackageDaraMeta);
+      packageInfo.emit(this.thirdPackageDaraMeta, objects);
     }
     this.combineHead(objects);
     this.combineCode(objects);
@@ -355,6 +355,85 @@ class Combinator extends CombinatorBase {
     this.emitFromMap(emitter, className, props, notes);
   }
 
+  emitToMapProp(emitter, prefix = 'res', prop, layer = 1) {
+    let var_name = '';
+    if (prop.name.indexOf('.second') < 0) {
+      var_name = `*${prop.name}`;
+      emitter.emitln(`if (${prop.name}) {`, this.level);
+      this.levelUp();
+    } else {
+      var_name = prop.name;
+    }
+    const self = this;
+    let needRecur = function (prop_type) {
+      if (typeof prop_type === 'undefined') {
+        return false;
+      }
+      let itemType = prop_type.itemType ? prop_type.itemType : prop_type.valType;
+      if (typeof itemType === 'undefined') {
+        return false;
+      }
+      if (itemType instanceof TypeArray || itemType instanceof TypeMap) {
+        return needRecur(itemType);
+      }
+      if (itemType instanceof TypeObject && !self.isClient(itemType)) {
+        return true;
+      }
+      return false;
+    };
+    if (needRecur(prop.type)) {
+      // item type is array or map
+      const p = new PropItem();
+      p.type = prop.type instanceof TypeArray ? prop.type.itemType : prop.type.valType;
+      let pre = '';
+      let temp = '';
+      if (prop.type instanceof TypeArray) {
+        emitter.emitln(`int n${layer} = 0;`, this.level);
+        p.name = `item${layer}.second`;
+        temp = `temp${layer}`;
+        pre = `${temp}[n${layer}]`;
+      } else {
+        p.name = `item${layer}.second`;
+        pre = `${temp}[item${layer}.first]`;
+        temp = `temp${layer}`;
+      }
+      emitter.emitln(`${this.emitType(p.type)} ${temp};`, this.level);
+      emitter.emitln(`for(auto item${layer}:${var_name}){`, this.level);
+      this.levelUp();
+      this.emitToMapProp(emitter, pre, p, layer + 1);
+      if (prop.type instanceof TypeArray) {
+        emitter.emitln('n++;', this.level);
+      }
+      this.levelDown();
+      emitter.emitln('}', this.level);
+      if (prop.type instanceof TypeArray) {
+        emitter.emitln(`${prefix} = ${temp};`, this.level);
+      } else {
+        emitter.emitln(`${prefix} = ${temp};`, this.level);
+      }
+    } else if (prop.type instanceof TypeArray || prop.type instanceof TypeMap) {
+      // item type is base type
+      emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
+    } else if (prop.type instanceof TypeObject) {
+      // type is model
+      if (!this.isClient(prop)) {
+        // is not client
+        emitter.emitln(`${prefix} = ${prop.name} ? boost::any(${prop.name}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
+      } else {
+        debug.warning('sub item type is client : ' + prefix);
+      }
+    } else if (prop.type instanceof TypeBase || prop.type instanceof TypeStream) {
+      // is base type
+      emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
+    } else {
+      debug.stack(prop);
+    }
+    if (prop.name.indexOf('.second') < 0) { 
+      this.levelDown();
+      emitter.emitln('}', this.level);
+    } 
+  }
+
   emitToMap(emitter, props, notes) {
     let nameMap = {};
     if (notes['name']) {
@@ -370,51 +449,7 @@ class Combinator extends CombinatorBase {
     emitter.emitln('map<string, boost::any> res;', this.level);
     props.forEach(prop => {
       let name = typeof nameMap[prop.name] !== 'undefined' ? nameMap[prop.name] : prop.name;
-      emitter.emitln(`if (nullptr != ${prop.name}) {`, this.level);
-      this.levelUp();
-      if (prop.type instanceof TypeArray && !(prop.type instanceof TypeBytes)) {
-        if (prop.type.itemType instanceof TypeBase || prop.type.itemType instanceof TypeStream) {
-          emitter.emitln(`res["${name}"] = boost::any(*${prop.name});`, this.level);
-        } else {
-          emitter.emitln(`res["${name}"] = boost::any(vector<boost::any>({}));`, this.level);
-          emitter.emitln(`if(nullptr != ${prop.name}){`, this.level);
-          this.levelUp();
-          emitter.emitln(`vector<boost::any> vec_${prop.name} = boost::any_cast<vector<boost::any>>(res["${name}"])`);
-          emitter.emitln(`for(auto item:*${prop.name}){`, this.level);
-          this.levelUp();
-          emitter.emitln(`vec_${prop.name}.push_back(boost::any(item.toMap()));`);
-          this.levelDown();
-          emitter.emitln('}', this.level);
-          emitter.emitln(`res["${name}"] = vec_${prop.name};`, this.level);
-          this.levelDown();
-          emitter.emitln('}', this.level);
-        }
-      } else if (prop.type instanceof TypeMap) {
-        if (prop.type.valType instanceof TypeBase || prop.type.itemType instanceof TypeStream) {
-          emitter.emitln(`res["${name}"] = boost::any(*${prop.name});`, this.level);
-        } else {
-          emitter.emitln(`res["${name}"] = boost::any(map<string, boost::any>({}));`, this.level);
-          emitter.emitln(`if(nullptr != ${prop.name}){`, this.level);
-          this.levelUp();
-          emitter.emitln(`map<string, boost::any> map_${prop.name} = boost::any_cast<map<string, boost::any>>(res["${name}"])`);
-          emitter.emitln(`for(auto item:*${prop.name}){`, this.level);
-          this.levelUp();
-          emitter.emitln(`map_${prop.name}[item.first] = boost::any(item.second.toMap());`, this.level);
-          this.levelDown();
-          emitter.emitln('}', this.level);
-          emitter.emitln(`res["${name}"] = map_${prop.name};`, this.level);
-          this.levelDown();
-          emitter.emitln('}', this.level);
-        }
-      } else if (prop.type instanceof TypeBase || prop.type instanceof TypeBytes || prop.type instanceof TypeStream) {
-        emitter.emitln(`res["${name}"] = boost::any(*${prop.name});`, this.level);
-      } else if (this.isClient(prop)) {
-        // emitter.emitln(`res["${name}"] = boost::any(*${prop.name});`, this.level);
-      } else {
-        emitter.emitln(`res["${name}"] = nullptr != ${prop.name} ? boost::any(${prop.name}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
-      }
-      this.levelDown();
-      emitter.emitln('}', this.level);
+      this.emitToMapProp(emitter, `res["${name}"]`, prop);
     });
     emitter.emitln('return res;', this.level);
     this.levelDown();
@@ -477,8 +512,7 @@ class Combinator extends CombinatorBase {
       this.pushInclude('map');
       return `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
     } else if (type instanceof TypeStream) {
-      // this.pushInclude('stream');
-      return type.writable ? 'ostream' : 'istream';
+      return 'Darabonba::Stream';
     } else if (type instanceof TypeObject) {
       if (!type.objectName) {
         return 'class';
@@ -615,7 +649,7 @@ class Combinator extends CombinatorBase {
   /**************************************** analyze ****************************************/
 
   isClient(prop) {
-    let client_name = prop.type.objectName;
+    let client_name = prop.objectName ? prop.objectName : prop.type.objectName;
     if (client_name.indexOf('Client') < 0) {
       return false;
     }
@@ -930,7 +964,7 @@ class Combinator extends CombinatorBase {
             let emit = new Emitter(this.config);
             this.grammer(emit, p, false, false);
             let dataType = this.resolveDataType(p);
-            tmp.push(`shared_ptr<${dataType}>(new ${dataType}(${emit.output}))`);
+            tmp.push(`make_shared<${dataType}>(${emit.output})`);
           } else {
             let emit = new Emitter(this.config);
             this.grammerValue(emit, p);
@@ -966,6 +1000,14 @@ class Combinator extends CombinatorBase {
         return;
       }
       emitter.emit(` ${symbol} `);
+      let toStream = false;
+      if (gram.left instanceof GrammerValue && gram.left.type === 'call' && gram.left.value.path[1].name === 'body') {
+        const k = gram.left.value.path.map(item => item.name).join('.');
+        toStream = k === '__request.body' && gram.right.dataType instanceof TypeString;
+      }
+      if (toStream) {
+        emitter.emit(`${this.config.tea.converter.name}::toStream(`);
+      }
       if (this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
         emitter.emit(`shared_ptr<${dataType}>(new ${dataType}(`);
@@ -978,6 +1020,9 @@ class Combinator extends CombinatorBase {
         this.grammer(emitter, gram.right, false, false);
       } else {
         this.grammer(emitter, gram.right, false, false);
+      }
+      if (toStream) {
+        emitter.emit(')');
       }
     } else {
       emitter.emit(` ${symbol} `);

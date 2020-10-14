@@ -23,7 +23,7 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != test) {
+    if (test) {
       res["test"] = boost::any(*test);
     }
     return res;

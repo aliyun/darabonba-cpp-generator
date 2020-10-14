@@ -28,7 +28,7 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != content) {
+    if (content) {
       res["Content"] = boost::any(*content);
     }
     return res;
@@ -49,13 +49,13 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != key) {
+    if (key) {
       res["key"] = boost::any(*key);
     }
-    if (nullptr != value) {
+    if (value) {
       res["value"] = boost::any(*value);
     }
-    if (nullptr != extra) {
+    if (extra) {
       res["extra"] = boost::any(*extra);
     }
     return res;
@@ -81,7 +81,7 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != partNumber) {
+    if (partNumber) {
       res["PartNumber"] = boost::any(*partNumber);
     }
     return res;
@@ -108,39 +108,38 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != accessKey) {
+    if (accessKey) {
       res["accessKey"] = boost::any(*accessKey);
     }
-    if (nullptr != body) {
+    if (body) {
       res["Body"] = boost::any(*body);
     }
-    if (nullptr != strs) {
+    if (strs) {
       res["Strs"] = boost::any(*strs);
     }
-    if (nullptr != header) {
-      res["header"] = nullptr != header ? boost::any(header->toMap()) : boost::any(map<string,boost::any>({}));
+    if (header) {
+      res["header"] = header ? boost::any(header->toMap()) : boost::any(map<string,boost::any>({}));
     }
-    if (nullptr != Num) {
+    if (Num) {
       res["Num"] = boost::any(*Num);
     }
-    if (nullptr != configs) {
-      res["configs"] = nullptr != configs ? boost::any(configs->toMap()) : boost::any(map<string,boost::any>({}));
+    if (configs) {
+      res["configs"] = configs ? boost::any(configs->toMap()) : boost::any(map<string,boost::any>({}));
     }
-    if (nullptr != part) {
-      res["Part"] = boost::any(vector<boost::any>({}));
-      if(nullptr != part){
-vector<boost::any> vec_part = boost::any_cast<vector<boost::any>>(res["Part"])
-        for(auto item:*part){
-vec_part.push_back(boost::any(item.toMap()));
-        }
-        res["Part"] = vec_part;
+    if (part) {
+      int n1 = 0;
+      ComplexRequestPart temp1;
+      for(auto item1:*part){
+        temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        n++;
       }
+      res["Part"] = temp1;
     }
     return res;
   }
 
   shared_ptr<string> accessKey{};
-  shared_ptr<istream> body{};
+  shared_ptr<Darabonba::Stream> body{};
   shared_ptr<vector<string>> strs{};
   shared_ptr<ComplexRequestHeader> header{};
   shared_ptr<int> Num{};

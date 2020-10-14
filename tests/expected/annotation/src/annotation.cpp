@@ -16,11 +16,11 @@ void Darabonba_Annotation::Client::testAPI() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(shared_ptr<boost::any>(new boost::any(runtime_["retry"])), shared_ptr<int>(new int(_retryTimes)), shared_ptr<int>(new int(_now)))) {
+  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_["retry"]), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(shared_ptr<boost::any>(new boost::any(runtime_["backoff"])), shared_ptr<int>(new int(_retryTimes)));
+      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_["backoff"]), make_shared<int>(_retryTimes));
       if (_backoffTime > 0) {
-        Darabonba::Core::sleep(shared_ptr<int>(new int(_backoffTime)));
+        Darabonba::Core::sleep(make_shared<int>(_backoffTime));
       }
     }
     _retryTimes = _retryTimes + 1;

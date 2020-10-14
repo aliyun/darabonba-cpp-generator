@@ -26,10 +26,10 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != test) {
+    if (test) {
       res["test"] = boost::any(*test);
     }
-    if (nullptr != test2) {
+    if (test2) {
       res["test2"] = boost::any(*test2);
     }
     return res;
@@ -57,10 +57,10 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != test) {
+    if (test) {
       res["test"] = boost::any(*test);
     }
-    if (nullptr != test2) {
+    if (test2) {
       res["test2"] = boost::any(*test2);
     }
     return res;
@@ -88,10 +88,10 @@ public:
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
-    if (nullptr != test) {
+    if (test) {
       res["test"] = boost::any(*test);
     }
-    if (nullptr != test1) {
+    if (test1) {
       res["test1"] = boost::any(*test1);
     }
     return res;

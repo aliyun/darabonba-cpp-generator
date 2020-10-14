@@ -6,12 +6,16 @@ const fs = require('fs');
 const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
 const { _toSnakeCase, _upperFirst, _avoidKeywords } = require('../../lib/helper');
+const Emitter = require('../../lib/emitter');
+const { FuncItem } = require('../common/items');
 
 class PackageInfo extends BasePackageInfo {
-  emit(requirePackage) {
+  emit(requirePackage, objects) {
     this.requirePackage = requirePackage;
     this.project_name = `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`;
     this.imports = [];
+    const [object] = objects.filter(obj => obj.type === 'client');
+    this.client = object;
 
     // generate external
     this.generateExternal();
@@ -41,7 +45,7 @@ class PackageInfo extends BasePackageInfo {
     } else if (config.cpp && config.cpp.packageInfo) {
       package_info = config.cpp.packageInfo;
     } else {
-      debug.warning(config.name +' haven\'t define Darafile.cpp.packageInfo, use default instead.');
+      debug.warning(config.name + ' haven\'t define Darafile.cpp.packageInfo, use default instead.');
       package_info = {
         'git': {
           'scope': 'darabonba',
@@ -93,6 +97,19 @@ class PackageInfo extends BasePackageInfo {
     );
   }
 
+  renderTestCode() {
+    const emitter = new Emitter(this.config);
+    const funcs = this.client.body.filter(item => item instanceof FuncItem);
+    funcs.forEach(func => {
+      emitter.emitln();
+      emitter.emitln(`TEST(tests_${this.client.name}, test_${func.name})`);
+      emitter.emitln('{');
+      emitter.emitln();
+      emitter.emitln('}');
+    });
+    return emitter.output;
+  }
+
   generateMainFiles() {
     let param_scope = _toSnakeCase(this.config.scope);
     let param_package = _avoidKeywords(_toSnakeCase(this.config.name));
@@ -102,7 +119,9 @@ class PackageInfo extends BasePackageInfo {
       if (!fs.existsSync(tests_main_path)) {
         this.renderAuto(
           path.join(__dirname, './files/main/tests.main.cpp.tmpl'),
-          tests_main_path, {}
+          tests_main_path, {
+            test_code: this.renderTestCode()
+          }
         );
       }
       template = this.render(template, {

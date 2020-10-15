@@ -49,6 +49,7 @@ const {
   TypeBase,
 
   BehaviorToMap,
+  TypeTree,
 } = require('../common/items');
 
 const assert = require('assert');
@@ -366,14 +367,14 @@ class Combinator extends CombinatorBase {
     }
     const self = this;
     let needRecur = function (prop_type) {
-      if (typeof prop_type === 'undefined') {
+      if (typeof prop_type === 'undefined' || !(prop_type instanceof TypeTree)) {
         return false;
       }
       let itemType = prop_type.itemType ? prop_type.itemType : prop_type.valType;
       if (typeof itemType === 'undefined') {
         return false;
       }
-      if (itemType instanceof TypeArray || itemType instanceof TypeMap) {
+      if (itemType instanceof TypeTree) {
         return needRecur(itemType);
       }
       if (itemType instanceof TypeObject && !self.isClient(itemType)) {
@@ -394,10 +395,10 @@ class Combinator extends CombinatorBase {
         pre = `${temp}[n${layer}]`;
       } else {
         p.name = `item${layer}.second`;
-        pre = `${temp}[item${layer}.first]`;
         temp = `temp${layer}`;
+        pre = `${temp}[item${layer}.first]`;
       }
-      emitter.emitln(`${this.emitType(p.type)} ${temp};`, this.level);
+      emitter.emitln(`${this.emitType(prop.type)} ${temp};`, this.level);
       emitter.emitln(`for(auto item${layer}:${var_name}){`, this.level);
       this.levelUp();
       this.emitToMapProp(emitter, pre, p, layer + 1);
@@ -411,7 +412,7 @@ class Combinator extends CombinatorBase {
       } else {
         emitter.emitln(`${prefix} = ${temp};`, this.level);
       }
-    } else if (prop.type instanceof TypeArray || prop.type instanceof TypeMap) {
+    } else if (prop.type instanceof TypeTree) {
       // item type is base type
       emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
     } else if (prop.type instanceof TypeObject) {

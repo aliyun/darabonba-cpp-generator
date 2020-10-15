@@ -20,13 +20,18 @@ public:
   Test() {_init();};
   explicit Test(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (test) {
       res["test"] = boost::any(*test);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("test") != m.end()) {
+      test = boost::any_cast<string>(m["test"]);
+    }
   }
 
   shared_ptr<string> test{};

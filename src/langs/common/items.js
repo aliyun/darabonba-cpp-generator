@@ -107,7 +107,7 @@ class TypeBytes extends TypeTree {
   }
 }
 
-class TypeMap extends TypeBase {
+class TypeMap extends TypeTree {
   constructor(keyType, valType) {
     super();
     assert.strictEqual(true, keyType instanceof TypeItem);
@@ -124,7 +124,7 @@ class TypeObject extends TypeItem {
   }
 }
 
-class TypeStream extends TypeItem {
+class TypeStream extends TypeBase {
   constructor(writable = null) {
     super();
     this.writable = writable;

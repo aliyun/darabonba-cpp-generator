@@ -134,22 +134,14 @@ public:
       res["submodel"] = submodel ? boost::any(submodel->toMap()) : boost::any(map<string,boost::any>({}));
     }
     if (submodelMap) {
-      MyModelSubmodel temp1;
-      for(auto item1:*submodelMap){
-        [item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-      }
-      res["submodelMap"] = temp1;
+      res["submodelMap"] = boost::any(*submodelMap);
     }
     if (mapModel) {
-      M temp1;
-      for(auto item1:*mapModel){
-        [item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-      }
-      res["mapModel"] = temp1;
+      res["mapModel"] = boost::any(*mapModel);
     }
     if (subarraymodel) {
       int n1 = 0;
-      MyModelSubarraymodel temp1;
+      vector<MyModelSubarraymodel> temp1;
       for(auto item1:*subarraymodel){
         temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
         n++;
@@ -158,7 +150,7 @@ public:
     }
     if (subarray) {
       int n1 = 0;
-      M temp1;
+      vector<M> temp1;
       for(auto item1:*subarray){
         temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
         n++;
@@ -169,25 +161,13 @@ public:
       res["maparray"] = boost::any(*maparray);
     }
     if (moduleModelMap) {
-      Darabonba_Source::Request temp1;
-      for(auto item1:*moduleModelMap){
-        [item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-      }
-      res["moduleModelMap"] = temp1;
+      res["moduleModelMap"] = boost::any(*moduleModelMap);
     }
     if (subModelMap) {
-      MSubM temp1;
-      for(auto item1:*subModelMap){
-        [item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-      }
-      res["subModelMap"] = temp1;
+      res["subModelMap"] = boost::any(*subModelMap);
     }
     if (modelMap) {
-      M temp1;
-      for(auto item1:*modelMap){
-        [item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-      }
-      res["modelMap"] = temp1;
+      res["modelMap"] = boost::any(*modelMap);
     }
     if (moduleMap) {
       res["moduleMap"] = boost::any(*moduleMap);
@@ -211,17 +191,7 @@ public:
       res["complexList"] = boost::any(*complexList);
     }
     if (complexMap) {
-      int n1 = 0;
-      map<string, MyModelSubmodel> temp1;
-      for(auto item1:*complexMap){
-        MyModelSubmodel temp2;
-        for(auto item2:item1.second){
-          [item2.first] = item2.second ? boost::any(item2.second->toMap()) : boost::any(map<string,boost::any>({}));
-        }
-        temp1[n1] = temp2;
-        n++;
-      }
-      res["complexMap"] = temp1;
+      res["complexMap"] = boost::any(*complexMap);
     }
     if (numberfield) {
       res["numberfield"] = boost::any(*numberfield);

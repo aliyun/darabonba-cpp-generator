@@ -128,7 +128,7 @@ public:
     }
     if (part) {
       int n1 = 0;
-      ComplexRequestPart temp1;
+      vector<ComplexRequestPart> temp1;
       for(auto item1:*part){
         temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
         n++;

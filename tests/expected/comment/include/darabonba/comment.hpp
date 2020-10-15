@@ -23,7 +23,6 @@ public:
   Test1() {_init();};
   explicit Test1(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (test) {
@@ -33,6 +32,15 @@ public:
       res["test2"] = boost::any(*test2);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("test") != m.end()) {
+      test = boost::any_cast<string>(m["test"]);
+    }
+    if (m.find("test2") != m.end()) {
+      test2 = boost::any_cast<string>(m["test2"]);
+    }
   }
 
   shared_ptr<string> test{};
@@ -54,7 +62,6 @@ public:
   Test2() {_init();};
   explicit Test2(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (test) {
@@ -64,6 +71,15 @@ public:
       res["test2"] = boost::any(*test2);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("test") != m.end()) {
+      test = boost::any_cast<string>(m["test"]);
+    }
+    if (m.find("test2") != m.end()) {
+      test2 = boost::any_cast<string>(m["test2"]);
+    }
   }
 
   // model的test front comment
@@ -85,7 +101,6 @@ public:
   Test3() {_init();};
   explicit Test3(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (test) {
@@ -95,6 +110,15 @@ public:
       res["test1"] = boost::any(*test1);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("test") != m.end()) {
+      test = boost::any_cast<string>(m["test"]);
+    }
+    if (m.find("test1") != m.end()) {
+      test1 = boost::any_cast<string>(m["test1"]);
+    }
   }
 
   // model的test front comment

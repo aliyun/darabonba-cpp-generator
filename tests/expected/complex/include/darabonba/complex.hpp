@@ -25,13 +25,18 @@ public:
   ComplexRequestHeader() {_init();};
   explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (content) {
       res["Content"] = boost::any(*content);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("Content") != m.end()) {
+      content = boost::any_cast<string>(m["Content"]);
+    }
   }
 
   shared_ptr<string> content{};
@@ -46,7 +51,6 @@ public:
   ComplexRequestConfigs() {_init();};
   explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (key) {
@@ -59,6 +63,18 @@ public:
       res["extra"] = boost::any(*extra);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("key") != m.end()) {
+      key = boost::any_cast<string>(m["key"]);
+    }
+    if (m.find("value") != m.end()) {
+      value = boost::any_cast<vector<string>>(m["value"]);
+    }
+    if (m.find("extra") != m.end()) {
+      extra = boost::any_cast<map<string, string>>(m["extra"]);
+    }
   }
 
   shared_ptr<string> key{};
@@ -78,13 +94,18 @@ public:
   ComplexRequestPart() {_init();};
   explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
     if (partNumber) {
       res["PartNumber"] = boost::any(*partNumber);
     }
     return res;
+  }
+
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("PartNumber") != m.end()) {
+      partNumber = boost::any_cast<string>(m["PartNumber"]);
+    }
   }
 
   shared_ptr<string> partNumber{};
@@ -104,7 +125,6 @@ protected:
 public:
   ComplexRequest() {_init();};
   explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
-
 
   map<string, boost::any> toMap() {
     map<string, boost::any> res;
@@ -128,18 +148,52 @@ public:
     }
     if (part) {
       int n1 = 0;
-      vector<ComplexRequestPart> temp1;
+      vector<boost::any> temp1;
       for(auto item1:*part){
         temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-        n++;
+        n1++;
       }
-      res["Part"] = temp1;
+      res["Part"] = boost::any(temp1);
     }
     return res;
   }
 
+  void fromMap(map<string, boost::any> m) {
+    if (m.find("accessKey") != m.end()) {
+      accessKey = boost::any_cast<string>(m["accessKey"]);
+    }
+    if (m.find("Body") != m.end()) {
+      body = boost::any_cast<shared_ptr<Darabonba::Stream>>(m["Body"]);
+    }
+    if (m.find("Strs") != m.end()) {
+      strs = boost::any_cast<vector<string>>(m["Strs"]);
+    }
+    if (m.find("header") != m.end()) {
+      ComplexRequestHeader complexRequestHeader;
+      complexRequestHeader.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
+      header = complexRequestHeader;
+    }
+    if (m.find("Num") != m.end()) {
+      Num = boost::any_cast<int>(m["Num"]);
+    }
+    if (m.find("configs") != m.end()) {
+      ComplexRequestConfigs complexRequestConfigs;
+      complexRequestConfigs.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
+      configs = complexRequestConfigs;
+    }
+    if (m.find("Part") != m.end()) {
+      vector<ComplexRequestPart> expect1;
+      for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
+        ComplexRequestPart complexRequestPart;
+        complexRequestPart.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+        expect1 = complexRequestPart;
+      }
+      Part = make_shared<vector<ComplexRequestPart>>(expect1);
+    }
+  }
+
   shared_ptr<string> accessKey{};
-  shared_ptr<Darabonba::Stream> body{};
+  shared_ptr<shared_ptr<Darabonba::Stream>> body{};
   shared_ptr<vector<string>> strs{};
   shared_ptr<ComplexRequestHeader> header{};
   shared_ptr<int> Num{};

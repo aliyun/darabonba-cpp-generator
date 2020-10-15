@@ -15,7 +15,8 @@ const {
   _convertStaticParam,
   _symbol,
   _toSnakeCase,
-  _modify
+  _modify,
+  _lowerFirst
 } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 
@@ -56,6 +57,35 @@ const assert = require('assert');
 
 function _name(name) {
   return name.split('.').map(item => _upperFirst(_avoidKeywords(item))).join('');
+}
+
+function _names(notes) {
+  let nameMap = {};
+  if (notes['name']) {
+    notes['name'].forEach(note => {
+      if (note.prop !== note.value) {
+        nameMap[note.prop] = note.value;
+      }
+    });
+  }
+  return nameMap;
+}
+
+function _needRecur(prop_type) {
+  if (typeof prop_type === 'undefined' || !(prop_type instanceof TypeTree)) {
+    return false;
+  }
+  let itemType = prop_type.itemType ? prop_type.itemType : prop_type.valType;
+  if (typeof itemType === 'undefined') {
+    return false;
+  }
+  if (itemType instanceof TypeTree) {
+    return _needRecur.call(this, itemType);
+  }
+  if (itemType instanceof TypeObject && !this.isClient(itemType)) {
+    return true;
+  }
+  return false;
 }
 
 class Combinator extends CombinatorBase {
@@ -353,7 +383,7 @@ class Combinator extends CombinatorBase {
     // emit toMap&fromMap method
     let props = object.body.filter(node => node instanceof PropItem);
     this.emitToMap(emitter, props, notes);
-    this.emitFromMap(emitter, className, props, notes);
+    this.emitFromMap(emitter, props, notes);
   }
 
   emitToMapProp(emitter, prefix = 'res', prop, layer = 1) {
@@ -365,24 +395,7 @@ class Combinator extends CombinatorBase {
     } else {
       var_name = prop.name;
     }
-    const self = this;
-    let needRecur = function (prop_type) {
-      if (typeof prop_type === 'undefined' || !(prop_type instanceof TypeTree)) {
-        return false;
-      }
-      let itemType = prop_type.itemType ? prop_type.itemType : prop_type.valType;
-      if (typeof itemType === 'undefined') {
-        return false;
-      }
-      if (itemType instanceof TypeTree) {
-        return needRecur(itemType);
-      }
-      if (itemType instanceof TypeObject && !self.isClient(itemType)) {
-        return true;
-      }
-      return false;
-    };
-    if (needRecur(prop.type)) {
+    if (_needRecur.call(this, prop.type)) {
       // item type is array or map
       const p = new PropItem();
       p.type = prop.type instanceof TypeArray ? prop.type.itemType : prop.type.valType;
@@ -398,23 +411,21 @@ class Combinator extends CombinatorBase {
         temp = `temp${layer}`;
         pre = `${temp}[item${layer}.first]`;
       }
-      emitter.emitln(`${this.emitType(prop.type)} ${temp};`, this.level);
+      let temp_type = prop.type instanceof TypeArray ? 'vector<boost::any>' : 'map<string, boost::any>';
+      emitter.emitln(`${temp_type} ${temp};`, this.level);
       emitter.emitln(`for(auto item${layer}:${var_name}){`, this.level);
       this.levelUp();
       this.emitToMapProp(emitter, pre, p, layer + 1);
       if (prop.type instanceof TypeArray) {
-        emitter.emitln('n++;', this.level);
+        emitter.emitln(`n${layer}++;`, this.level);
       }
       this.levelDown();
       emitter.emitln('}', this.level);
       if (prop.type instanceof TypeArray) {
-        emitter.emitln(`${prefix} = ${temp};`, this.level);
+        emitter.emitln(`${prefix} = boost::any(${temp});`, this.level);
       } else {
-        emitter.emitln(`${prefix} = ${temp};`, this.level);
+        emitter.emitln(`${prefix} = boost::any(${temp});`, this.level);
       }
-    } else if (prop.type instanceof TypeTree) {
-      // item type is base type
-      emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
     } else if (prop.type instanceof TypeObject) {
       // type is model
       if (!this.isClient(prop)) {
@@ -423,28 +434,20 @@ class Combinator extends CombinatorBase {
       } else {
         debug.warning('sub item type is client : ' + prefix);
       }
-    } else if (prop.type instanceof TypeBase || prop.type instanceof TypeStream) {
+    } else if (prop.type instanceof TypeBase) {
       // is base type
       emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
     } else {
-      debug.stack(prop);
+      debug.warning('unsupported type toMap()', prop);
     }
-    if (prop.name.indexOf('.second') < 0) { 
+    if (prop.name.indexOf('.second') < 0) {
       this.levelDown();
       emitter.emitln('}', this.level);
-    } 
+    }
   }
 
   emitToMap(emitter, props, notes) {
-    let nameMap = {};
-    if (notes['name']) {
-      notes['name'].forEach(note => {
-        if (note.prop !== note.value) {
-          nameMap[note.prop] = note.value;
-        }
-      });
-    }
-    emitter.emitln();
+    let nameMap = _names(notes);
     emitter.emitln('map<string, boost::any> toMap() {', this.level);
     this.levelUp();
     emitter.emitln('map<string, boost::any> res;', this.level);
@@ -458,8 +461,83 @@ class Combinator extends CombinatorBase {
     emitter.emitln();
   }
 
-  emitFromMap(emitter, modelName, props, notes) {
+  emitFromMapProp(emitter, name, prop, realkey, layer = 1) {
+    if (realkey.indexOf('expect') !== 0) {
+      emitter.emitln(`if (m.find("${realkey}") != m.end()) {`, this.level);
+      this.levelUp();
+    }
 
+    if (_needRecur.call(this, prop.type)) {
+      // item type is array or map
+      const p = new PropItem();
+      p.type = prop.type instanceof TypeArray ? prop.type.itemType : prop.type.valType;
+      let nextName = '';
+      let nextExpectName = '';
+      let expectName = `expect${layer}`;
+      if (prop.type instanceof TypeArray) {
+        p.name = `item${layer}.second`;
+        p.parent = prop.type;
+        nextName = `item${layer}.second`;
+        nextExpectName = `${expectName}`;
+      } else {
+        p.name = `item${layer}.second`;
+        nextName = `item${layer}.second`;
+        nextExpectName = `${expectName}[item.first]`;
+      }
+      let temp_type = prop.type instanceof TypeArray ? 'vector<boost::any>' : 'map<string, boost::any>';
+      let expected_type = this.emitType(prop.type);
+      emitter.emitln(`${expected_type} ${expectName};`, this.level);
+      emitter.emitln(`for(auto item${layer}:boost::any_cast<${temp_type}>(${name})){`, this.level);
+      this.levelUp();
+      this.emitFromMapProp(emitter, nextName, p, nextExpectName, layer + 1);
+      this.levelDown();
+      emitter.emitln('}', this.level);
+      if (prop.parent && prop.parent instanceof TypeArray) {
+        if (layer === 1) {
+          emitter.emitln(`${realkey}.push_back(make_shared<${this.emitType(prop.type)}>(${expectName}));`, this.level);
+        } else {
+          emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
+        }
+      } else {
+        if (layer === 1) {
+          emitter.emitln(`${realkey} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
+        } else {
+          emitter.emitln(`${realkey} = ${expectName};`, this.level);
+        }
+      }
+    } else if (prop.type instanceof TypeObject) {
+      if (!this.isClient(prop)) {
+        // type is model
+        let var_name = _lowerFirst(this.emitType(prop.type));
+        emitter.emitln(`${this.emitType(prop.type)} ${var_name};`, this.level);
+        emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
+        emitter.emitln(`${realkey} = ${var_name};`, this.level);
+      } else {
+        // type is client
+        debug.warning('sub item type is client : ' + prop.name);
+      }
+    } else if (prop.type instanceof TypeBase) {
+      emitter.emitln(`${prop.name} = boost::any_cast<${this.emitType(prop.type)}>(${name});`, this.level);
+    } else {
+      debug.warning('unsupported type toMap()', prop);
+    }
+    if (realkey.indexOf('expect') !== 0) {
+      this.levelDown();
+      emitter.emitln('}', this.level);
+    }
+  }
+
+  emitFromMap(emitter, props, notes) {
+    let nameMap = _names(notes);
+    emitter.emitln('void fromMap(map<string, boost::any> m) {', this.level);
+    this.levelUp();
+    props.forEach(prop => {
+      let name = typeof nameMap[prop.name] !== 'undefined' ? nameMap[prop.name] : prop.name;
+      this.emitFromMapProp(emitter, `m["${name}"]`, prop, name);
+    });
+    this.levelDown();
+    emitter.emitln('}', this.level);
+    emitter.emitln();
   }
 
   emitParams(emitter, params = []) {
@@ -513,7 +591,7 @@ class Combinator extends CombinatorBase {
       this.pushInclude('map');
       return `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
     } else if (type instanceof TypeStream) {
-      return 'Darabonba::Stream';
+      return 'shared_ptr<Darabonba::Stream>';
     } else if (type instanceof TypeObject) {
       if (!type.objectName) {
         return 'class';
@@ -965,7 +1043,11 @@ class Combinator extends CombinatorBase {
             let emit = new Emitter(this.config);
             this.grammer(emit, p, false, false);
             let dataType = this.resolveDataType(p);
-            tmp.push(`make_shared<${dataType}>(${emit.output})`);
+            if (p.dataType instanceof TypeStream) {
+              tmp.push(`${emit.output}`);
+            } else {
+              tmp.push(`make_shared<${dataType}>(${emit.output})`);
+            }
           } else {
             let emit = new Emitter(this.config);
             this.grammerValue(emit, p);

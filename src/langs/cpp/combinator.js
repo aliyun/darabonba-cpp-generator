@@ -308,7 +308,11 @@ class Combinator extends CombinatorBase {
     object.body.forEach(node => {
       if (node instanceof PropItem) {
         // emit properties
-        emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${node.name}{};`, this.level);
+        if (node.type instanceof TypeStream) {
+          emitter.emitln(`${this.emitType(node.type)} ${node.name}{};`, this.level);
+        } else {
+          emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${node.name}{};`, this.level);
+        }
       } else if (node instanceof AnnotationItem) {
         // emit annotation
         this.emitAnnotation(emitter, node);
@@ -388,7 +392,8 @@ class Combinator extends CombinatorBase {
 
   emitToMapProp(emitter, prefix = 'res', prop, layer = 1) {
     let var_name = '';
-    if (prop.name.indexOf('.second') < 0) {
+    let isProp = prop.name.indexOf('.second') < 0 && !this.isClient(prop);
+    if (isProp) {
       var_name = `*${prop.name}`;
       emitter.emitln(`if (${prop.name}) {`, this.level);
       this.levelUp();
@@ -440,7 +445,7 @@ class Combinator extends CombinatorBase {
     } else {
       debug.warning('unsupported type toMap()', prop);
     }
-    if (prop.name.indexOf('.second') < 0) {
+    if (isProp) {
       this.levelDown();
       emitter.emitln('}', this.level);
     }
@@ -462,7 +467,8 @@ class Combinator extends CombinatorBase {
   }
 
   emitFromMapProp(emitter, name, prop, realkey, layer = 1) {
-    if (realkey.indexOf('expect') !== 0) {
+    const isProp = realkey.indexOf('expect') !== 0 && !this.isClient(prop);
+    if (isProp) {
       emitter.emitln(`if (m.find("${realkey}") != m.end()) {`, this.level);
       this.levelUp();
     }
@@ -509,19 +515,28 @@ class Combinator extends CombinatorBase {
       if (!this.isClient(prop)) {
         // type is model
         let var_name = _lowerFirst(this.emitType(prop.type));
-        emitter.emitln(`${this.emitType(prop.type)} ${var_name};`, this.level);
+        let prop_type = this.emitType(prop.type);
+        emitter.emitln(`${prop_type} ${var_name};`, this.level);
         emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
-        emitter.emitln(`${realkey} = ${var_name};`, this.level);
+        if (isProp) {
+          emitter.emitln(`${realkey} = make_shared<${prop_type}>(${var_name});`, this.level);
+        } else {
+          emitter.emitln(`${realkey} = ${var_name};`, this.level);
+        }
       } else {
         // type is client
         debug.warning('sub item type is client : ' + prop.name);
       }
     } else if (prop.type instanceof TypeBase) {
-      emitter.emitln(`${prop.name} = boost::any_cast<${this.emitType(prop.type)}>(${name});`, this.level);
+      if (isProp) {
+        emitter.emitln(`${prop.name} = make_shared<${this.emitType(prop.type)}>(boost::any_cast<${this.emitType(prop.type)}>(${name}));`, this.level);
+      } else {
+        emitter.emitln(`${prop.name} = boost::any_cast<${this.emitType(prop.type)}>(${name});`, this.level);
+      }
     } else {
       debug.warning('unsupported type toMap()', prop);
     }
-    if (realkey.indexOf('expect') !== 0) {
+    if (isProp) {
       this.levelDown();
       emitter.emitln('}', this.level);
     }
@@ -628,10 +643,12 @@ class Combinator extends CombinatorBase {
       notes['default'].forEach(note => {
         if (note.key === 'default') {
           let val = note.value;
-          if (note.type === 'string') {
-            val = `"${val}"`;
+          if (note.value !== '') {
+            if (note.type === 'string') {
+              val = `"${val}"`;
+            }
+            emitter.emitln(`{"${note.prop}" , boost::any(${val})},`, this.level);
           }
-          emitter.emitln(`{"${note.prop}" , boost::any(${val})},`, this.level);
         }
       });
       this.levelDown();
@@ -729,7 +746,7 @@ class Combinator extends CombinatorBase {
 
   isClient(prop) {
     let client_name = prop.objectName ? prop.objectName : prop.type.objectName;
-    if (client_name.indexOf('Client') < 0) {
+    if (client_name && client_name.indexOf('Client') < 0) {
       return false;
     }
     let is = false;
@@ -1336,7 +1353,7 @@ class Combinator extends CombinatorBase {
   }
 
   behaviorToModel(emitter, behavior) {
-    emitter.emit('behavior.expected::fromMap(');
+    emitter.emit(`${behavior.expected}::fromMap(`);
     this.grammer(emitter, behavior.grammer, false, false);
     emitter.emit(')');
   }

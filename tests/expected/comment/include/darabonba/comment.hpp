@@ -36,10 +36,10 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("test") != m.end()) {
-      test = boost::any_cast<string>(m["test"]);
+      test = make_shared<string>(boost::any_cast<string>(m["test"]));
     }
     if (m.find("test2") != m.end()) {
-      test2 = boost::any_cast<string>(m["test2"]);
+      test2 = make_shared<string>(boost::any_cast<string>(m["test2"]));
     }
   }
 
@@ -75,10 +75,10 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("test") != m.end()) {
-      test = boost::any_cast<string>(m["test"]);
+      test = make_shared<string>(boost::any_cast<string>(m["test"]));
     }
     if (m.find("test2") != m.end()) {
-      test2 = boost::any_cast<string>(m["test2"]);
+      test2 = make_shared<string>(boost::any_cast<string>(m["test2"]));
     }
   }
 
@@ -114,10 +114,10 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("test") != m.end()) {
-      test = boost::any_cast<string>(m["test"]);
+      test = make_shared<string>(boost::any_cast<string>(m["test"]));
     }
     if (m.find("test1") != m.end()) {
-      test1 = boost::any_cast<string>(m["test1"]);
+      test1 = make_shared<string>(boost::any_cast<string>(m["test1"]));
     }
   }
 

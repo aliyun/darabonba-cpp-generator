@@ -35,7 +35,7 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("Content") != m.end()) {
-      content = boost::any_cast<string>(m["Content"]);
+      content = make_shared<string>(boost::any_cast<string>(m["Content"]));
     }
   }
 
@@ -67,13 +67,13 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("key") != m.end()) {
-      key = boost::any_cast<string>(m["key"]);
+      key = make_shared<string>(boost::any_cast<string>(m["key"]));
     }
     if (m.find("value") != m.end()) {
-      value = boost::any_cast<vector<string>>(m["value"]);
+      value = make_shared<vector<string>>(boost::any_cast<vector<string>>(m["value"]));
     }
     if (m.find("extra") != m.end()) {
-      extra = boost::any_cast<map<string, string>>(m["extra"]);
+      extra = make_shared<map<string, string>>(boost::any_cast<map<string, string>>(m["extra"]));
     }
   }
 
@@ -104,7 +104,7 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("PartNumber") != m.end()) {
-      partNumber = boost::any_cast<string>(m["PartNumber"]);
+      partNumber = make_shared<string>(boost::any_cast<string>(m["PartNumber"]));
     }
   }
 
@@ -160,26 +160,26 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("accessKey") != m.end()) {
-      accessKey = boost::any_cast<string>(m["accessKey"]);
+      accessKey = make_shared<string>(boost::any_cast<string>(m["accessKey"]));
     }
     if (m.find("Body") != m.end()) {
-      body = boost::any_cast<shared_ptr<Darabonba::Stream>>(m["Body"]);
+      body = make_shared<shared_ptr<Darabonba::Stream>>(boost::any_cast<shared_ptr<Darabonba::Stream>>(m["Body"]));
     }
     if (m.find("Strs") != m.end()) {
-      strs = boost::any_cast<vector<string>>(m["Strs"]);
+      strs = make_shared<vector<string>>(boost::any_cast<vector<string>>(m["Strs"]));
     }
     if (m.find("header") != m.end()) {
       ComplexRequestHeader complexRequestHeader;
       complexRequestHeader.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
-      header = complexRequestHeader;
+      header = make_shared<ComplexRequestHeader>(complexRequestHeader);
     }
     if (m.find("Num") != m.end()) {
-      Num = boost::any_cast<int>(m["Num"]);
+      Num = make_shared<int>(boost::any_cast<int>(m["Num"]));
     }
     if (m.find("configs") != m.end()) {
       ComplexRequestConfigs complexRequestConfigs;
       complexRequestConfigs.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
-      configs = complexRequestConfigs;
+      configs = make_shared<ComplexRequestConfigs>(complexRequestConfigs);
     }
     if (m.find("Part") != m.end()) {
       vector<ComplexRequestPart> expect1;
@@ -193,7 +193,7 @@ public:
   }
 
   shared_ptr<string> accessKey{};
-  shared_ptr<shared_ptr<Darabonba::Stream>> body{};
+  shared_ptr<Darabonba::Stream> body{};
   shared_ptr<vector<string>> strs{};
   shared_ptr<ComplexRequestHeader> header{};
   shared_ptr<int> Num{};

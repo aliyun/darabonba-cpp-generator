@@ -30,7 +30,7 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("test") != m.end()) {
-      test = boost::any_cast<string>(m["test"]);
+      test = make_shared<string>(boost::any_cast<string>(m["test"]));
     }
   }
 

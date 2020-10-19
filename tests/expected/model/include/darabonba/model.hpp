@@ -51,7 +51,7 @@ public:
     if (m.find("subM") != m.end()) {
       MSubM mSubM;
       mSubM.fromMap(boost::any_cast<map<string, boost::any>>(m["subM"]));
-      subM = mSubM;
+      subM = make_shared<MSubM>(mSubM);
     }
   }
 
@@ -94,7 +94,7 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("stringfield") != m.end()) {
-      stringfield = boost::any_cast<string>(m["stringfield"]);
+      stringfield = make_shared<string>(boost::any_cast<string>(m["stringfield"]));
     }
   }
 
@@ -287,24 +287,24 @@ public:
 
   void fromMap(map<string, boost::any> m) {
     if (m.find("stringfield") != m.end()) {
-      stringfield = boost::any_cast<string>(m["stringfield"]);
+      stringfield = make_shared<string>(boost::any_cast<string>(m["stringfield"]));
     }
     if (m.find("bytesfield") != m.end()) {
-      bytesfield = boost::any_cast<vector<uint8_t>>(m["bytesfield"]);
+      bytesfield = make_shared<vector<uint8_t>>(boost::any_cast<vector<uint8_t>>(m["bytesfield"]));
     }
     if (m.find("stringarrayfield") != m.end()) {
-      stringarrayfield = boost::any_cast<vector<string>>(m["stringarrayfield"]);
+      stringarrayfield = make_shared<vector<string>>(boost::any_cast<vector<string>>(m["stringarrayfield"]));
     }
     if (m.find("mapfield") != m.end()) {
-      mapfield = boost::any_cast<map<string, string>>(m["mapfield"]);
+      mapfield = make_shared<map<string, string>>(boost::any_cast<map<string, string>>(m["mapfield"]));
     }
     if (m.find("realName") != m.end()) {
-      name = boost::any_cast<string>(m["realName"]);
+      name = make_shared<string>(boost::any_cast<string>(m["realName"]));
     }
     if (m.find("submodel") != m.end()) {
       MyModelSubmodel myModelSubmodel;
       myModelSubmodel.fromMap(boost::any_cast<map<string, boost::any>>(m["submodel"]));
-      submodel = myModelSubmodel;
+      submodel = make_shared<MyModelSubmodel>(myModelSubmodel);
     }
     if (m.find("submodelMap") != m.end()) {
       map<string, MyModelSubmodel> expect1;
@@ -343,7 +343,7 @@ public:
       subarray = make_shared<vector<M>>(expect1);
     }
     if (m.find("maparray") != m.end()) {
-      maparray = boost::any_cast<vector<map<string, boost::any>>>(m["maparray"]);
+      maparray = make_shared<vector<map<string, boost::any>>>(boost::any_cast<vector<map<string, boost::any>>>(m["maparray"]));
     }
     if (m.find("moduleModelMap") != m.end()) {
       map<string, Darabonba_Source::Request> expect1;
@@ -373,29 +373,29 @@ public:
       modelMap = make_shared<map<string, M>>(expect1);
     }
     if (m.find("moduleMap") != m.end()) {
-      moduleMap = boost::any_cast<map<string, Darabonba_Import::Client>>(m["moduleMap"]);
+      moduleMap = make_shared<map<string, Darabonba_Import::Client>>(boost::any_cast<map<string, Darabonba_Import::Client>>(m["moduleMap"]));
     }
     if (m.find("object") != m.end()) {
-      object = boost::any_cast<map<string, boost::any>>(m["object"]);
+      object = make_shared<map<string, boost::any>>(boost::any_cast<map<string, boost::any>>(m["object"]));
     }
     if (m.find("readable") != m.end()) {
-      readable = boost::any_cast<shared_ptr<Darabonba::Stream>>(m["readable"]);
+      readable = make_shared<shared_ptr<Darabonba::Stream>>(boost::any_cast<shared_ptr<Darabonba::Stream>>(m["readable"]));
     }
     if (m.find("writable") != m.end()) {
-      writable = boost::any_cast<shared_ptr<Darabonba::Stream>>(m["writable"]);
+      writable = make_shared<shared_ptr<Darabonba::Stream>>(boost::any_cast<shared_ptr<Darabonba::Stream>>(m["writable"]));
     }
     if (m.find("existModel") != m.end()) {
       M m;
       m.fromMap(boost::any_cast<map<string, boost::any>>(m["existModel"]));
-      existModel = m;
+      existModel = make_shared<M>(m);
     }
     if (m.find("request") != m.end()) {
       Darabonba::Request darabonba::Request;
       darabonba::Request.fromMap(boost::any_cast<map<string, boost::any>>(m["request"]));
-      request = darabonba::Request;
+      request = make_shared<Darabonba::Request>(darabonba::Request);
     }
     if (m.find("complexList") != m.end()) {
-      complexList = boost::any_cast<vector<vector<string>>>(m["complexList"]);
+      complexList = make_shared<vector<vector<string>>>(boost::any_cast<vector<vector<string>>>(m["complexList"]));
     }
     if (m.find("complexMap") != m.end()) {
       vector<map<string, MyModelSubmodel>> expect1;
@@ -411,46 +411,46 @@ public:
       complexMap = make_shared<vector<map<string, MyModelSubmodel>>>(expect1);
     }
     if (m.find("numberfield") != m.end()) {
-      numberfield = boost::any_cast<int>(m["numberfield"]);
+      numberfield = make_shared<int>(boost::any_cast<int>(m["numberfield"]));
     }
     if (m.find("integerField") != m.end()) {
-      integerField = boost::any_cast<int>(m["integerField"]);
+      integerField = make_shared<int>(boost::any_cast<int>(m["integerField"]));
     }
     if (m.find("floatField") != m.end()) {
-      floatField = boost::any_cast<float>(m["floatField"]);
+      floatField = make_shared<float>(boost::any_cast<float>(m["floatField"]));
     }
     if (m.find("doubleField") != m.end()) {
-      doubleField = boost::any_cast<float>(m["doubleField"]);
+      doubleField = make_shared<float>(boost::any_cast<float>(m["doubleField"]));
     }
     if (m.find("longField") != m.end()) {
-      longField = boost::any_cast<long>(m["longField"]);
+      longField = make_shared<long>(boost::any_cast<long>(m["longField"]));
     }
     if (m.find("ulongField") != m.end()) {
-      ulongField = boost::any_cast<long>(m["ulongField"]);
+      ulongField = make_shared<long>(boost::any_cast<long>(m["ulongField"]));
     }
     if (m.find("int8Field") != m.end()) {
-      int8Field = boost::any_cast<int>(m["int8Field"]);
+      int8Field = make_shared<int>(boost::any_cast<int>(m["int8Field"]));
     }
     if (m.find("int16Field") != m.end()) {
-      int16Field = boost::any_cast<int>(m["int16Field"]);
+      int16Field = make_shared<int>(boost::any_cast<int>(m["int16Field"]));
     }
     if (m.find("int32Field") != m.end()) {
-      int32Field = boost::any_cast<long>(m["int32Field"]);
+      int32Field = make_shared<long>(boost::any_cast<long>(m["int32Field"]));
     }
     if (m.find("int64Field") != m.end()) {
-      int64Field = boost::any_cast<long>(m["int64Field"]);
+      int64Field = make_shared<long>(boost::any_cast<long>(m["int64Field"]));
     }
     if (m.find("uint8Field") != m.end()) {
-      uint8Field = boost::any_cast<int>(m["uint8Field"]);
+      uint8Field = make_shared<int>(boost::any_cast<int>(m["uint8Field"]));
     }
     if (m.find("uint16Field") != m.end()) {
-      uint16Field = boost::any_cast<int>(m["uint16Field"]);
+      uint16Field = make_shared<int>(boost::any_cast<int>(m["uint16Field"]));
     }
     if (m.find("uint32Field") != m.end()) {
-      uint32Field = boost::any_cast<long>(m["uint32Field"]);
+      uint32Field = make_shared<long>(boost::any_cast<long>(m["uint32Field"]));
     }
     if (m.find("uint64Field") != m.end()) {
-      uint64Field = boost::any_cast<long>(m["uint64Field"]);
+      uint64Field = make_shared<long>(boost::any_cast<long>(m["uint64Field"]));
     }
   }
 
@@ -470,8 +470,8 @@ public:
   shared_ptr<map<string, M>> modelMap{};
   shared_ptr<map<string, Darabonba_Import::Client>> moduleMap{};
   shared_ptr<map<string, boost::any>> object{};
-  shared_ptr<shared_ptr<Darabonba::Stream>> readable{};
-  shared_ptr<shared_ptr<Darabonba::Stream>> writable{};
+  shared_ptr<Darabonba::Stream> readable{};
+  shared_ptr<Darabonba::Stream> writable{};
   shared_ptr<M> existModel{};
   shared_ptr<Darabonba::Request> request{};
   shared_ptr<vector<vector<string>>> complexList{};

@@ -659,7 +659,7 @@ class ClientResolver extends BaseResolver {
           call.addParams(grammerValue);
         });
       }
-
+      call.returnType = this.resolveTypeItem(object.inferred);
       valGrammer.value = call;
     } else if (object.type === 'construct') {
       valGrammer.type = 'instance';

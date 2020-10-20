@@ -10,6 +10,8 @@
 
 using namespace std;
 
+using namespace Darabonba_Statements;
+
 Darabonba_Statements::Client::Client(){}
 void Darabonba_Statements::Client::hello() {
   Darabonba::Request request_ = Darabonba::Request();

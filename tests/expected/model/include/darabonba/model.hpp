@@ -4,6 +4,7 @@
 #define DARABONBA_MODEL_H_
 
 #include <boost/any.hpp>
+#include <boost/throw_exception.hpp>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
@@ -20,12 +21,13 @@ public:
   MSubM() {_init();};
   explicit MSubM(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {}
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
   }
 
 
@@ -39,7 +41,12 @@ public:
   M() {_init();};
   explicit M(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!subM) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subM is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (subM) {
       res["subM"] = subM ? boost::any(subM->toMap()) : boost::any(map<string,boost::any>({}));
@@ -47,7 +54,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("subM") != m.end()) {
       MSubM mSubM;
       mSubM.fromMap(boost::any_cast<map<string, boost::any>>(m["subM"]));
@@ -65,12 +72,13 @@ public:
   Class() {_init();};
   explicit Class(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {}
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
   }
 
 
@@ -84,7 +92,12 @@ public:
   MyModelSubmodel() {_init();};
   explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!stringfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("stringfield is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (stringfield) {
       res["stringfield"] = boost::any(*stringfield);
@@ -92,7 +105,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("stringfield") != m.end()) {
       stringfield = make_shared<string>(boost::any_cast<string>(m["stringfield"]));
     }
@@ -108,12 +121,13 @@ public:
   MyModelSubarraymodel() {_init();};
   explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {}
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
   }
 
 
@@ -130,7 +144,117 @@ public:
   MyModel() {_init();};
   explicit MyModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!stringfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("stringfield is required.")));
+    }
+    if (!bytesfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("bytesfield is required.")));
+    }
+    if (!stringarrayfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("stringarrayfield is required.")));
+    }
+    if (!mapfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("mapfield is required.")));
+    }
+    if (!name) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("name is required.")));
+    }
+    if (!submodel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("submodel is required.")));
+    }
+    if (!submodelMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("submodelMap is required.")));
+    }
+    if (!mapModel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("mapModel is required.")));
+    }
+    if (!subarraymodel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subarraymodel is required.")));
+    }
+    if (!subarray) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subarray is required.")));
+    }
+    if (!maparray) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("maparray is required.")));
+    }
+    if (!moduleModelMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("moduleModelMap is required.")));
+    }
+    if (!subModelMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subModelMap is required.")));
+    }
+    if (!modelMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("modelMap is required.")));
+    }
+    if (!moduleMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("moduleMap is required.")));
+    }
+    if (!object) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("object is required.")));
+    }
+    if (!readable) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("readable is required.")));
+    }
+    if (!writable) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("writable is required.")));
+    }
+    if (!existModel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("existModel is required.")));
+    }
+    if (!request) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("request is required.")));
+    }
+    if (!complexList) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("complexList is required.")));
+    }
+    if (!complexMap) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("complexMap is required.")));
+    }
+    if (!numberfield) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("numberfield is required.")));
+    }
+    if (!integerField) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("integerField is required.")));
+    }
+    if (!floatField) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("floatField is required.")));
+    }
+    if (!doubleField) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("doubleField is required.")));
+    }
+    if (!longField) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("longField is required.")));
+    }
+    if (!ulongField) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("ulongField is required.")));
+    }
+    if (!int8Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("int8Field is required.")));
+    }
+    if (!int16Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("int16Field is required.")));
+    }
+    if (!int32Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("int32Field is required.")));
+    }
+    if (!int64Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("int64Field is required.")));
+    }
+    if (!uint8Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("uint8Field is required.")));
+    }
+    if (!uint16Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("uint16Field is required.")));
+    }
+    if (!uint32Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("uint32Field is required.")));
+    }
+    if (!uint64Field) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("uint64Field is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (stringfield) {
       res["stringfield"] = boost::any(*stringfield);
@@ -153,32 +277,28 @@ public:
     if (submodelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*submodelMap){
-        temp1[item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["submodelMap"] = boost::any(temp1);
     }
     if (mapModel) {
       map<string, boost::any> temp1;
       for(auto item1:*mapModel){
-        temp1[item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["mapModel"] = boost::any(temp1);
     }
     if (subarraymodel) {
-      int n1 = 0;
       vector<boost::any> temp1;
       for(auto item1:*subarraymodel){
-        temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-        n1++;
+        temp1.push_back(boost::any(item1.toMap()));
       }
       res["subarraymodel"] = boost::any(temp1);
     }
     if (subarray) {
-      int n1 = 0;
       vector<boost::any> temp1;
       for(auto item1:*subarray){
-        temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-        n1++;
+        temp1.push_back(boost::any(item1.toMap()));
       }
       res["subarray"] = boost::any(temp1);
     }
@@ -188,21 +308,21 @@ public:
     if (moduleModelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*moduleModelMap){
-        temp1[item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["moduleModelMap"] = boost::any(temp1);
     }
     if (subModelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*subModelMap){
-        temp1[item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["subModelMap"] = boost::any(temp1);
     }
     if (modelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*modelMap){
-        temp1[item1.first] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["modelMap"] = boost::any(temp1);
     }
@@ -228,15 +348,13 @@ public:
       res["complexList"] = boost::any(*complexList);
     }
     if (complexMap) {
-      int n1 = 0;
       vector<boost::any> temp1;
       for(auto item1:*complexMap){
         map<string, boost::any> temp2;
-        for(auto item2:item1.second){
-          temp2[item2.first] = item2.second ? boost::any(item2.second->toMap()) : boost::any(map<string,boost::any>({}));
+        for(auto item2:item1){
+          temp2[item2.first] = boost::any(item2.second.toMap());
         }
-        temp1[n1] = boost::any(temp2);
-        n1++;
+        temp1 = boost::any(temp2);
       }
       res["complexMap"] = boost::any(temp1);
     }
@@ -285,7 +403,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("stringfield") != m.end()) {
       stringfield = make_shared<string>(boost::any_cast<string>(m["stringfield"]));
     }
@@ -328,8 +446,8 @@ public:
       vector<MyModelSubarraymodel> expect1;
       for(auto item1:boost::any_cast<vector<boost::any>>(m["subarraymodel"])){
         MyModelSubarraymodel myModelSubarraymodel;
-        myModelSubarraymodel.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-        expect1 = myModelSubarraymodel;
+        myModelSubarraymodel.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+        expect1.push_back(myModelSubarraymodel);
       }
       subarraymodel = make_shared<vector<MyModelSubarraymodel>>(expect1);
     }
@@ -337,8 +455,8 @@ public:
       vector<M> expect1;
       for(auto item1:boost::any_cast<vector<boost::any>>(m["subarray"])){
         M m;
-        m.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-        expect1 = m;
+        m.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+        expect1.push_back(m);
       }
       subarray = make_shared<vector<M>>(expect1);
     }
@@ -401,7 +519,7 @@ public:
       vector<map<string, MyModelSubmodel>> expect1;
       for(auto item1:boost::any_cast<vector<boost::any>>(m["complexMap"])){
         map<string, MyModelSubmodel> expect2;
-        for(auto item2:boost::any_cast<map<string, boost::any>>(item1.second)){
+        for(auto item2:boost::any_cast<map<string, boost::any>>(item1)){
           MyModelSubmodel myModelSubmodel;
           myModelSubmodel.fromMap(boost::any_cast<map<string, boost::any>>(item2.second));
           expect2[item.first] = myModelSubmodel;

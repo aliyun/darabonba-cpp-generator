@@ -4,6 +4,8 @@
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
 
+using namespace Darabonba_Alias;
+
 void Darabonba_Alias::Client::emptyModel() {
   Darabonba_Import::Client::test();
   Darabonba_Source::Client::test();

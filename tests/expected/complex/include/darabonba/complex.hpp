@@ -4,6 +4,7 @@
 #define DARABONBA_COMPLEX_H_
 
 #include <boost/any.hpp>
+#include <boost/throw_exception.hpp>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
@@ -25,7 +26,12 @@ public:
   ComplexRequestHeader() {_init();};
   explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!content) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("content is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (content) {
       res["Content"] = boost::any(*content);
@@ -33,7 +39,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("Content") != m.end()) {
       content = make_shared<string>(boost::any_cast<string>(m["Content"]));
     }
@@ -51,7 +57,18 @@ public:
   ComplexRequestConfigs() {_init();};
   explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!key) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("key is required.")));
+    }
+    if (!value) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("value is required.")));
+    }
+    if (!extra) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("extra is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (key) {
       res["key"] = boost::any(*key);
@@ -65,7 +82,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("key") != m.end()) {
       key = make_shared<string>(boost::any_cast<string>(m["key"]));
     }
@@ -94,7 +111,8 @@ public:
   ComplexRequestPart() {_init();};
   explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {}
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (partNumber) {
       res["PartNumber"] = boost::any(*partNumber);
@@ -102,7 +120,7 @@ public:
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("PartNumber") != m.end()) {
       partNumber = make_shared<string>(boost::any_cast<string>(m["PartNumber"]));
     }
@@ -126,7 +144,27 @@ public:
   ComplexRequest() {_init();};
   explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
 
-  map<string, boost::any> toMap() {
+  void validate() override {
+    if (!accessKey) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("accessKey is required.")));
+    }
+    if (!body) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("body is required.")));
+    }
+    if (!strs) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("strs is required.")));
+    }
+    if (!header) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("header is required.")));
+    }
+    if (!Num) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("Num is required.")));
+    }
+    if (!configs) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("configs is required.")));
+    }
+  }
+  map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (accessKey) {
       res["accessKey"] = boost::any(*accessKey);
@@ -147,18 +185,16 @@ public:
       res["configs"] = configs ? boost::any(configs->toMap()) : boost::any(map<string,boost::any>({}));
     }
     if (part) {
-      int n1 = 0;
       vector<boost::any> temp1;
       for(auto item1:*part){
-        temp1[n1] = item1.second ? boost::any(item1.second->toMap()) : boost::any(map<string,boost::any>({}));
-        n1++;
+        temp1.push_back(boost::any(item1.toMap()));
       }
       res["Part"] = boost::any(temp1);
     }
     return res;
   }
 
-  void fromMap(map<string, boost::any> m) {
+  void fromMap(map<string, boost::any> m) override {
     if (m.find("accessKey") != m.end()) {
       accessKey = make_shared<string>(boost::any_cast<string>(m["accessKey"]));
     }
@@ -185,10 +221,10 @@ public:
       vector<ComplexRequestPart> expect1;
       for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
         ComplexRequestPart complexRequestPart;
-        complexRequestPart.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-        expect1 = complexRequestPart;
+        complexRequestPart.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+        expect1.push_back(complexRequestPart);
       }
-      Part = make_shared<vector<ComplexRequestPart>>(expect1);
+      part = make_shared<vector<ComplexRequestPart>>(expect1);
     }
   }
 
@@ -205,7 +241,7 @@ public:
 class Client : Darabonba_Import::Client {
 public:
   shared_ptr<vector<Darabonba_Source::Config>> _configs{};
-  explicit Client(shared_ptr<Darabonba_Source::Config> config): Darabonba_Import::Client(shared_ptr<Darabonba_Source::Config> config);
+  explicit Client(shared_ptr<Darabonba_Source::Config> config);
   Darabonba_Source::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
   map<string, boost::any> Complex2(shared_ptr<ComplexRequest> request, shared_ptr<vector<string>> str, shared_ptr<map<string, string>> val);
   ComplexRequest Complex3(shared_ptr<ComplexRequest> request);

@@ -11,16 +11,18 @@
 
 using namespace std;
 
+using namespace Darabonba_Comment;
+
 Darabonba_Comment::Client::Client() {
   // string declate comment
   string str = "sss";
   // new model instance comment
-  Test1 modelInstance = Test1(shared_ptr<map<string, string>>(new map<string, string>({
+  Test1 modelInstance(map<string, string>({
     {"test", "test"},
     // test declare back comment
     {"test2", "test2"},
     // test2 declare back comment
-  })));
+  }));
   vector<boost::any> array = vector<boost::any>({
     // array string comment
     "string",
@@ -38,9 +40,9 @@ void Darabonba_Comment::Client::testAPI() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_["retry"]), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
+  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_.at("retry")), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_["backoff"]), make_shared<int>(_retryTimes));
+      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_.at("backoff")), make_shared<int>(_retryTimes));
       if (_backoffTime > 0) {
         Darabonba::Core::sleep(make_shared<int>(_backoffTime));
       }
@@ -49,12 +51,12 @@ void Darabonba_Comment::Client::testAPI() {
     try {
       Darabonba::Request request_ = Darabonba::Request();
       // new model instance comment
-      Test1 modelInstance = Test1(shared_ptr<map<string, string>>(new map<string, string>({
+      Test1 modelInstance(map<string, string>({
         // test declare front comment
         {"test", "test"},
         // test2 declare front comment
         {"test2", "test2"}
-      })));
+      }));
       // number declare comment
       int num = 123;
       // static function call comment
@@ -88,9 +90,9 @@ void Darabonba_Comment::Client::testAPI2() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_["retry"]), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
+  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_.at("retry")), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_["backoff"]), make_shared<int>(_retryTimes));
+      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_.at("backoff")), make_shared<int>(_retryTimes));
       if (_backoffTime > 0) {
         Darabonba::Core::sleep(make_shared<int>(_backoffTime));
       }
@@ -99,9 +101,9 @@ void Darabonba_Comment::Client::testAPI2() {
     try {
       Darabonba::Request request_ = Darabonba::Request();
       // new model instance comment
-      Test3 modelInstance = Test3(shared_ptr<map<string, boost::any>>(new map<string, boost::any>({
+      Test3 modelInstance(map<string, boost::any>({
         // empty model
-      })));
+      }));
       // boolean declare comment
       bool bool_ = true;
       if (bool_) {

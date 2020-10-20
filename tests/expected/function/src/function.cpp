@@ -9,6 +9,8 @@
 
 using namespace std;
 
+using namespace Darabonba_Function;
+
 void Darabonba_Function::Client::hello() {
   return;
 }

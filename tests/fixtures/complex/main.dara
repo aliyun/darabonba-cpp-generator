@@ -85,6 +85,7 @@ api Complex2(request: ComplexRequest, str: [ string ], val: map[string]string): 
     protocol = __request.protocol,
 
   });
+  val["test"];
   __request.body = Source.body();
 }
 

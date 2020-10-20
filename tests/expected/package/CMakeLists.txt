@@ -58,7 +58,7 @@ endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core )
+target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core crypto )
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_darabonba_package

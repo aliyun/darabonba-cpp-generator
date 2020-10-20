@@ -2,6 +2,7 @@
 
 #include <darabonba/model.hpp>
 #include <boost/any.hpp>
+#include <boost/throw_exception.hpp>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
 #include <darabonba/source.hpp>
@@ -10,4 +11,6 @@
 #include <vector>
 
 using namespace std;
+
+using namespace Darabonba_Model;
 

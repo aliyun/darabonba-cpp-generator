@@ -25,7 +25,7 @@ const {
   AnnotationItem,
   FuncItem,
   ConstructItem,
-  // GrammerNewObject,
+  GrammerNewObject,
   GrammerThrows,
   GrammerCatch,
   GrammerValue,
@@ -237,6 +237,7 @@ class Combinator extends CombinatorBase {
     }
     emitter.emitln(`#include <${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`);
     this.emitInclude(emitter);
+    emitter.emitln(`using namespace ${this.namespace};`).emitln();
     outputPars.head = emitter.output;
 
     /***************************** combine output ******************************/
@@ -328,26 +329,28 @@ class Combinator extends CombinatorBase {
         emitter.emitln(');');
       } else if (node instanceof ConstructItem) {
         // emit custom constructer
-        let params = '';
+        // let params = '';
         if (node.params.length) {
           emitter.emit(`explicit ${className}(`, this.level);
-          params = this.emitParams(emitter, node.params);
+          // params = this.emitParams(emitter, node.params);
+          this.emitParams(emitter, node.params);
           emitter.emit(')');
         } else {
           emitter.emit(`${className}()`, this.level);
         }
-        if (object.extends.length) {
-          let tmp = [];
-          if (!(object.extends instanceof Array)) {
-            object.extends = [object.extends];
-          }
-          object.extends.forEach(baseClass => {
-            tmp.push(baseClass);
-          });
-          emitter.emitln(`: ${object.extends[0]}(${params});`);
-        } else {
-          emitter.emitln(';');
-        }
+        emitter.emitln(';');
+        // if (object.extends.length) {
+        //   let tmp = [];
+        //   if (!(object.extends instanceof Array)) {
+        //     object.extends = [object.extends];
+        //   }
+        //   object.extends.forEach(baseClass => {
+        //     tmp.push(baseClass);
+        //   });
+        //   emitter.emitln(`: ${object.extends[0]}(${params});`);
+        // } else {
+        //   emitter.emitln(';');
+        // }
         hasConstruct = true;
       }
     });
@@ -386,13 +389,70 @@ class Combinator extends CombinatorBase {
 
     // emit toMap&fromMap method
     let props = object.body.filter(node => node instanceof PropItem);
+    this.emitValidate(emitter, props);
     this.emitToMap(emitter, props, notes);
     this.emitFromMap(emitter, props, notes);
   }
 
-  emitToMapProp(emitter, prefix = 'res', prop, layer = 1) {
+  emitValidate(emitter, props) {
+    let emit = new Emitter(this.config);
+    let validateNoteKeys = [
+      'required',
+      'maximum',
+      'minimum',
+      'maxLength',
+      'minLength',
+      // 'format',
+      // 'enum',
+      'pattern',
+      // 'maxItems'
+    ];
+    this.levelUp();
+    props.forEach(prop => {
+      prop.notes.forEach(note => {
+        if (validateNoteKeys.indexOf(note.key) > -1) {
+          let val = note.value;
+          if (note.type === 'string') {
+            val = `"${val}"`;
+          }
+          if (note.key === 'required' && note.value === true) {
+            emit.emitln(`if (!${note.prop}) {`, this.level);
+            this.pushInclude('throw_exception', this.level);
+            this.levelUp();
+            emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
+            this.levelDown();
+            emit.emitln('}', this.level);
+          } else if (note.key === 'maximum' || note.key === 'minimum') {
+            let opt = note.key === 'maximum' ? '>' : '<';
+            emit.emitln(`if (${note.prop} {`, this.level);
+            this.levelUp();
+            emit.emitln(`if (${note.prop} ${opt} ${val})) {`, this.level);
+            this.pushInclude('throw_exception', this.level);
+            this.levelUp();
+            emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
+            this.levelDown();
+            emit.emitln('}');
+            this.levelDown();
+            emit.emitln('}', this.level);
+          } else {
+            emit.emitln(`Darabonba::Model::validate${_upperFirst(note.key)}("${note.prop}", ${note.prop}, ${val});`, this.level);
+          }
+        }
+      });
+    });
+    this.levelDown();
+    if (emit.output) {
+      emitter.emitln('void validate() override {', this.level);
+      emitter.emit(emit.output);
+      emitter.emitln('}', this.level);
+    } else {
+      emitter.emitln('void validate() override {}', this.level);
+    }
+  }
+
+  emitToMapProp(emitter, prefix = 'res', prop, layer = 1, parent_type) {
     let var_name = '';
-    let isProp = prop.name.indexOf('.second') < 0 && !this.isClient(prop);
+    let isProp = layer === 1 && !this.isClient(prop);
     if (isProp) {
       var_name = `*${prop.name}`;
       emitter.emitln(`if (${prop.name}) {`, this.level);
@@ -407,10 +467,9 @@ class Combinator extends CombinatorBase {
       let pre = '';
       let temp = '';
       if (prop.type instanceof TypeArray) {
-        emitter.emitln(`int n${layer} = 0;`, this.level);
-        p.name = `item${layer}.second`;
+        p.name = `item${layer}`;
         temp = `temp${layer}`;
-        pre = `${temp}[n${layer}]`;
+        pre = `${temp}`;
       } else {
         p.name = `item${layer}.second`;
         temp = `temp${layer}`;
@@ -420,10 +479,7 @@ class Combinator extends CombinatorBase {
       emitter.emitln(`${temp_type} ${temp};`, this.level);
       emitter.emitln(`for(auto item${layer}:${var_name}){`, this.level);
       this.levelUp();
-      this.emitToMapProp(emitter, pre, p, layer + 1);
-      if (prop.type instanceof TypeArray) {
-        emitter.emitln(`n${layer}++;`, this.level);
-      }
+      this.emitToMapProp(emitter, pre, p, layer + 1, prop.type);
       this.levelDown();
       emitter.emitln('}', this.level);
       if (prop.type instanceof TypeArray) {
@@ -435,7 +491,15 @@ class Combinator extends CombinatorBase {
       // type is model
       if (!this.isClient(prop)) {
         // is not client
-        emitter.emitln(`${prefix} = ${prop.name} ? boost::any(${prop.name}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
+        if (layer === 1) {
+          emitter.emitln(`${prefix} = ${prop.name} ? boost::any(${prop.name}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
+        } else {
+          if (parent_type instanceof TypeArray) {
+            emitter.emitln(`${prefix}.push_back(boost::any(${prop.name}.toMap()));`, this.level);
+          } else {
+            emitter.emitln(`${prefix} = boost::any(${prop.name}.toMap());`, this.level);
+          }
+        }
       } else {
         debug.warning('sub item type is client : ' + prefix);
       }
@@ -453,7 +517,7 @@ class Combinator extends CombinatorBase {
 
   emitToMap(emitter, props, notes) {
     let nameMap = _names(notes);
-    emitter.emitln('map<string, boost::any> toMap() {', this.level);
+    emitter.emitln('map<string, boost::any> toMap() override {', this.level);
     this.levelUp();
     emitter.emitln('map<string, boost::any> res;', this.level);
     props.forEach(prop => {
@@ -466,7 +530,7 @@ class Combinator extends CombinatorBase {
     emitter.emitln();
   }
 
-  emitFromMapProp(emitter, name, prop, realkey, layer = 1) {
+  emitFromMapProp(emitter, name, prop, realkey, layer = 1, parent_type = null) {
     const isProp = realkey.indexOf('expect') !== 0 && !this.isClient(prop);
     if (isProp) {
       emitter.emitln(`if (m.find("${realkey}") != m.end()) {`, this.level);
@@ -481,9 +545,9 @@ class Combinator extends CombinatorBase {
       let nextExpectName = '';
       let expectName = `expect${layer}`;
       if (prop.type instanceof TypeArray) {
-        p.name = `item${layer}.second`;
+        p.name = `item${layer}`;
         p.parent = prop.type;
-        nextName = `item${layer}.second`;
+        nextName = `item${layer}`;
         nextExpectName = `${expectName}`;
       } else {
         p.name = `item${layer}.second`;
@@ -495,7 +559,7 @@ class Combinator extends CombinatorBase {
       emitter.emitln(`${expected_type} ${expectName};`, this.level);
       emitter.emitln(`for(auto item${layer}:boost::any_cast<${temp_type}>(${name})){`, this.level);
       this.levelUp();
-      this.emitFromMapProp(emitter, nextName, p, nextExpectName, layer + 1);
+      this.emitFromMapProp(emitter, nextName, p, nextExpectName, layer + 1, prop.type);
       this.levelDown();
       emitter.emitln('}', this.level);
       if (prop.parent && prop.parent instanceof TypeArray) {
@@ -506,9 +570,13 @@ class Combinator extends CombinatorBase {
         }
       } else {
         if (layer === 1) {
-          emitter.emitln(`${realkey} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
+          emitter.emitln(`${prop.name} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
         } else {
-          emitter.emitln(`${realkey} = ${expectName};`, this.level);
+          if (parent_type instanceof TypeArray) {
+            emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
+          } else {
+            emitter.emitln(`${realkey} = ${expectName};`, this.level);
+          }
         }
       }
     } else if (prop.type instanceof TypeObject) {
@@ -519,9 +587,13 @@ class Combinator extends CombinatorBase {
         emitter.emitln(`${prop_type} ${var_name};`, this.level);
         emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
         if (isProp) {
-          emitter.emitln(`${realkey} = make_shared<${prop_type}>(${var_name});`, this.level);
+          emitter.emitln(`${prop.name} = make_shared<${prop_type}>(${var_name});`, this.level);
         } else {
-          emitter.emitln(`${realkey} = ${var_name};`, this.level);
+          if (parent_type instanceof TypeArray) {
+            emitter.emitln(`${realkey}.push_back(${var_name});`, this.level);
+          } else {
+            emitter.emitln(`${realkey} = ${var_name};`, this.level);
+          }
         }
       } else {
         // type is client
@@ -531,7 +603,11 @@ class Combinator extends CombinatorBase {
       if (isProp) {
         emitter.emitln(`${prop.name} = make_shared<${this.emitType(prop.type)}>(boost::any_cast<${this.emitType(prop.type)}>(${name}));`, this.level);
       } else {
-        emitter.emitln(`${prop.name} = boost::any_cast<${this.emitType(prop.type)}>(${name});`, this.level);
+        if (parent_type instanceof TypeArray) {
+          emitter.emitln(`${realkey}.push_back(boost::any_cast<${this.emitType(prop.type)}>(${name}));`, this.level);
+        } else {
+          emitter.emitln(`${realkey} = boost::any_cast<${this.emitType(prop.type)}>(${name});`, this.level);
+        }
       }
     } else {
       debug.warning('unsupported type toMap()', prop);
@@ -544,7 +620,7 @@ class Combinator extends CombinatorBase {
 
   emitFromMap(emitter, props, notes) {
     let nameMap = _names(notes);
-    emitter.emitln('void fromMap(map<string, boost::any> m) {', this.level);
+    emitter.emitln('void fromMap(map<string, boost::any> m) override {', this.level);
     this.levelUp();
     props.forEach(prop => {
       let name = typeof nameMap[prop.name] !== 'undefined' ? nameMap[prop.name] : prop.name;
@@ -809,7 +885,8 @@ class Combinator extends CombinatorBase {
       } else if (path.type === 'prop_static') {
         prefix += `::${pathName}`;
       } else if (path.type === 'map') {
-        prefix += `["${pathName}"]`;
+        let isPointer = this.statements[lastPath] && this.statements[lastPath] === 'pointer';
+        prefix += isPointer ? `->at("${pathName}")` : `.at("${pathName}")`;
       } else if (path.type === 'list') {
         prefix += `[${pathName}]`;
       } else {
@@ -843,19 +920,28 @@ class Combinator extends CombinatorBase {
 
   isPointerVar(gram) {
     if (gram instanceof GrammerValue) {
+      if (gram.type === 'null') {
+        return true;
+      }
+    }
+
+    if (gram instanceof GrammerValue) {
+      let grammerVar;
       if (gram.type === 'var' && gram.value instanceof GrammerVar) {
-        if (this.statements[gram.value.name] && this.statements[gram.value.name] === 'pointer') {
+        grammerVar = gram.value;
+      }
+      if (grammerVar) {
+        if (this.statements[grammerVar.name] && this.statements[grammerVar.name] === 'pointer') {
           return true;
         }
       } else if (gram.type === 'call' && gram.value instanceof GrammerCall && gram.value.type === 'prop') {
-        if (gram.value.path[0].type === 'parent' && gram.value.path[1].type === 'prop') {
-          return true;
+        if (gram.value.path[0].name === '__request' || gram.value.path[0].name === '__response') {
+          if (gram.value.path[1].name === 'body') {
+            return true;
+          }
+          return false;
         }
-        let obj = gram.value.path[0].name;
-        if (this.statements[obj] && this.statements[obj] === 'pointer') {
-          return true;
-        }
-        return false;
+        return true;
       }
     }
     return false;
@@ -920,7 +1006,7 @@ class Combinator extends CombinatorBase {
           let emit = new Emitter(this.config);
           this.grammerValue(emit, item, layer + 1);
           let emitItem = emit.output;
-          emitter.emit(`${emitItem} == nullptr ? NULL : *${emitItem}`);
+          emitter.emit(`!${emitItem} ? NULL : *${emitItem}`);
         } else {
           this.grammerValue(emitter, item, layer + 1);
         }
@@ -1034,7 +1120,20 @@ class Combinator extends CombinatorBase {
           // 'empty'
         ];
         gram.params.forEach(p => {
-          if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && gram.path[1].name === 'isUnset') {
+          if (gram.type === 'sys_func' && gram.path[1].name === 'toJSONString') {
+            let emit = new Emitter(this.config);
+
+            if (this.isPointerVar(p)) {
+              emit.emit('make_shared<boost::any>(*');
+              this.grammer(emit, p, false, false);
+              emit.emit(')');
+            } else {
+              emit.emit('make_shared<boost::any>(');
+              this.grammer(emit, p, false, false);
+              emit.emit(')');
+            }
+            tmp.push(emit.output);
+          } else if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && gram.path[1].name === 'isUnset') {
             let emit = new Emitter(this.config);
             this.grammer(emit, p.value.grammer, false, false);
             tmp.push(emit.output);
@@ -1062,6 +1161,8 @@ class Combinator extends CombinatorBase {
             let dataType = this.resolveDataType(p);
             if (p.dataType instanceof TypeStream) {
               tmp.push(`${emit.output}`);
+            } else if (p.type === 'behavior' && p.value instanceof BehaviorToMap) {
+              tmp.push(`make_shared<map<string, boost::any>>(${emit.output})`);
             } else {
               tmp.push(`make_shared<${dataType}>(${emit.output})`);
             }
@@ -1087,19 +1188,38 @@ class Combinator extends CombinatorBase {
 
   grammerExpr(emitter, gram) {
     if (gram.opt === Symbol.concat()) {
+      // implement by behaviorTamplateString
       debug.stack(gram);
     }
     if (!gram.left && !gram.right) {
+      // only emit symbol
       emitter.emit(` ${_symbol(gram.opt)} `);
       return;
     }
+    // emit left of expr
+    let assignToPtr = false;
     this.grammer(emitter, gram.left, false, false);
-    let symbol = _symbol(gram.opt);
+
+    if (gram.right.type === 'null') {
+      // not emit symbol&right if right of expr is null
+      return;
+    }
+
+    // emit right of expr
     if (gram.opt === Symbol.assign()) {
-      if (gram.right.type === 'null') {
+      if (gram.right instanceof GrammerValue && gram.right.type === 'instance' && gram.right.value instanceof GrammerNewObject) {
+        // is new object
+        if (this.isPointerVar(gram.left)) {
+          // new object to ptr property
+          assignToPtr = true;
+          emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
+          this.grammerNewObject(emitter, gram.right.value, assignToPtr);
+          return;
+        }
+        this.grammerNewObject(emitter, gram.right.value, assignToPtr, false);
         return;
       }
-      emitter.emit(` ${symbol} `);
+      emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
       let toStream = false;
       if (gram.left instanceof GrammerValue && gram.left.type === 'call' && gram.left.value.path[1].name === 'body') {
         const k = gram.left.value.path.map(item => item.name).join('.');
@@ -1110,9 +1230,9 @@ class Combinator extends CombinatorBase {
       }
       if (this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
-        emitter.emit(`shared_ptr<${dataType}>(new ${dataType}(`);
-        this.grammer(emitter, gram.right, false, false);
-        emitter.emit('))');
+        emitter.emit(`make_shared<${dataType}>(`);
+        this.grammerValue(emitter, gram.right, false, false);
+        emitter.emit(')');
       } else if (!this.isPointerVar(gram.left) && this.isPointerVar(gram.right)) {
         emitter.emit('*');
         this.grammer(emitter, gram.right, false, false);
@@ -1124,10 +1244,10 @@ class Combinator extends CombinatorBase {
       if (toStream) {
         emitter.emit(')');
       }
-    } else {
-      emitter.emit(` ${symbol} `);
-      this.grammer(emitter, gram.right, false, false);
+      return;
     }
+    emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
+    this.grammer(emitter, gram.right, false, false);
   }
 
   grammerLoop(emitter, gram) {
@@ -1271,9 +1391,14 @@ class Combinator extends CombinatorBase {
     emitter.emit(')'); // close BOOST_THROW_EXCEPTION
   }
 
-  grammerNewObject(emitter, gram) {
+  grammerNewObject(emitter, gram, assignToPtr = false, isAssign = true) {
     let objectName = gram.name;
-    emitter.emit(`${objectName}(`);
+    if (!assignToPtr && isAssign) {
+      emitter.emit(`${objectName}(`);
+    } else if (isAssign) {
+      emitter.emit(`make_shared<${objectName}>(`);
+    }
+    let tmp = [];
     let params;
     if (Array.isArray(gram.params)) {
       params = gram.params;
@@ -1281,22 +1406,29 @@ class Combinator extends CombinatorBase {
       params = [gram.params];
     }
     if (params.length) {
-      let tmp = [];
       params.forEach(p => {
         let emit = new Emitter(this.config);
-        if (!this.isPointerVar(p)) {
-          let dataType = this.resolveDataType(p);
-          emit.emit(`shared_ptr<${dataType}>(new ${dataType}(`);
-          this.grammer(emit, p, false, false);
-          emit.emit('))');
+        if (p instanceof GrammerValue && p.type === 'model_construct_params') {
+          if (p.value.length) {
+            this.grammerValue(emit, p, false, false);
+          }
         } else {
           this.grammer(emit, p, false, false);
         }
-        tmp.push(emit.output);
+        if (emit.output) {
+          tmp.push(emit.output);
+        }
       });
-      emitter.emit(tmp.join(', '));
+      // emitter.emit(tmp.join(', '));
     }
-    emitter.emit(')');
+    if (isAssign) {
+      emitter.emit(tmp.join(', '));
+      emitter.emit(')');
+    } else if (tmp.length) {
+      emitter.emit('(');
+      emitter.emit(tmp.join(', '));
+      emitter.emit(')');
+    }
   }
 
   grammerReturn(emitter, gram) {
@@ -1344,16 +1476,29 @@ class Combinator extends CombinatorBase {
   behaviorToMap(emitter, behavior) {
     const grammer = behavior.grammer;
     if (grammer instanceof GrammerCall) {
+      grammer.path.push({
+        type: 'call',
+        name: 'toMap'
+      });
       this.grammerCall(emitter, grammer);
     } else if (grammer instanceof GrammerVar) {
-      this.grammerVar(emitter, grammer);
+      const grammerCall = new GrammerCall('method');
+      grammerCall.path.push({
+        type: 'object',
+        name: grammer.name
+      });
+      grammerCall.path.push({
+        type: 'call',
+        name: 'toMap'
+      });
+      this.grammerCall(emitter, grammerCall);
     } else {
       debug.stack(grammer);
     }
   }
 
   behaviorToModel(emitter, behavior) {
-    emitter.emit(`${behavior.expected}::fromMap(`);
+    emitter.emit(`${behavior.expected}(`);
     this.grammer(emitter, behavior.grammer, false, false);
     emitter.emit(')');
   }

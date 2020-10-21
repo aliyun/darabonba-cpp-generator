@@ -181,6 +181,16 @@ class PackageInfo extends BasePackageInfo {
   generateExternal() {
     // generate external/CMakeLists.txt
     let tmpl_path = path.join(__dirname, './files/external/CMakeLists.txt.tmpl');
+    this.requirePackage['Core'] = {
+      scope: 'darabonba',
+      name: 'core',
+      packageInfo: {
+        git: {
+          'scope': 'aliyun',
+          'project': 'tea-cpp'
+        }
+      }
+    };
     let keys = Object.keys(this.requirePackage);
     let libraries = '';
     if (keys.length > 0) {

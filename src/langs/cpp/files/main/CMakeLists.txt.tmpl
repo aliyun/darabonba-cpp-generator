@@ -58,7 +58,7 @@ endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core crypto ${param_import})
+target_link_libraries(${PROJECT_NAME} INTERFACE crypto ${param_import})
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_${param_scope}_${param_package}

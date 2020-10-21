@@ -21,6 +21,6 @@ else()
       ${_${package_name}_SOURCE_DIR} 
       ${_${package_name}_BINARY_DIR}
     )
-    target_include_directories(${project_name} PRIVATE "${_${package_name}_SOURCE_DIR}/include")
+    target_include_directories(${project_name} INTERFACE "${_${package_name}_SOURCE_DIR}/include")
   endif()
 endif()

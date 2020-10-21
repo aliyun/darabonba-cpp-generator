@@ -329,28 +329,29 @@ class Combinator extends CombinatorBase {
         emitter.emitln(');');
       } else if (node instanceof ConstructItem) {
         // emit custom constructer
-        // let params = '';
         if (node.params.length) {
           emitter.emit(`explicit ${className}(`, this.level);
-          // params = this.emitParams(emitter, node.params);
-          this.emitParams(emitter, node.params);
+          let tmp = [];
+          node.params.forEach(param => {
+            tmp.push(`const shared_ptr<${this.emitType(param.type)}>& ${_avoidKeywords(param.key)}`);
+            this.statements[param.key] = 'pointer';
+          });
+          let emit = new Emitter(this.config);
+          let str;
+          if (tmp.length > 3) {
+            let curr_row_len = emitter.currRow().length;
+            str = tmp.join(`,${emit.eol}${' '.repeat(curr_row_len)}`);
+          } else {
+            str = tmp.join(', ');
+          }
+          if (emitter instanceof Emitter) {
+            emitter.emit(str);
+          }
           emitter.emit(')');
         } else {
           emitter.emit(`${className}()`, this.level);
         }
         emitter.emitln(';');
-        // if (object.extends.length) {
-        //   let tmp = [];
-        //   if (!(object.extends instanceof Array)) {
-        //     object.extends = [object.extends];
-        //   }
-        //   object.extends.forEach(baseClass => {
-        //     tmp.push(baseClass);
-        //   });
-        //   emitter.emitln(`: ${object.extends[0]}(${params});`);
-        // } else {
-        //   emitter.emitln(';');
-        // }
         hasConstruct = true;
       }
     });
@@ -373,18 +374,17 @@ class Combinator extends CombinatorBase {
   }
 
   emitModelFunc(emitter, className, object) {
-    // emit notes
-    emitter.emitln('protected:');
-    this.levelUp();
     const notes = this.resolveNotes(object.body);
-    if (Object.keys(notes).length > 0) {
-      this.emitNotes(emitter, notes);
-    }
-    this.levelDown();
     emitter.emitln('public:');
     this.levelUp();
-    emitter.emitln(`${className}() {_init();};`, this.level);
-    emitter.emitln(`explicit ${className}(const std::map<string, boost::any> &config) : ${this.config.tea.model.name}(config) {_init();};`, this.level);
+    emitter.emitln(`${className}() {}`, this.level);
+    emitter.emitln(`explicit ${className}(const std::map<string, boost::any> &config) : ${this.config.tea.model.name}(config) {`, this.level);
+    this.levelUp();
+    emitter.emits(this.level,
+      'fromMap(config);'
+    );
+    this.levelDown();
+    emitter.emitln('};', this.level);
     emitter.emitln();
 
     // emit toMap&fromMap method
@@ -697,43 +697,6 @@ class Combinator extends CombinatorBase {
     debug.stack('Unsupported Type', type);
   }
 
-  emitNotes(emitter, notes) {
-    // emit _name
-    emitter.emitln('void _init(){', this.level);
-    this.levelUp();
-    if (notes['name'] && notes['name'].length > 0) {
-      emitter.emitln('_name = map<string, string>({', this.level);
-      this.levelUp();
-      notes['name'].forEach(note => {
-        if (note.key === 'name') {
-          emitter.emitln(`{"${note.prop}" , "${note.value}"},`, this.level);
-        }
-      });
-      this.levelDown();
-      emitter.emitln('});', this.level);
-    }
-
-    if (notes['default'] && notes['default'].length > 0) {
-      emitter.emitln('_default = {', this.level);
-      this.levelUp();
-      notes['default'].forEach(note => {
-        if (note.key === 'default') {
-          let val = note.value;
-          if (note.value !== '') {
-            if (note.type === 'string') {
-              val = `"${val}"`;
-            }
-            emitter.emitln(`{"${note.prop}" , boost::any(${val})},`, this.level);
-          }
-        }
-      });
-      this.levelDown();
-      emitter.emitln('};', this.level);
-    }
-    this.levelDown();
-    emitter.emitln('}', this.level);
-  }
-
   emitAnnotation(emitter, annotation, level) {
     if (typeof level === 'undefined') {
       level = this.level;
@@ -768,7 +731,22 @@ class Combinator extends CombinatorBase {
     // emit construct header
     emitter.emit(`${this.namespace}::Client::Client(`);
     if (node.params.length) {
-      this.emitParams(emitter, node.params);
+      let tmp = [];
+      node.params.forEach(param => {
+        tmp.push(`const shared_ptr<${this.emitType(param.type)}>& ${_avoidKeywords(param.key)}`);
+        this.statements[param.key] = 'pointer';
+      });
+      let emit = new Emitter(this.config);
+      let str;
+      if (tmp.length > 3) {
+        let curr_row_len = emitter.currRow().length;
+        str = tmp.join(`,${emit.eol}${' '.repeat(curr_row_len)}`);
+      } else {
+        str = tmp.join(', ');
+      }
+      if (emitter instanceof Emitter) {
+        emitter.emit(str);
+      }
       emitter.emit(')', this.level);
       if (hasSuper) {
         let tmp = [];
@@ -886,7 +864,22 @@ class Combinator extends CombinatorBase {
         prefix += `::${pathName}`;
       } else if (path.type === 'map') {
         let isPointer = this.statements[lastPath] && this.statements[lastPath] === 'pointer';
-        prefix += isPointer ? `->at("${pathName}")` : `.at("${pathName}")`;
+        let path_name;
+        if (path.isVar) {
+          let varIsPointer = this.statements[pathName] && this.statements[pathName] === 'pointer';
+          if (varIsPointer) {
+            path_name = `*${pathName}`;
+          } else {
+            path_name = pathName;
+          }
+        } else {
+          path_name = `"${pathName}"`;
+        }
+        if (isPointer) {
+          prefix = `(*${prefix})[${path_name}]`;
+        } else {
+          prefix += `[${path_name}]` ;
+        }
       } else if (path.type === 'list') {
         prefix += `[${pathName}]`;
       } else {
@@ -1006,7 +999,7 @@ class Combinator extends CombinatorBase {
           let emit = new Emitter(this.config);
           this.grammerValue(emit, item, layer + 1);
           let emitItem = emit.output;
-          emitter.emit(`!${emitItem} ? NULL : *${emitItem}`);
+          emitter.emit(`!${emitItem} ? ${this.emitType(gram.dataType.valType)}() : *${emitItem}`);
         } else {
           this.grammerValue(emitter, item, layer + 1);
         }
@@ -1213,7 +1206,7 @@ class Combinator extends CombinatorBase {
           // new object to ptr property
           assignToPtr = true;
           emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
-          this.grammerNewObject(emitter, gram.right.value, assignToPtr);
+          this.grammerNewObject(emitter, gram.right.value, assignToPtr, true, true);
           return;
         }
         this.grammerNewObject(emitter, gram.right.value, assignToPtr, false);
@@ -1228,7 +1221,7 @@ class Combinator extends CombinatorBase {
       if (toStream) {
         emitter.emit(`${this.config.tea.converter.name}::toStream(`);
       }
-      if (this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
+      if (!toStream && this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
         emitter.emit(`make_shared<${dataType}>(`);
         this.grammerValue(emitter, gram.right, false, false);
@@ -1391,7 +1384,7 @@ class Combinator extends CombinatorBase {
     emitter.emit(')'); // close BOOST_THROW_EXCEPTION
   }
 
-  grammerNewObject(emitter, gram, assignToPtr = false, isAssign = true) {
+  grammerNewObject(emitter, gram, assignToPtr = false, isAssign = true, isPtrParam = false) {
     let objectName = gram.name;
     if (!assignToPtr && isAssign) {
       emitter.emit(`${objectName}(`);
@@ -1407,17 +1400,18 @@ class Combinator extends CombinatorBase {
     }
     if (params.length) {
       params.forEach(p => {
+        if (p instanceof GrammerValue && p.type === 'model_construct_params' && !p.value.length) {
+          return;
+        }
         let emit = new Emitter(this.config);
-        if (p instanceof GrammerValue && p.type === 'model_construct_params') {
-          if (p.value.length) {
-            this.grammerValue(emit, p, false, false);
-          }
-        } else {
+        if (isPtrParam && !this.isPointerVar(p)) {
+          emit.emit(`make_shared<${this.emitType(p.dataType ? p.dataType : p.type)}>(`);
           this.grammer(emit, p, false, false);
+          emit.emit(')');
+        } else {
+          this.grammerValue(emit, p, false, false);
         }
-        if (emit.output) {
-          tmp.push(emit.output);
-        }
+        tmp.push(emit.output);
       });
       // emitter.emit(tmp.join(', '));
     }

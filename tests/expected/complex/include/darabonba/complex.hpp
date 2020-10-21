@@ -16,15 +16,11 @@ using namespace std;
 
 namespace Darabonba_Complex {
 class ComplexRequestHeader : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"content" , "Content"},
-    });
-  }
 public:
-  ComplexRequestHeader() {_init();};
-  explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  ComplexRequestHeader() {}
+  explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!content) {
@@ -50,12 +46,11 @@ public:
   ~ComplexRequestHeader() {};
 };
 class ComplexRequestConfigs : public Darabonba::Model {
-protected:
-  void _init(){
-  }
 public:
-  ComplexRequestConfigs() {_init();};
-  explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  ComplexRequestConfigs() {}
+  explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!key) {
@@ -101,15 +96,11 @@ public:
   ~ComplexRequestConfigs() {};
 };
 class ComplexRequestPart : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"partNumber" , "PartNumber"},
-    });
-  }
 public:
-  ComplexRequestPart() {_init();};
-  explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  ComplexRequestPart() {}
+  explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {}
   map<string, boost::any> toMap() override {
@@ -131,18 +122,11 @@ public:
   ~ComplexRequestPart() {};
 };
 class ComplexRequest : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"body" , "Body"},
-      {"strs" , "Strs"},
-      {"header" , "header"},
-      {"part" , "Part"},
-    });
-  }
 public:
-  ComplexRequest() {_init();};
-  explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  ComplexRequest() {}
+  explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!accessKey) {
@@ -241,7 +225,7 @@ public:
 class Client : Darabonba_Import::Client {
 public:
   shared_ptr<vector<Darabonba_Source::Config>> _configs{};
-  explicit Client(shared_ptr<Darabonba_Source::Config> config);
+  explicit Client(const shared_ptr<Darabonba_Source::Config>& config);
   Darabonba_Source::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
   map<string, boost::any> Complex2(shared_ptr<ComplexRequest> request, shared_ptr<vector<string>> str, shared_ptr<map<string, string>> val);
   ComplexRequest Complex3(shared_ptr<ComplexRequest> request);
@@ -255,6 +239,7 @@ public:
   static string arrayAccess();
   static string arrayAccess2();
   static string arrayAccess3(shared_ptr<ComplexRequest> request);
+  static void arrayAccess4(shared_ptr<ComplexRequest> request, shared_ptr<string> config, shared_ptr<int> index);
   static vector<string> arrayAssign(shared_ptr<string> config);
   static vector<string> arrayAssign2(shared_ptr<string> config);
   static void arrayAssign3(shared_ptr<ComplexRequest> request, shared_ptr<string> config);

@@ -21,6 +21,6 @@ else()
       ${_darabonba_core_SOURCE_DIR} 
       ${_darabonba_core_BINARY_DIR}
     )
-    target_include_directories(darabonba_package PRIVATE "${_darabonba_core_SOURCE_DIR}/include")
+    target_include_directories(darabonba_package INTERFACE "${_darabonba_core_SOURCE_DIR}/include")
   endif()
 endif()

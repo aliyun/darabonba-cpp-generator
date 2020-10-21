@@ -6,4 +6,4 @@
 
 using namespace Darabonba_Super;
 
-Darabonba_Super::Client::Client(shared_ptr<Darabonba_Source::Config> config) : Darabonba_Import::Client(config) {};
+Darabonba_Super::Client::Client(const shared_ptr<Darabonba_Source::Config>& config) : Darabonba_Import::Client(config) {};

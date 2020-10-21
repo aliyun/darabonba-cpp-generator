@@ -9,7 +9,7 @@
 namespace Darabonba_Super {
 class Client : Darabonba_Import::Client {
 public:
-  explicit Client(shared_ptr<Darabonba_Source::Config> config);
+  explicit Client(const shared_ptr<Darabonba_Source::Config>& config);
 
   ~Client() {};
 };

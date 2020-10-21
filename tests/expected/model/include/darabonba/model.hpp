@@ -16,10 +16,11 @@ using namespace std;
 
 namespace Darabonba_Model {
 class MSubM : public Darabonba::Model {
-protected:
 public:
-  MSubM() {_init();};
-  explicit MSubM(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  MSubM() {}
+  explicit MSubM(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {}
   map<string, boost::any> toMap() override {
@@ -34,12 +35,11 @@ public:
   ~MSubM() {};
 };
 class M : public Darabonba::Model {
-protected:
-  void _init(){
-  }
 public:
-  M() {_init();};
-  explicit M(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  M() {}
+  explicit M(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!subM) {
@@ -67,10 +67,11 @@ public:
   ~M() {};
 };
 class Class : public Darabonba::Model {
-protected:
 public:
-  Class() {_init();};
-  explicit Class(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  Class() {}
+  explicit Class(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {}
   map<string, boost::any> toMap() override {
@@ -85,12 +86,11 @@ public:
   ~Class() {};
 };
 class MyModelSubmodel : public Darabonba::Model {
-protected:
-  void _init(){
-  }
 public:
-  MyModelSubmodel() {_init();};
-  explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  MyModelSubmodel() {}
+  explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!stringfield) {
@@ -116,10 +116,11 @@ public:
   ~MyModelSubmodel() {};
 };
 class MyModelSubarraymodel : public Darabonba::Model {
-protected:
 public:
-  MyModelSubarraymodel() {_init();};
-  explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  MyModelSubarraymodel() {}
+  explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {}
   map<string, boost::any> toMap() override {
@@ -134,15 +135,11 @@ public:
   ~MyModelSubarraymodel() {};
 };
 class MyModel : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"name" , "realName"},
-    });
-  }
 public:
-  MyModel() {_init();};
-  explicit MyModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  MyModel() {}
+  explicit MyModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!stringfield) {

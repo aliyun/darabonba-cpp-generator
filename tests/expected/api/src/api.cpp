@@ -30,9 +30,9 @@ void Darabonba_Api::Client::helloRuntime() {
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_.at("retry")), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
+  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_["retry"]), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
     if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_.at("backoff")), make_shared<int>(_retryTimes));
+      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_["backoff"]), make_shared<int>(_retryTimes));
       if (_backoffTime > 0) {
         Darabonba::Core::sleep(make_shared<int>(_backoffTime));
       }

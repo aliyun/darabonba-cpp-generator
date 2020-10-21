@@ -13,16 +13,11 @@ using namespace std;
 
 namespace Darabonba_Comment {
 class Test1 : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"test" , "test"},
-      {"test2" , "test2"},
-    });
-  }
 public:
-  Test1() {_init();};
-  explicit Test1(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  Test1() {}
+  explicit Test1(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!test) {
@@ -60,16 +55,11 @@ public:
   ~Test1() {};
 };
 class Test2 : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"test" , "test"},
-      {"test2" , "test2"},
-    });
-  }
 public:
-  Test2() {_init();};
-  explicit Test2(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  Test2() {}
+  explicit Test2(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!test) {
@@ -107,16 +97,11 @@ public:
   ~Test2() {};
 };
 class Test3 : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"test" , "test"},
-      {"test1" , "test1"},
-    });
-  }
 public:
-  Test3() {_init();};
-  explicit Test3(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  Test3() {}
+  explicit Test3(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!test) {

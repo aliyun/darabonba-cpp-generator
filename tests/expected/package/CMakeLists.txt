@@ -58,7 +58,7 @@ endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core crypto )
+target_link_libraries(${PROJECT_NAME} INTERFACE crypto darabonba_core)
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_darabonba_package
@@ -68,7 +68,7 @@ if (ENABLE_UNIT_TESTS)
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main )
+            gmock_main darabonba_core)
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests_darabonba_package>)
 endif ()

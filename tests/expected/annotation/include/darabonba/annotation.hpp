@@ -11,15 +11,11 @@ using namespace std;
 
 namespace Darabonba_Annotation {
 class Test : public Darabonba::Model {
-protected:
-  void _init(){
-    _name = map<string, string>({
-      {"test" , "test"},
-    });
-  }
 public:
-  Test() {_init();};
-  explicit Test(const std::map<string, boost::any> &config) : Darabonba::Model(config) {_init();};
+  Test() {}
+  explicit Test(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
 
   void validate() override {
     if (!test) {

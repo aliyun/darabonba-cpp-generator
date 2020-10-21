@@ -725,13 +725,15 @@ class ClientResolver extends BaseResolver {
           current = object.propertyPathTypes[i];
         }
       }
-      call.addPath({ type: 'map', name: accessKey });
+      call.addPath({ type: 'map', name: accessKey, isVar: object.accessKey.type === 'variable' });
       valGrammer.value = call;
     } else if (object.type === 'array_access') {
       valGrammer.type = 'call';
       let accessKey;
       if (object.accessKey.type === 'number') {
         accessKey = object.accessKey.value.value;
+      } else if (object.accessKey.type === 'variable') {
+        accessKey = object.accessKey.id.lexeme;
       } else {
         debug.stack(object);
       }
@@ -751,7 +753,7 @@ class ClientResolver extends BaseResolver {
           current = object.propertyPathTypes[i];
         }
       }
-      call.addPath({ type: 'list', name: accessKey });
+      call.addPath({ type: 'list', name: accessKey, isVar: object.accessKey.type === 'variable' });
       valGrammer.value = call;
     } else {
       debug.stack('unimpelemented : ' + object.type, object);

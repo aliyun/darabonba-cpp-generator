@@ -52,7 +52,7 @@ Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
         {"date", boost::any("2019")},
         {"access", boost::any(mapAccess)},
         {"test", boost::any(mapVal["test"])}
-      }), *request->header)));
+      }), !request->header ? map<string, boost::any>() : request->header->toMap())));
       request_.body = make_shared<shared_ptr<Darabonba::Stream>>(Darabonba_Import::Client::body());
       _lastRequest = request_;
       Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);

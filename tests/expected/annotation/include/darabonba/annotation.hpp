@@ -22,6 +22,7 @@ public:
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("test is required.")));
     }
   }
+
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (test) {

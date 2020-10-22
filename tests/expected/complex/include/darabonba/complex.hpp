@@ -27,6 +27,7 @@ public:
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("content is required.")));
     }
   }
+
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (content) {
@@ -63,6 +64,7 @@ public:
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("extra is required.")));
     }
   }
+
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (key) {
@@ -82,7 +84,14 @@ public:
       key = make_shared<string>(boost::any_cast<string>(m["key"]));
     }
     if (m.find("value") != m.end()) {
-      value = make_shared<vector<string>>(boost::any_cast<vector<string>>(m["value"]));
+      vector<string> toVec1;
+      if (typeid(vector<boost::any>).name() == m["value"].type().name()) {
+        vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["value"]);
+        for (auto item:vec1) {
+           toVec1.push_back(boost::any_cast<string>(item));
+        }
+      }
+      value = make_shared<vector<string>>(toVec1);
     }
     if (m.find("extra") != m.end()) {
       extra = make_shared<map<string, string>>(boost::any_cast<map<string, string>>(m["extra"]));
@@ -103,6 +112,7 @@ public:
   };
 
   void validate() override {}
+
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (partNumber) {
@@ -148,6 +158,7 @@ public:
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("configs is required.")));
     }
   }
+
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
     if (accessKey) {
@@ -186,29 +197,44 @@ public:
       body = make_shared<shared_ptr<Darabonba::Stream>>(boost::any_cast<shared_ptr<Darabonba::Stream>>(m["Body"]));
     }
     if (m.find("Strs") != m.end()) {
-      strs = make_shared<vector<string>>(boost::any_cast<vector<string>>(m["Strs"]));
+      vector<string> toVec1;
+      if (typeid(vector<boost::any>).name() == m["Strs"].type().name()) {
+        vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["Strs"]);
+        for (auto item:vec1) {
+           toVec1.push_back(boost::any_cast<string>(item));
+        }
+      }
+      strs = make_shared<vector<string>>(toVec1);
     }
     if (m.find("header") != m.end()) {
-      ComplexRequestHeader complexRequestHeader;
-      complexRequestHeader.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
-      header = make_shared<ComplexRequestHeader>(complexRequestHeader);
+      if (typeid(map<string, boost::any>).name() == m["header"].type().name()) {
+        ComplexRequestHeader complexRequestHeader;
+        complexRequestHeader.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
+        header = make_shared<ComplexRequestHeader>(complexRequestHeader);
+      }
     }
     if (m.find("Num") != m.end()) {
       Num = make_shared<int>(boost::any_cast<int>(m["Num"]));
     }
     if (m.find("configs") != m.end()) {
-      ComplexRequestConfigs complexRequestConfigs;
-      complexRequestConfigs.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
-      configs = make_shared<ComplexRequestConfigs>(complexRequestConfigs);
+      if (typeid(map<string, boost::any>).name() == m["configs"].type().name()) {
+        ComplexRequestConfigs complexRequestConfigs;
+        complexRequestConfigs.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
+        configs = make_shared<ComplexRequestConfigs>(complexRequestConfigs);
+      }
     }
     if (m.find("Part") != m.end()) {
-      vector<ComplexRequestPart> expect1;
-      for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
-        ComplexRequestPart complexRequestPart;
-        complexRequestPart.fromMap(boost::any_cast<map<string, boost::any>>(item1));
-        expect1.push_back(complexRequestPart);
+      if (typeid(vector<boost::any>).name() == m["Part"].type().name()) {
+        vector<ComplexRequestPart> expect1;
+        for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
+          if (typeid(map<string, boost::any>).name() == item1.type().name()) {
+            ComplexRequestPart complexRequestPart;
+            complexRequestPart.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            expect1.push_back(complexRequestPart);
+          }
+        }
+        part = make_shared<vector<ComplexRequestPart>>(expect1);
       }
-      part = make_shared<vector<ComplexRequestPart>>(expect1);
     }
   }
 

@@ -58,7 +58,7 @@ endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} INTERFACE crypto ${param_import})
+target_link_libraries(${PROJECT_NAME} PRIVATE crypto ${param_import})
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_${param_scope}_${param_package}
@@ -68,7 +68,7 @@ if (ENABLE_UNIT_TESTS)
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main ${param_import})
+            gmock_main crypto ${param_import})
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests_${param_scope}_${param_package}>)
 endif ()

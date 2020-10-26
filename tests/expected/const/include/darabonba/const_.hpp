@@ -13,7 +13,6 @@ public:
   static string hello();
 
   Client() {};
-  ~Client() {};
 };
 } // namespace Darabonba_Const_
 

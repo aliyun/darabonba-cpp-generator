@@ -8,7 +8,6 @@ class Client {
 public:
 
   Client() {};
-  ~Client() {};
 };
 } // namespace Darabonba_Empty
 

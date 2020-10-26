@@ -12,7 +12,6 @@ public:
   static void emptyModel();
 
   Client() {};
-  ~Client() {};
 };
 } // namespace Darabonba_Alias
 

@@ -53,7 +53,7 @@ public:
   shared_ptr<string> test2{};
   // model的test2 back comment
 
-  ~Test1() {};
+  ~Test1() = default;
 };
 class Test2 : public Darabonba::Model {
 public:
@@ -96,7 +96,7 @@ public:
   // model的test front comment
   shared_ptr<string> test2{};
 
-  ~Test2() {};
+  ~Test2() = default;
 };
 class Test3 : public Darabonba::Model {
 public:
@@ -141,7 +141,7 @@ public:
   shared_ptr<string> test1{};
   // model的test back comment
 
-  ~Test3() {};
+  ~Test3() = default;
 };
 class Client {
 public:
@@ -153,7 +153,7 @@ public:
   static void staticFunc();
   static void testFunc(shared_ptr<string> str, shared_ptr<bool> val);
 
-  ~Client() {};
+  ~Client() = default;
 };
 } // namespace Darabonba_Comment
 

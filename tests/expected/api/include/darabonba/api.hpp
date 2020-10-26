@@ -12,7 +12,6 @@ public:
   void hello();
   void helloRuntime();
 
-  ~Client() {};
 };
 } // namespace Darabonba_Api
 

@@ -16,7 +16,6 @@ public:
   static void helloWhile();
   static void helloDeclare();
 
-  ~Client() {};
 };
 } // namespace Darabonba_Statements
 

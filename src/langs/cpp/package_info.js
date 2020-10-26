@@ -98,7 +98,6 @@ class PackageInfo extends BasePackageInfo {
           }
         );
       });
-      debug.halt(this.config.packageInfo.files);
     }
 
     // generate git ignore file

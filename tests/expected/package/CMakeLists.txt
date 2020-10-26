@@ -58,7 +58,9 @@ endif ()
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
-target_link_libraries(${PROJECT_NAME} PRIVATE crypto darabonba_core)
+find_package(Boost REQUIRED COMPONENTS random system thread filesystem chrono atomic date_time regex)
+find_library(CPPREST_LIB cpprest)
+target_link_libraries(${PROJECT_NAME} PRIVATE crypto darabonba_core ${CPPREST_LIB})
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_darabonba_package
@@ -68,7 +70,7 @@ if (ENABLE_UNIT_TESTS)
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main crypto darabonba_core)
+            gmock_main crypto darabonba_core ${CPPREST_LIB})
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests_darabonba_package>)
 endif ()

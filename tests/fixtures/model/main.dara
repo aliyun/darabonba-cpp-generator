@@ -7,6 +7,8 @@ model M = {
 model Class = {};
 
 model MyModel = {
+  // keyword property
+  delete: string(name='Delete'),
   stringfield: string,
   bytesfield: bytes,
   stringarrayfield: [ string ],

@@ -149,6 +149,9 @@ public:
   };
 
   void validate() override {
+    if (!delete_) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("delete is required.")));
+    }
     if (!stringfield) {
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("stringfield is required.")));
     }
@@ -261,6 +264,9 @@ public:
 
   map<string, boost::any> toMap() override {
     map<string, boost::any> res;
+    if (delete_) {
+      res["Delete"] = boost::any(*delete_);
+    }
     if (stringfield) {
       res["stringfield"] = boost::any(*stringfield);
     }
@@ -409,6 +415,9 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
+    if (m.find("Delete") != m.end()) {
+      delete_ = make_shared<string>(boost::any_cast<string>(m["Delete"]));
+    }
     if (m.find("stringfield") != m.end()) {
       stringfield = make_shared<string>(boost::any_cast<string>(m["stringfield"]));
     }
@@ -645,6 +654,8 @@ public:
     }
   }
 
+  // keyword property
+  shared_ptr<string> delete_{};
   shared_ptr<string> stringfield{};
   shared_ptr<vector<uint8_t>> bytesfield{};
   shared_ptr<vector<string>> stringarrayfield{};

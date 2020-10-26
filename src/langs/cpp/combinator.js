@@ -56,7 +56,7 @@ const {
 const assert = require('assert');
 
 function _name(name) {
-  return name.split('.').map(item => _upperFirst(_avoidKeywords(item))).join('');
+  return _avoidKeywords(name.split('.').map(item => _upperFirst(item)).join(''));
 }
 
 function _names(notes) {
@@ -310,9 +310,9 @@ class Combinator extends CombinatorBase {
       if (node instanceof PropItem) {
         // emit properties
         if (node.type instanceof TypeStream) {
-          emitter.emitln(`${this.emitType(node.type)} ${node.name}{};`, this.level);
+          emitter.emitln(`${this.emitType(node.type)} ${_avoidKeywords(node.name)}{};`, this.level);
         } else {
-          emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${node.name}{};`, this.level);
+          emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${_avoidKeywords(node.name)}{};`, this.level);
         }
       } else if (node instanceof AnnotationItem) {
         // emit annotation
@@ -416,7 +416,7 @@ class Combinator extends CombinatorBase {
             val = `"${val}"`;
           }
           if (note.key === 'required' && note.value === true) {
-            emit.emitln(`if (!${note.prop}) {`, this.level);
+            emit.emitln(`if (!${_avoidKeywords(note.prop)}) {`, this.level);
             this.pushInclude('throw_exception', this.level);
             this.levelUp();
             emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
@@ -424,9 +424,9 @@ class Combinator extends CombinatorBase {
             emit.emitln('}', this.level);
           } else if (note.key === 'maximum' || note.key === 'minimum') {
             let opt = note.key === 'maximum' ? '>' : '<';
-            emit.emitln(`if (${note.prop} {`, this.level);
+            emit.emitln(`if (${_avoidKeywords(note.prop)} {`, this.level);
             this.levelUp();
-            emit.emitln(`if (${note.prop} ${opt} ${val})) {`, this.level);
+            emit.emitln(`if (${_avoidKeywords(note.prop)} ${opt} ${val})) {`, this.level);
             this.pushInclude('throw_exception', this.level);
             this.levelUp();
             emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
@@ -435,7 +435,7 @@ class Combinator extends CombinatorBase {
             this.levelDown();
             emit.emitln('}', this.level);
           } else {
-            emit.emitln(`Darabonba::Model::validate${_upperFirst(note.key)}("${note.prop}", ${note.prop}, ${val});`, this.level);
+            emit.emitln(`Darabonba::Model::validate${_upperFirst(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
           }
         }
       });
@@ -455,11 +455,11 @@ class Combinator extends CombinatorBase {
     let var_name = '';
     let isProp = layer === 1 && !this.isClient(prop);
     if (isProp) {
-      var_name = `*${prop.name}`;
-      emitter.emitln(`if (${prop.name}) {`, this.level);
+      var_name = `*${_avoidKeywords(prop.name)}`;
+      emitter.emitln(`if (${_avoidKeywords(prop.name)}) {`, this.level);
       this.levelUp();
     } else {
-      var_name = prop.name;
+      var_name = _avoidKeywords(prop.name);
     }
     if (_needRecur.call(this, prop.type)) {
       // item type is array or map
@@ -493,12 +493,12 @@ class Combinator extends CombinatorBase {
       if (!this.isClient(prop)) {
         // is not client
         if (layer === 1) {
-          emitter.emitln(`${prefix} = ${prop.name} ? boost::any(${prop.name}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
+          emitter.emitln(`${prefix} = ${_avoidKeywords(prop.name)} ? boost::any(${_avoidKeywords(prop.name)}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
         } else {
           if (parent_type instanceof TypeArray) {
-            emitter.emitln(`${prefix}.push_back(boost::any(${prop.name}.toMap()));`, this.level);
+            emitter.emitln(`${prefix}.push_back(boost::any(${_avoidKeywords(prop.name)}.toMap()));`, this.level);
           } else {
-            emitter.emitln(`${prefix} = boost::any(${prop.name}.toMap());`, this.level);
+            emitter.emitln(`${prefix} = boost::any(${_avoidKeywords(prop.name)}.toMap());`, this.level);
           }
         }
       } else {
@@ -629,7 +629,7 @@ class Combinator extends CombinatorBase {
         }
       } else {
         if (layer === 1) {
-          emitter.emitln(`${prop.name} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
+          emitter.emitln(`${_avoidKeywords(prop.name)} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
         } else {
           if (parent_type instanceof TypeArray) {
             emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
@@ -651,7 +651,7 @@ class Combinator extends CombinatorBase {
         emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
         if (isProp) {
           // emitter.emitln(`${prop.name} = make_shared<${prop_type}>(${var_name});`, this.level);
-          this.emitFromMapItem(emitter, prop.name, prop.type, var_name, parent_type, layer);
+          this.emitFromMapItem(emitter, _avoidKeywords(prop.name), prop.type, var_name, parent_type, layer);
         } else {
           if (parent_type instanceof TypeArray) {
             emitter.emitln(`${realkey}.push_back(${var_name});`, this.level);
@@ -667,7 +667,7 @@ class Combinator extends CombinatorBase {
       }
     } else if (prop.type instanceof TypeBase) {
       if (isProp) {
-        this.emitFromMapItem(emitter, prop.name, prop.type, name);
+        this.emitFromMapItem(emitter, _avoidKeywords(prop.name), prop.type, name);
       } else {
         this.emitFromMapItem(emitter, realkey, prop.type, name, parent_type, layer);
       }

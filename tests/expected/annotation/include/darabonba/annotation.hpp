@@ -39,7 +39,7 @@ public:
 
   shared_ptr<string> test{};
 
-  ~Test() {};
+  ~Test() = default;
 };
 class Client {
 public:
@@ -48,7 +48,7 @@ public:
   void testAPI();
   static void testFunc();
 
-  ~Client() {};
+  ~Client() = default;
 };
 } // namespace Darabonba_Annotation
 

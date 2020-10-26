@@ -19,7 +19,6 @@ public:
   static void helloInterface();
 
   Client() {};
-  ~Client() {};
 };
 } // namespace Darabonba_Function
 

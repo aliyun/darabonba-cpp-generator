@@ -10,12 +10,22 @@ const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
 
 class PackageInfo extends BasePackageInfo {
-  emit(requirePackage, objects) {
-    this.requirePackage = requirePackage;
+  emit(requirePackage, libraries, objects) {
     this.project_name = `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`;
     this.imports = [];
     const [object] = objects.filter(obj => obj.type === 'client');
     this.client = object;
+    Object.keys(libraries).forEach((key) => {
+      if (!requirePackage[key]) {
+        const lib_path = path.join(this.config.pkgDir, libraries[key]);
+        if (fs.existsSync(path.join(lib_path, 'Teafile'))) {
+          requirePackage[key] = JSON.parse(fs.readFileSync(path.join(lib_path, 'Teafile')));
+        } else if (fs.existsSync(path.join(lib_path, 'Darafile'))) {
+          requirePackage[key] = JSON.parse(fs.readFileSync(path.join(lib_path, 'Darafile')));
+        }
+      }
+    });
+    this.requirePackage = requirePackage;
 
     // generate external
     this.generateExternal();
@@ -88,6 +98,7 @@ class PackageInfo extends BasePackageInfo {
           }
         );
       });
+      debug.halt(this.config.packageInfo.files);
     }
 
     // generate git ignore file
@@ -113,7 +124,9 @@ class PackageInfo extends BasePackageInfo {
   generateMainFiles() {
     let param_scope = _toSnakeCase(this.config.scope);
     let param_package = _avoidKeywords(_toSnakeCase(this.config.name));
-    let template = fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.tmpl'), 'utf-8');
+    let template = this.config.withTest ?
+      fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.test.tmpl'), 'utf-8') :
+      fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.tmpl'), 'utf-8');
     if (this.config.withTest) {
       let tests_main_path = path.join(this.config.dir, 'tests/main.cpp');
       if (!fs.existsSync(tests_main_path)) {
@@ -178,19 +191,31 @@ class PackageInfo extends BasePackageInfo {
     }
   }
 
-  generateExternal() {
-    // generate external/CMakeLists.txt
-    let tmpl_path = path.join(__dirname, './files/external/CMakeLists.txt.tmpl');
-    this.requirePackage['Core'] = {
-      scope: 'darabonba',
-      name: 'core',
-      packageInfo: {
-        git: {
-          'scope': 'aliyun',
-          'project': 'tea-cpp'
+  addGlobalPackage() {
+    const globalPackage = {
+      'Core': {
+        scope: 'darabonba',
+        name: 'core',
+        packageInfo: {
+          git: {
+            'scope': 'aliyun',
+            'project': 'tea-cpp'
+          }
         }
       }
     };
+    Object.assign(this.requirePackage, globalPackage);
+    if (this.config.cpp && this.config.cpp.require) {
+      Object.assign(this.requirePackage, globalPackage, this.config.cpp.require);
+    }
+  }
+
+  generateExternal() {
+    // generate external/CMakeLists.txt
+    let tmpl_path = this.config.withTest ?
+      path.join(__dirname, './files/external/CMakeLists.txt.test.tmpl') :
+      path.join(__dirname, './files/external/CMakeLists.txt.tmpl');
+    this.addGlobalPackage();
     let keys = Object.keys(this.requirePackage);
     let libraries = '';
     if (keys.length > 0) {

@@ -145,6 +145,7 @@ describe('C++ Generator', function () {
       'src/package.cpp',
       'include/darabonba/package.hpp',
       'external/CMakeLists.txt',
+      'external/darabonba_core/CMakeLists.txt',
       '.gitignore',
       'scripts/build.sh',
       'scripts/codecov.sh',

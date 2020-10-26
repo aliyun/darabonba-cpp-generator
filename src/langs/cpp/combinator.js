@@ -158,7 +158,7 @@ class Combinator extends CombinatorBase {
   combine(objects = []) {
     if (this.config.packageInfo) {
       const packageInfo = new PackageInfo(this.config);
-      packageInfo.emit(this.thirdPackageDaraMeta, objects);
+      packageInfo.emit(this.thirdPackageDaraMeta, this.libraries, objects);
     }
     this.combineHead(objects);
     this.combineCode(objects);
@@ -1065,7 +1065,7 @@ class Combinator extends CombinatorBase {
             emitter.emit(`!${emitItem} ? ${this.emitType(gram.dataType.valType)}() : *${emitItem}`);
           }
         } else {
-          if (isAny) { 
+          if (isAny) {
             emitter.emit('boost::any(');
             this.grammerValue(emitter, item, layer + 1);
             emitter.emit(')');

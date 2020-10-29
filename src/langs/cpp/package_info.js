@@ -5,7 +5,7 @@ const os = require('os');
 const fs = require('fs');
 const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
-const { _toSnakeCase, _upperFirst, _avoidKeywords } = require('../../lib/helper');
+const { _toSnakeCase, _upperFirst, _avoidKeywords, _render } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
 
@@ -136,15 +136,15 @@ class PackageInfo extends BasePackageInfo {
           }
         );
       }
-      template = this.render(template, {
-        with_test: this.render(fs.readFileSync(path.join(__dirname, './files/main/with_test.CMakeLists.txt.tmpl'), 'utf-8'), {
+      template = _render(template, {
+        with_test: _render(fs.readFileSync(path.join(__dirname, './files/main/with_test.CMakeLists.txt.tmpl'), 'utf-8'), {
           param_scope,
           param_package,
         }),
         param_import: this.imports.join(' ')
       });
     } else {
-      template = this.render(template, { with_test: '' });
+      template = _render(template, { with_test: '' });
     }
     this.renderContent(
       template,

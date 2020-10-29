@@ -413,6 +413,9 @@ class Combinator extends CombinatorBase {
           if (note.type === 'string') {
             val = `"${val}"`;
           }
+          if (note.key === 'pattern') { 
+            val = val.split('\\').join('\\\\');
+          }
           if (note.key === 'required' && note.value === true) {
             emit.emitln(`if (!${_avoidKeywords(note.prop)}) {`, this.level);
             this.pushInclude('throw_exception', this.level);

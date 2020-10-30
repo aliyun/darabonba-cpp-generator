@@ -145,8 +145,7 @@ Darabonba_Source::Request Darabonba_Complex::Client::print(shared_ptr<Darabonba:
 }
 
 vector<boost::any> Darabonba_Complex::Client::array0(shared_ptr<map<string, boost::any>> req) {
-  return vector<boost::any>()
-;
+  return vector<boost::any>();
 }
 
 vector<string> Darabonba_Complex::Client::array1() {

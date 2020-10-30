@@ -9,48 +9,31 @@ const {
 } = require('../common/enum');
 
 const {
-  _avoidKeywords,
+  is,
+  _symbol,
+  _modify,
+  _contain,
   _deepClone,
   _upperFirst,
-  _convertStaticParam,
-  _symbol,
   _toSnakeCase,
-  _modify,
-  // _lowerFirst
+  _avoidKeywords,
+  _convertStaticParam,
+  _startWith,
 } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 
 const {
   PropItem,
   AnnotationItem,
-  FuncItem,
-  ConstructItem,
+
   GrammerNewObject,
   GrammerThrows,
   GrammerCatch,
   GrammerValue,
   GrammerCall,
-  // GrammerExpr,
   GrammerVar,
 
-  TypeGeneric,
-  TypeDecimal,
-  TypeInteger,
-  TypeStream,
-  TypeObject,
-  TypeString,
-  TypeNumber,
-  TypeArray,
-  TypeBytes,
-  TypeBool,
-  TypeItem,
-  TypeVoid,
-  TypeNull,
-  TypeMap,
-  TypeBase,
-
   BehaviorToMap,
-  TypeTree,
 } = require('../common/items');
 
 const assert = require('assert');
@@ -72,17 +55,17 @@ function _names(notes) {
 }
 
 function _needRecur(prop_type) {
-  if (typeof prop_type === 'undefined' || !(prop_type instanceof TypeTree)) {
+  if (is.undefined(prop_type) || !is.tree(prop_type)) {
     return false;
   }
   let itemType = prop_type.itemType ? prop_type.itemType : prop_type.valType;
-  if (typeof itemType === 'undefined') {
+  if (is.undefined(itemType)) {
     return false;
   }
-  if (itemType instanceof TypeTree) {
+  if (is.tree(itemType)) {
     return _needRecur.call(this, itemType);
   }
-  if (itemType instanceof TypeObject && !this.isClient(itemType)) {
+  if (is.object(itemType) && !this.isClient(itemType)) {
     return true;
   }
   return false;
@@ -102,7 +85,7 @@ class Combinator extends CombinatorBase {
 
   addInclude(className) {
     let realFullClassName, includeFileName, using;
-    if (className.indexOf('$') > -1) {
+    if (_contain(className, '$')) {
       realFullClassName = this.coreClass(className);
       includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
     } else if (this.thirdPackageNamespace[className]) {
@@ -128,7 +111,7 @@ class Combinator extends CombinatorBase {
   addModelInclude(modelName) {
     let realFullClassName, includeFileName, using;
     let accessPath = modelName.split('.');
-    if (modelName.indexOf('$') > -1) {
+    if (_contain(modelName, '$')) {
       realFullClassName = this.coreClass(modelName);
       includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
     } else if (accessPath.length > 1 && this.thirdPackageNamespace[accessPath[0]]) {
@@ -213,7 +196,7 @@ class Combinator extends CombinatorBase {
     const outputPars = { head: '', body: '', foot: '' };
     this.object = object;
     this.properties = {};
-    object.body.filter(node => node instanceof PropItem).forEach(node => {
+    object.body.filter(node => is.prop(node)).forEach(node => {
       this.properties[node.name] = 'pointer';
     });
 
@@ -221,9 +204,9 @@ class Combinator extends CombinatorBase {
     let emitter = new Emitter(this.config);
     object.body.forEach(node => {
       this.statements = _deepClone(this.properties);
-      if (node instanceof FuncItem) {
+      if (is.func(node)) {
         this.emitFuncCode(emitter, node);
-      } else if (node instanceof ConstructItem) {
+      } else if (is.construct(node)) {
         this.emitConstruct(emitter, node);
       }
     });
@@ -257,7 +240,7 @@ class Combinator extends CombinatorBase {
       includeList.filter(item => item.includeFileName !== selfInclude).sort(function (a, b) {
         return a.includeFileName > b.includeFileName ? 1 : -1;
       }).forEach(include => {
-        if (includeFileSet.indexOf(include.includeFileName) === -1) {
+        if (!_contain(includeFileSet, include.includeFileName)) {
           emitter.emitln(`#include ${include.includeFileName}`);
           includeFileSet.push(include.includeFileName);
         }
@@ -268,7 +251,7 @@ class Combinator extends CombinatorBase {
       const usingSet = [];
       if (includeList.length > 0) {
         includeList.forEach(item => {
-          if (usingSet.indexOf(item.using) === -1) {
+          if (!_contain(usingSet, item.using)) {
             emitter.emitln(`using namespace ${item.using};`);
             usingSet.push(item.using);
           }
@@ -307,17 +290,17 @@ class Combinator extends CombinatorBase {
 
     // emit child nodes
     object.body.forEach(node => {
-      if (node instanceof PropItem) {
+      if (is.prop(node)) {
         // emit properties
-        if (node.type instanceof TypeStream) {
+        if (is.stream(node.type)) {
           emitter.emitln(`${this.emitType(node.type)} ${_avoidKeywords(node.name)}{};`, this.level);
         } else {
           emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${_avoidKeywords(node.name)}{};`, this.level);
         }
-      } else if (node instanceof AnnotationItem) {
+      } else if (is.annotation(node)) {
         // emit annotation
         this.emitAnnotation(emitter, node);
-      } else if (node instanceof FuncItem) {
+      } else if (is.func(node)) {
         let modify = _modify(node.modify);
         let returnType = this.emitType(node.return[0]);
         if (modify) {
@@ -327,7 +310,7 @@ class Combinator extends CombinatorBase {
         }
         this.emitParams(emitter, node.params);
         emitter.emitln(');');
-      } else if (node instanceof ConstructItem) {
+      } else if (is.construct(node)) {
         // emit custom constructer
         if (node.params.length) {
           emitter.emit(`explicit ${className}(`, this.level);
@@ -344,9 +327,7 @@ class Combinator extends CombinatorBase {
           } else {
             str = tmp.join(', ');
           }
-          if (emitter instanceof Emitter) {
-            emitter.emit(str);
-          }
+          emitter.emit(str);
           emitter.emit(')');
         } else {
           emitter.emit(`${className}()`, this.level);
@@ -360,7 +341,7 @@ class Combinator extends CombinatorBase {
     if (!hasConstruct) {
       emitter.emitln(`${className}() {};`, this.level);
     }
-    let properties = object.body.filter(node => node instanceof PropItem);
+    let properties = object.body.filter(node => is.prop(node));
     if (properties.length) {
       emitter.emitln(`~${className}() = default;`, this.level);
     }
@@ -386,7 +367,7 @@ class Combinator extends CombinatorBase {
     emitter.emitln();
 
     // emit toMap&fromMap method
-    let props = object.body.filter(node => node instanceof PropItem);
+    let props = object.body.filter(node => is.prop(node));
     this.emitValidate(emitter, props);
     this.emitToMap(emitter, props, notes);
     this.emitFromMap(emitter, props, notes);
@@ -408,12 +389,12 @@ class Combinator extends CombinatorBase {
     this.levelUp();
     props.forEach(prop => {
       prop.notes.forEach(note => {
-        if (validateNoteKeys.indexOf(note.key) > -1) {
+        if (_contain(validateNoteKeys, note.key)) {
           let val = note.value;
           if (note.type === 'string') {
             val = `"${val}"`;
           }
-          if (note.key === 'pattern') { 
+          if (note.key === 'pattern') {
             val = val.split('\\').join('\\\\');
           }
           if (note.key === 'required' && note.value === true) {
@@ -465,10 +446,10 @@ class Combinator extends CombinatorBase {
     if (_needRecur.call(this, prop.type)) {
       // item type is array or map
       const p = new PropItem();
-      p.type = prop.type instanceof TypeArray ? prop.type.itemType : prop.type.valType;
+      p.type = is.array(prop.type) ? prop.type.itemType : prop.type.valType;
       let pre = '';
       let temp = '';
-      if (prop.type instanceof TypeArray) {
+      if (is.array(prop.type)) {
         p.name = `item${layer}`;
         temp = `temp${layer}`;
         pre = `${temp}`;
@@ -477,26 +458,26 @@ class Combinator extends CombinatorBase {
         temp = `temp${layer}`;
         pre = `${temp}[item${layer}.first]`;
       }
-      let temp_type = prop.type instanceof TypeArray ? 'vector<boost::any>' : 'map<string, boost::any>';
+      let temp_type = is.array(prop.type) ? 'vector<boost::any>' : 'map<string, boost::any>';
       emitter.emitln(`${temp_type} ${temp};`, this.level);
       emitter.emitln(`for(auto item${layer}:${var_name}){`, this.level);
       this.levelUp();
       this.emitToMapProp(emitter, pre, p, layer + 1, prop.type);
       this.levelDown();
       emitter.emitln('}', this.level);
-      if (prop.type instanceof TypeArray) {
+      if (is.array(prop.type)) {
         emitter.emitln(`${prefix} = boost::any(${temp});`, this.level);
       } else {
         emitter.emitln(`${prefix} = boost::any(${temp});`, this.level);
       }
-    } else if (prop.type instanceof TypeObject) {
+    } else if (is.object(prop.type)) {
       // type is model
       if (!this.isClient(prop)) {
         // is not client
         if (layer === 1) {
           emitter.emitln(`${prefix} = ${_avoidKeywords(prop.name)} ? boost::any(${_avoidKeywords(prop.name)}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
         } else {
-          if (parent_type instanceof TypeArray) {
+          if (is.array(parent_type)) {
             emitter.emitln(`${prefix}.push_back(boost::any(${_avoidKeywords(prop.name)}.toMap()));`, this.level);
           } else {
             emitter.emitln(`${prefix} = boost::any(${_avoidKeywords(prop.name)}.toMap());`, this.level);
@@ -505,7 +486,7 @@ class Combinator extends CombinatorBase {
       } else {
         debug.warning('sub item type is client : ' + prefix);
       }
-    } else if (prop.type instanceof TypeBase) {
+    } else if (is.base(prop.type)) {
       // is base type
       emitter.emitln(`${prefix} = boost::any(${var_name});`, this.level);
     } else {
@@ -533,7 +514,7 @@ class Combinator extends CombinatorBase {
   }
 
   emitFromMapItem(emitter, target, type, source, parent_type = null, layer = 1) {
-    if (type instanceof TypeArray) {
+    if (is.array(type)) {
       emitter.emitln(`vector<${this.emitType(type.itemType)}> toVec${layer};`, this.level);
       emitter.emitln(`if (typeid(vector<boost::any>).name() == ${source}.type().name()) {`, this.level);
       this.levelUp();
@@ -550,7 +531,7 @@ class Combinator extends CombinatorBase {
       } else {
         emitter.emitln(`${target} = toVec${layer};`, this.level);
       }
-    } else if (type instanceof TypeMap) {
+    } else if (is.map(type)) {
       emitter.emitln(`map<string, boost::any> map${layer} = boost::any_cast<map<string, boost::any>>(${source});`, this.level);
       emitter.emitln(`map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}> toMap${layer};`, this.level);
       emitter.emitln(`for (auto item:map${layer}) {`, this.level);
@@ -563,24 +544,24 @@ class Combinator extends CombinatorBase {
       } else {
         emitter.emitln(`${target} = toMap${layer};`, this.level);
       }
-    } else if (type instanceof TypeStream) {
-      if (parent_type instanceof TypeArray) {
+    } else if (is.stream(type)) {
+      if (is.array(parent_type)) {
         emitter.emitln(`${target}.push_back(boost::any_cast<Darabonba::Stream>(${source}));`, this.level);
       } else if (layer === 1) {
         emitter.emitln(`${target} = make_shared<Darabonba::Stream>(boost::any_cast<Darabonba::Stream>(${source}));`, this.level);
       } else {
         emitter.emitln(`${target} = boost::any_cast<Darabonba::Stream>(${source});`, this.level);
       }
-    } else if (type instanceof TypeBase) {
-      if (parent_type instanceof TypeArray) {
+    } else if (is.base(type)) {
+      if (is.array(parent_type)) {
         emitter.emitln(`${target}.push_back(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else if (layer === 1) {
         emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else {
         emitter.emitln(`${target} = boost::any_cast<${this.emitType(type)}>(${source});`, this.level);
       }
-    } else if (type instanceof TypeObject) {
-      if (parent_type instanceof TypeArray) {
+    } else if (is.object(type)) {
+      if (is.array(parent_type)) {
         if (layer === 1) {
           emitter.emitln(`${target}->push_back(${source});`, this.level);
         } else {
@@ -606,11 +587,11 @@ class Combinator extends CombinatorBase {
     if (_needRecur.call(this, prop.type)) {
       // item type is array or map
       const p = new PropItem();
-      p.type = prop.type instanceof TypeArray ? prop.type.itemType : prop.type.valType;
+      p.type = is.array(prop.type) ? prop.type.itemType : prop.type.valType;
       let nextName = '';
       let nextExpectName = '';
       let expectName = `expect${layer}`;
-      if (prop.type instanceof TypeArray) {
+      if (is.array(prop.type)) {
         p.name = `item${layer}`;
         p.parent = prop.type;
         nextName = `item${layer}`;
@@ -620,7 +601,7 @@ class Combinator extends CombinatorBase {
         nextName = `item${layer}.second`;
         nextExpectName = `${expectName}[item.first]`;
       }
-      let temp_type = prop.type instanceof TypeArray ? 'vector<boost::any>' : 'map<string, boost::any>';
+      let temp_type = is.array(prop.type) ? 'vector<boost::any>' : 'map<string, boost::any>';
       let expected_type = this.emitType(prop.type);
       emitter.emitln(`if (typeid(${temp_type}).name() == ${name}.type().name()) {`, this.level);
       this.levelUp();
@@ -630,7 +611,7 @@ class Combinator extends CombinatorBase {
       this.emitFromMapProp(emitter, nextName, p, nextExpectName, layer + 1, prop.type);
       this.levelDown();
       emitter.emitln('}', this.level);
-      if (prop.parent && prop.parent instanceof TypeArray) {
+      if (prop.parent && is.array(prop.parent)) {
         if (layer === 1) {
           emitter.emitln(`${realkey}.push_back(make_shared<${this.emitType(prop.type)}>(${expectName}));`, this.level);
         } else {
@@ -640,7 +621,7 @@ class Combinator extends CombinatorBase {
         if (layer === 1) {
           emitter.emitln(`${_avoidKeywords(prop.name)} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
         } else {
-          if (parent_type instanceof TypeArray) {
+          if (is.array(parent_type)) {
             emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
           } else {
             emitter.emitln(`${realkey} = ${expectName};`, this.level);
@@ -649,7 +630,7 @@ class Combinator extends CombinatorBase {
       }
       this.levelDown();
       emitter.emitln('}', this.level);
-    } else if (prop.type instanceof TypeObject) {
+    } else if (is.object(prop.type)) {
       if (!this.isClient(prop)) {
         // type is model
         let var_name = `model${layer}`;
@@ -659,10 +640,9 @@ class Combinator extends CombinatorBase {
         emitter.emitln(`${prop_type} ${var_name};`, this.level);
         emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
         if (isProp) {
-          // emitter.emitln(`${prop.name} = make_shared<${prop_type}>(${var_name});`, this.level);
           this.emitFromMapItem(emitter, _avoidKeywords(prop.name), prop.type, var_name, parent_type, layer);
         } else {
-          if (parent_type instanceof TypeArray) {
+          if (is.array(parent_type)) {
             emitter.emitln(`${realkey}.push_back(${var_name});`, this.level);
           } else {
             emitter.emitln(`${realkey} = ${var_name};`, this.level);
@@ -674,7 +654,7 @@ class Combinator extends CombinatorBase {
         // type is client
         debug.warning('sub item type is client : ' + prop.name);
       }
-    } else if (prop.type instanceof TypeBase) {
+    } else if (is.base(prop.type)) {
       if (isProp) {
         this.emitFromMapItem(emitter, _avoidKeywords(prop.name), prop.type, name);
       } else {
@@ -723,46 +703,46 @@ class Combinator extends CombinatorBase {
   }
 
   emitType(type) {
-    if (!(type instanceof TypeItem)) {
+    if (!is.type(type)) {
       debug.stack('Inavalid type', type);
     }
-    if (type instanceof TypeGeneric) {
+    if (is.any(type)) {
       this.pushInclude('boost_any');
       return 'boost::any';
-    } else if (type instanceof TypeDecimal) {
+    } else if (is.decimal(type)) {
       return 'double';
-    } else if (type instanceof TypeInteger) {
+    } else if (is.integer(type)) {
       return type.length > 16 ? 'long' : 'int';
-    } else if (type instanceof TypeNumber) {
+    } else if (is.number(type)) {
       return 'int';
-    } else if (type instanceof TypeString) {
+    } else if (is.string(type)) {
       this.pushInclude('iostream');
       return 'string';
-    } else if (type instanceof TypeBytes) {
+    } else if (is.bytes(type)) {
       this.pushInclude('vector');
       return 'vector<uint8_t>';
-    } else if (type instanceof TypeArray) {
+    } else if (is.array(type)) {
       let subType = this.emitType(type.itemType);
       this.pushInclude('vector');
       return `vector<${subType}>`;
-    } else if (type instanceof TypeBool) {
+    } else if (is.bool(type)) {
       return 'bool';
-    } else if (type instanceof TypeVoid) {
+    } else if (is.void(type)) {
       return 'void';
-    } else if (type instanceof TypeMap) {
+    } else if (is.map(type)) {
       this.pushInclude('map');
       return `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
-    } else if (type instanceof TypeStream) {
+    } else if (is.stream(type)) {
       return 'shared_ptr<Darabonba::Stream>';
-    } else if (type instanceof TypeObject) {
+    } else if (is.object(type)) {
       if (!type.objectName) {
         return 'class';
       }
-      if (type.objectName.indexOf('$') === 0) {
+      if (_startWith(type.objectName, '$')) {
         return this.addInclude(type.objectName);
       }
       return type.objectName;
-    } else if (type instanceof TypeNull) {
+    } else if (is.null(type)) {
       return 'nullptr';
     }
     debug.stack('Unsupported Type', type);
@@ -912,7 +892,7 @@ class Combinator extends CombinatorBase {
     paths.forEach((path, i) => {
       let pathName = typeof path.name === 'string' ? path.name.replace('@', '_') : path.name;
       if (path.type === 'parent') {
-        if (paths[i + 1] && paths[i + 1].type.indexOf('static') > -1) {
+        if (paths[i + 1] && _contain(paths[i + 1].type, 'static')) {
           prefix += `${this.config.client.name}`;
           if (path.name) {
             prefix += '::' + pathName;
@@ -1075,7 +1055,7 @@ class Combinator extends CombinatorBase {
           return;
         }
         emitter.emit(`{"${item.key}", `, this.level);
-        let isAny = gram.dataType.valType instanceof TypeGeneric;
+        let isAny = is.any(gram.dataType.valType);
         if (this.isPointerVar(item)) {
           let emit = new Emitter(this.config);
           this.grammerValue(emit, item, layer + 1);
@@ -1087,7 +1067,7 @@ class Combinator extends CombinatorBase {
           }
         } else {
           if (isAny) {
-            if (item.dataType instanceof TypeGeneric) {
+            if (is.any(item.dataType)) {
               this.grammerValue(emitter, item, layer + 1);
             } else {
               emitter.emit('boost::any(');
@@ -1119,7 +1099,7 @@ class Combinator extends CombinatorBase {
       let tmp = [];
       expandItems.forEach(item => {
         let emit = new Emitter(this.config);
-        let needConvertMap = item.dataType instanceof TypeMap && gram.dataType.valType instanceof TypeGeneric && !(item.dataType.valType instanceof TypeGeneric);
+        let needConvertMap = is.map(item.dataType) && is.any(gram.dataType.valType) && !is.any(item.dataType.valType);
         if (needConvertMap) {
           emit.emit(`${this.config.tea.converter.name}::toGenericMap(`);
         }
@@ -1128,10 +1108,10 @@ class Combinator extends CombinatorBase {
           this.grammer(varEmit, item, false, false);
           let var_name = varEmit.output;
           let type_name = this.resolveDataType(item);
-          if (item.dataType instanceof TypeObject) {
+          if (is.object(item.dataType)) {
             type_name = `map<${keyType}, ${valType}>`;
           }
-          emit.emit(`!${var_name} ? ${type_name}() : ${item.dataType instanceof TypeObject ? `${var_name}->toMap()` : `*${var_name}`}`);
+          emit.emit(`!${var_name} ? ${type_name}() : ${is.object(item.dataType) ? `${var_name}->toMap()` : `*${var_name}`}`);
         } else if (item.type === 'var') {
           this.grammer(emit, item, false, false);
         } else if (item.type === 'call') {
@@ -1156,7 +1136,7 @@ class Combinator extends CombinatorBase {
   }
 
   grammerValue(emitter, gram, layer = 0) {
-    if (gram instanceof AnnotationItem) {
+    if (is.annotation(gram)) {
       this.emitAnnotation(emitter, gram);
       return;
     }
@@ -1200,7 +1180,7 @@ class Combinator extends CombinatorBase {
         this.levelDown();
         emitter.emit('})', this.level);
       } else {
-        emitter.emitln(`vector<${itemType}>()`);
+        emitter.emit(`vector<${itemType}>()`);
       }
     } else if (gram.type === 'not') {
       emitter.emit(_symbol(Symbol.reverse()));
@@ -1222,13 +1202,17 @@ class Combinator extends CombinatorBase {
         gram.params.forEach(p => {
           let emit = new Emitter(this.config);
           if (gram.type === 'sys_func' && gram.path[1].name === 'toJSONString') {
-            if (this.isPointerVar(p)) {
-              emit.emit('make_shared<boost::any>(*');
+            if (!this.isPointerVar(p)) {
+              emit.emit('make_shared<boost::any>(');
+            }
+            if (is.any(p.dataType)) {
+              this.grammer(emit, p, false, false);
+            } else {
+              emit.emit('boost::any(');
               this.grammer(emit, p, false, false);
               emit.emit(')');
-            } else {
-              emit.emit('make_shared<boost::any>(');
-              this.grammer(emit, p, false, false);
+            }
+            if (!this.isPointerVar(p)) {
               emit.emit(')');
             }
             tmp.push(emit.output);
@@ -1250,12 +1234,12 @@ class Combinator extends CombinatorBase {
             this.grammerValue(emit, p);
             emit.emit(')');
             tmp.push(emit.output);
-          } else if (p.type === 'var' && p.value.type instanceof TypeObject && p.value.varType === 'static_class') {
+          } else if (p.type === 'var' && is.object(p.value.type) && p.value.varType === 'static_class') {
             tmp.push('nullptr');
           } else if (!this.isPointerVar(p)) {
             this.grammer(emit, p, false, false);
             let dataType = this.resolveDataType(p);
-            if (p.dataType instanceof TypeStream) {
+            if (is.stream(p.dataType)) {
               tmp.push(`${emit.output}`);
             } else if (p.type === 'behavior' && p.value instanceof BehaviorToMap) {
               tmp.push(`make_shared<map<string, boost::any>>(${emit.output})`);
@@ -1265,9 +1249,6 @@ class Combinator extends CombinatorBase {
           } else {
             this.grammerValue(emit, p);
             tmp.push(emit.output);
-          }
-          if (emit.output === 'DeleteMultipleObjectsResponse::class') {
-            // debug.halt(emit.output, p);
           }
         });
         params = tmp.join(', ');
@@ -1321,14 +1302,14 @@ class Combinator extends CombinatorBase {
       let toStream = false;
       if (gram.left instanceof GrammerValue && gram.left.type === 'call' && gram.left.value.path[1].name === 'body') {
         const k = gram.left.value.path.map(item => item.name).join('.');
-        toStream = k === '__request.body' && gram.right.dataType instanceof TypeString;
+        toStream = k === '__request.body' && is.string(gram.right.dataType);
       }
       if (toStream) {
         emitter.emit(`${this.config.tea.converter.name}::toStream(`);
       }
       if (!toStream && this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
-        if (gram.right.dataType instanceof TypeStream) {
+        if (is.stream(gram.right.dataType)) {
           this.grammerValue(emitter, gram.right, false, false);
         } else {
           emitter.emit(`make_shared<${dataType}>(`);
@@ -1355,9 +1336,12 @@ class Combinator extends CombinatorBase {
   grammerLoop(emitter, gram) {
     this.pushInclude('algorithm');
     if (gram.type === 'foreach') {
-      emitter.emit('for(');
+      emitter.emit('for(auto ');
       this.grammerVar(emitter, gram.item, false, false);
       emitter.emit(' : ');
+      if (this.isPointerVar(gram.source)) {
+        emitter.emit('*');
+      }
       this.grammer(emitter, gram.source, false, false);
       emitter.emitln(') {');
     }
@@ -1453,7 +1437,7 @@ class Combinator extends CombinatorBase {
     emitter.emit('BOOST_THROW_EXCEPTION(');
     // emit exception_begin
     if (gram.exception) {
-      let isException = gram.exception instanceof TypeObject && gram.exception.objectName === '$Exception';
+      let isException = is.object(gram.exception) && gram.exception.objectName === '$Exception';
       if (isException) {
         emitter.emit('std::runtime_error(');
       } else {
@@ -1466,7 +1450,7 @@ class Combinator extends CombinatorBase {
       let msg = gram.message ? `"${gram.message}"` : '';
       emitter.emit(msg);
     } else if (gram.params.length === 1) {
-      let isError = gram.exception instanceof TypeObject && gram.exception.objectName === '$Error';
+      let isError = is.object(gram.exception) && gram.exception.objectName === '$Error';
       if (isError) {
         let dataType = this.resolveDataType(gram.params[0]);
         emitter.emit(`${dataType}(`);
@@ -1535,7 +1519,7 @@ class Combinator extends CombinatorBase {
   }
 
   grammerReturn(emitter, gram) {
-    if (this.funcReturnType instanceof TypeVoid) {
+    if (is.void(this.funcReturnType)) {
       emitter.emit('return');
       return;
     }
@@ -1636,9 +1620,9 @@ class Combinator extends CombinatorBase {
       if (this.isPointerVar(item)) {
         emit.emit('*');
       }
-      if (item.dataType instanceof TypeString) {
+      if (is.string(item.dataType)) {
         this.grammer(emit, item, false, false);
-      } else if (item.dataType instanceof TypeGeneric) {
+      } else if (is.any(item.dataType)) {
         this.pushInclude('darabonba_core');
         emit.emit(`${this.config.tea.converter.name}::toString(`);
         this.grammer(emit, item, false, false);

@@ -54,8 +54,7 @@ void Darabonba_Statements::Client::helloThrow() {
 }
 
 void Darabonba_Statements::Client::helloForBreak() {
-  for(item : vector<boost::any>()
-) {
+  for(auto item : vector<boost::any>()) {
     break;
   }
 }

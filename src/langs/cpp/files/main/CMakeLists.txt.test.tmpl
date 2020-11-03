@@ -60,7 +60,7 @@ endif ()
 add_subdirectory(external)
 find_package(Boost REQUIRED COMPONENTS random system thread filesystem chrono atomic date_time regex)
 find_library(CPPREST_LIB cpprest)
-target_link_libraries(${PROJECT_NAME} PRIVATE crypto ${param_import} ${CPPREST_LIB})
+target_link_libraries(${PROJECT_NAME} PRIVATE crypto ${param_import} ${Boost_LIBRARIES} ${CPPREST_LIB})
 
 if (ENABLE_UNIT_TESTS)
     target_include_directories(tests_${param_scope}_${param_package}
@@ -70,7 +70,7 @@ if (ENABLE_UNIT_TESTS)
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main crypto ${param_import} ${CPPREST_LIB})
+            gmock_main crypto ${param_import} ${Boost_LIBRARIES} ${CPPREST_LIB})
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests_${param_scope}_${param_package}>)
 endif ()

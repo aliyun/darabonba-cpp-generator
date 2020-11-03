@@ -44,6 +44,9 @@ class PackageInfo extends BasePackageInfo {
   }
 
   resolveGitInfo(config) {
+    if (!config.packageInfo && !config.cpp) {
+      return false;
+    }
     let git_scope = '';
     let git_project = '';
     let git_link = '';
@@ -220,18 +223,21 @@ class PackageInfo extends BasePackageInfo {
     if (keys.length > 0) {
       Object.keys(this.requirePackage).forEach(key => {
         const item = this.requirePackage[key];
-        const { package_name, git_link, git_tag } = this.resolveGitInfo(item);
-        this.renderAuto(
-          tmpl_path,
-          path.join(this.config.dir, `external/${package_name}/CMakeLists.txt`), {
-            package_name: package_name,
-            git_link: git_link,
-            git_tag: git_tag,
-            project_name: this.project_name
-          }
-        );
-        libraries += `add_subdirectory(${package_name})${os.EOL}`;
-        this.imports.push(package_name);
+        const res = this.resolveGitInfo(item);
+        if (false !== res) {
+          const { package_name, git_link, git_tag } = this.resolveGitInfo(item);
+          this.renderAuto(
+            tmpl_path,
+            path.join(this.config.dir, `external/${package_name}/CMakeLists.txt`), {
+              package_name: package_name,
+              git_link: git_link,
+              git_tag: git_tag,
+              project_name: this.project_name
+            }
+          );
+          libraries += `add_subdirectory(${package_name})${os.EOL}`;
+          this.imports.push(package_name);
+        }
       });
     }
     this.renderContent(

@@ -6,6 +6,10 @@ model M = {
 
 model Class = {};
 
+model useBeforeDefineModel = {
+  m: MyModel
+};
+
 model MyModel = {
   // keyword property
   delete: string(name='Delete'),

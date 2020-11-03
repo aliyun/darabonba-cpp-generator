@@ -1001,7 +1001,7 @@ class Combinator extends CombinatorBase {
     return this.emitType(expectedType);
   }
 
-  isPointerVar(gram) {
+  isPointerVar(gram, ignore_to_map = false) {
     if (gram instanceof GrammerValue) {
       if (gram.type === 'null') {
         return true;
@@ -1012,6 +1012,9 @@ class Combinator extends CombinatorBase {
       let grammerVar;
       if (gram.type === 'var' && gram.value instanceof GrammerVar) {
         grammerVar = gram.value;
+      }
+      if (ignore_to_map && gram.type === 'behavior' && gram.value instanceof BehaviorToMap) {
+        grammerVar = gram.value.grammer;
       }
       if (grammerVar) {
         if (this.statements[grammerVar.name] && this.statements[grammerVar.name] === 'pointer') {
@@ -1233,22 +1236,28 @@ class Combinator extends CombinatorBase {
         let tmp = [];
         gram.params.forEach(p => {
           let emit = new Emitter(this.config);
-          if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && gram.path[gram.path.length - 1].name === 'isUnset') {
-            if (!this.isPointerVar(p)) {
-              emit.emit('make_shared<boost::any>(');
+          let isUnsetMethod = gram.path[0].name === 'Darabonba_Util::Client' && gram.path[1].name === 'isUnset';
+          if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
+            if (!this.isPointerVar(p, true)) {
+              emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
             }
             this.grammer(emit, p.value.grammer, false, false);
             if (!this.isPointerVar(p)) {
               emit.emit(')');
             }
             tmp.push(emit.output);
+          } else if (p.value instanceof BehaviorToMap && gram.type === 'sys_func') {
+            emit.emit('make_shared<map<string, boost::any>>(');
+            this.grammer(emit, p, false, false);
+            emit.emit(')');
+            tmp.push(emit.output);
           } else if (gram.type === 'sys_func') {
             if (!this.isPointerVar(p)) {
               emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
-            }
-            this.grammer(emit, p, false, false);
-            if (!this.isPointerVar(p)) {
+              this.grammer(emit, p, false, false);
               emit.emit(')');
+            } else {
+              this.grammer(emit, p, false, false);
             }
             tmp.push(emit.output);
           } else if (p instanceof GrammerVar && p.type.objectName === '$Exception') {

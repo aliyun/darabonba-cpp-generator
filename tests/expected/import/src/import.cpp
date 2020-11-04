@@ -12,7 +12,7 @@ using namespace std;
 
 using namespace Darabonba_Import;
 
-Darabonba_Import::Client::Client(const shared_ptr<vector<string>>& id, const shared_ptr<string>& str) {
+Darabonba_Import::Client::Client(const vector<string>& id, const string& str) {
   _id = id;
   _str = str;
   BOOST_THROW_EXCEPTION(Darabonba::Error(map<string, string>({
@@ -22,11 +22,11 @@ Darabonba_Import::Client::Client(const shared_ptr<vector<string>>& id, const sha
 };
 
 void Darabonba_Import::Client::Sample(shared_ptr<Darabonba_Source::Client> client) {
-  Darabonba_Source::RuntimeObject runtime;
-  Darabonba_Source::Request request(map<string, string>({
+  shared_ptr<Darabonba_Source::RuntimeObject> runtime = make_shared<Darabonba_Source::RuntimeObject>();
+  shared_ptr<Darabonba_Source::Request> request = make_shared<Darabonba_Source::Request>(map<string, string>({
     {"accesskey", "accesskey"},
     {"region", "region"}
   }));
-  client->print(make_shared<Darabonba_Source::RuntimeObject>(runtime));
+  client->print(runtime);
 }
 

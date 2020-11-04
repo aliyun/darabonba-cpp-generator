@@ -17,7 +17,7 @@ Darabonba_Comment::Client::Client() {
   // string declate comment
   string str = "sss";
   // new model instance comment
-  Test1 modelInstance(map<string, string>({
+  shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, string>({
     {"test", "test"},
     // test declare back comment
     {"test2", "test2"},
@@ -36,7 +36,7 @@ void Darabonba_Comment::Client::testAPI() {
     // empty runtime comment
     // another runtime comment
   };
-  Darabonba::Request _lastRequest;
+  shared_ptr<Darabonba::Request> _lastRequest;
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
@@ -49,9 +49,9 @@ void Darabonba_Comment::Client::testAPI() {
     }
     _retryTimes = _retryTimes + 1;
     try {
-      Darabonba::Request request_ = Darabonba::Request();
+      shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
       // new model instance comment
-      Test1 modelInstance(map<string, string>({
+      shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, string>({
         // test declare front comment
         {"test", "test"},
         // test2 declare front comment
@@ -62,7 +62,7 @@ void Darabonba_Comment::Client::testAPI() {
       // static function call comment
       Client::staticFunc();
       _lastRequest = request_;
-      Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
+      shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_, runtime_));
       // static async function call
       Client::testFunc(make_shared<string>("test"), make_shared<bool>(true));
       // return comment
@@ -86,7 +86,7 @@ void Darabonba_Comment::Client::testAPI2() {
     // runtime back comment one
     // runtime back comment two
   };
-  Darabonba::Request _lastRequest;
+  shared_ptr<Darabonba::Request> _lastRequest;
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
@@ -99,9 +99,9 @@ void Darabonba_Comment::Client::testAPI2() {
     }
     _retryTimes = _retryTimes + 1;
     try {
-      Darabonba::Request request_ = Darabonba::Request();
+      shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
       // new model instance comment
-      Test3 modelInstance(map<string, boost::any>({
+      shared_ptr<Test3> modelInstance = make_shared<Test3>(map<string, boost::any>({
         // empty model
       }));
       // boolean declare comment
@@ -115,7 +115,7 @@ void Darabonba_Comment::Client::testAPI2() {
       // api function call comment
       testAPI();
       _lastRequest = request_;
-      Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
+      shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_, runtime_));
       // empty return comment
       // back comment
     }

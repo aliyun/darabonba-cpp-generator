@@ -13,20 +13,20 @@ using namespace Darabonba_Api;
 
 Darabonba_Api::Client::Client(){}
 void Darabonba_Api::Client::hello() {
-  Darabonba::Request request_ = Darabonba::Request();
-  request_.method = "GET";
-  request_.pathname = "/";
-  request_.headers = {
+  shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
+  request_->method = "GET";
+  request_->pathname = "/";
+  request_->headers = {
     {"host", "www.test.com"}
   };
-  Darabonba::Request _lastRequest = request_;
-  Darabonba::Response response_= Darabonba::Core::doAction(request_);
+  shared_ptr<Darabonba::Request> _lastRequest = request_;
+  shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
   return;
 }
 
 void Darabonba_Api::Client::helloRuntime() {
   map<string, boost::any> runtime_ = map<string, boost::any>();
-  Darabonba::Request _lastRequest;
+  shared_ptr<Darabonba::Request> _lastRequest;
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
@@ -39,14 +39,14 @@ void Darabonba_Api::Client::helloRuntime() {
     }
     _retryTimes = _retryTimes + 1;
     try {
-      Darabonba::Request request_ = Darabonba::Request();
-      request_.method = "GET";
-      request_.pathname = "/";
-      request_.headers = {
+      shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
+      request_->method = "GET";
+      request_->pathname = "/";
+      request_->headers = {
         {"host", "www.test.com"}
       };
       _lastRequest = request_;
-      Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
+      shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_, runtime_));
       return;
     }
     catch (std::exception &e) {

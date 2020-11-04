@@ -14,7 +14,7 @@ class Client {
 public:
   shared_ptr<vector<string>> _id{};
   shared_ptr<string> _str{};
-  explicit Client(const shared_ptr<vector<string>>& id, const shared_ptr<string>& str);
+  explicit Client(const vector<string>& id, const string& str);
   static void Sample(shared_ptr<Darabonba_Source::Client> client);
 
   ~Client() = default;

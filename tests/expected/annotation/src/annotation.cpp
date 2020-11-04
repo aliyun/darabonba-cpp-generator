@@ -14,7 +14,7 @@ using namespace Darabonba_Annotation;
 Darabonba_Annotation::Client::Client(){}
 void Darabonba_Annotation::Client::testAPI() {
   map<string, boost::any> runtime_ = map<string, boost::any>();
-  Darabonba::Request _lastRequest;
+  shared_ptr<Darabonba::Request> _lastRequest;
   std::exception _lastException;
   int _now = 0;
   int _retryTimes = 0;
@@ -27,9 +27,9 @@ void Darabonba_Annotation::Client::testAPI() {
     }
     _retryTimes = _retryTimes + 1;
     try {
-      Darabonba::Request request_ = Darabonba::Request();
+      shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
       _lastRequest = request_;
-      Darabonba::Response response_= Darabonba::Core::doAction(request_, runtime_);
+      shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_, runtime_));
       return;
     }
     catch (std::exception &e) {

@@ -187,7 +187,7 @@ public:
     if (part) {
       vector<boost::any> temp1;
       for(auto item1:*part){
-        temp1.push_back(boost::any(item1.toMap()));
+        temp1.push_back(boost::any(item1->toMap()));
       }
       res["Part"] = boost::any(temp1);
     }
@@ -213,9 +213,9 @@ public:
     }
     if (m.find("header") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["header"].type().name()) {
-        ComplexRequestHeader model1;
-        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
-        header = make_shared<ComplexRequestHeader>(model1);
+        shared_ptr<ComplexRequestHeader> model1 = make_shared<ComplexRequestHeader>();
+        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
+        header = model1;
       }
     }
     if (m.find("Num") != m.end()) {
@@ -223,22 +223,22 @@ public:
     }
     if (m.find("configs") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["configs"].type().name()) {
-        ComplexRequestConfigs model1;
-        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
-        configs = make_shared<ComplexRequestConfigs>(model1);
+        shared_ptr<ComplexRequestConfigs> model1 = make_shared<ComplexRequestConfigs>();
+        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
+        configs = model1;
       }
     }
     if (m.find("Part") != m.end()) {
       if (typeid(vector<boost::any>).name() == m["Part"].type().name()) {
-        vector<ComplexRequestPart> expect1;
+        vector<shared_ptr<ComplexRequestPart>> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
           if (typeid(map<string, boost::any>).name() == item1.type().name()) {
-            ComplexRequestPart model2;
-            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            shared_ptr<ComplexRequestPart> model2 = make_shared<ComplexRequestPart>();
+            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1));
             expect1.push_back(model2);
           }
         }
-        part = make_shared<vector<ComplexRequestPart>>(expect1);
+        part = make_shared<vector<shared_ptr<ComplexRequestPart>>>(expect1);
       }
     }
   }
@@ -249,22 +249,22 @@ public:
   shared_ptr<ComplexRequestHeader> header{};
   shared_ptr<int> Num{};
   shared_ptr<ComplexRequestConfigs> configs{};
-  shared_ptr<vector<ComplexRequestPart>> part{};
+  shared_ptr<vector<shared_ptr<ComplexRequestPart>>> part{};
 
   ~ComplexRequest() = default;
 };
 class Client : Darabonba_Import::Client {
 public:
-  shared_ptr<vector<Darabonba_Source::Config>> _configs{};
+  shared_ptr<vector<shared_ptr<Darabonba_Source::Config>>> _configs{};
   explicit Client(const shared_ptr<Darabonba_Source::Config>& config);
-  Darabonba_Source::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
+  shared_ptr<Darabonba_Source::RuntimeObject> complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
   map<string, boost::any> Complex2(shared_ptr<ComplexRequest> request, shared_ptr<vector<string>> str, shared_ptr<map<string, string>> val);
-  ComplexRequest Complex3(shared_ptr<ComplexRequest> request);
+  shared_ptr<ComplexRequest> Complex3(shared_ptr<ComplexRequest> request);
   vector<string> hello(shared_ptr<map<string, boost::any>> request, shared_ptr<vector<string>> strs);
-  static Darabonba_Source::Request print(shared_ptr<Darabonba::Request> reqeust,
-                                         shared_ptr<vector<ComplexRequest>> reqs,
-                                         shared_ptr<Darabonba::Response> response,
-                                         shared_ptr<map<string, string>> val);
+  static shared_ptr<Darabonba_Source::Request> print(shared_ptr<Darabonba::Request> reqeust,
+                                                     shared_ptr<vector<shared_ptr<ComplexRequest>>> reqs,
+                                                     shared_ptr<Darabonba::Response> response,
+                                                     shared_ptr<map<string, string>> val);
   static vector<boost::any> array0(shared_ptr<map<string, boost::any>> req);
   static vector<string> array1();
   static string arrayAccess();

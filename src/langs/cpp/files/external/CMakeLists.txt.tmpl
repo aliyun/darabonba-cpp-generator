@@ -1,4 +1,4 @@
-find_package(${package_name} ${${package_name}_MINIMUM_REQUIRED} QUIET COMPONENTS ${${package_name}_COMPONENTS_REQUIRED})
+find_package(${package_name} QUIET)
 
 if(${package_name}_FOUND)
   message(STATUS "Found ${package_name} version ${${package_name}_VERSION}")
@@ -12,14 +12,14 @@ else()
     GIT_TAG ${git_tag}
     CMAKE_ARGS
       -DENABLE_UNIT_TESTS:BOOL="0")
-  
+
   FetchContent_GetProperties(_${package_name})
   if(NOT _${package_name}_POPULATED)
     FetchContent_Populate(_${package_name})
     message(STATUS "Added ${package_name} source : ${_${package_name}_SOURCE_DIR}")
     message(STATUS "Added ${package_name} binary : ${_${package_name}_BINARY_DIR}")
     add_subdirectory(
-      ${_${package_name}_SOURCE_DIR} 
+      ${_${package_name}_SOURCE_DIR}
       ${_${package_name}_BINARY_DIR}
     )
   endif()

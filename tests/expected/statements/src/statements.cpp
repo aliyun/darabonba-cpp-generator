@@ -14,17 +14,17 @@ using namespace Darabonba_Statements;
 
 Darabonba_Statements::Client::Client(){}
 void Darabonba_Statements::Client::hello() {
-  Darabonba::Request request_ = Darabonba::Request();
-  request_.method = "GET";
-  request_.pathname = "/";
-  request_.headers = {
+  shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
+  request_->method = "GET";
+  request_->pathname = "/";
+  request_->headers = {
     {"host", "www.test.com"}
   };
   if (true) {
-    request_.headers.insert(pair<string, string>("host", "www.test2.com"));
+    request_->headers.insert(pair<string, string>("host", "www.test2.com"));
   }
-  Darabonba::Request _lastRequest = request_;
-  Darabonba::Response response_= Darabonba::Core::doAction(request_);
+  shared_ptr<Darabonba::Request> _lastRequest = request_;
+  shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
   if (true) {
     throw Darabonba::Error(request_, response_);
   }

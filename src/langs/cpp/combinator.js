@@ -323,7 +323,7 @@ class Combinator extends CombinatorBase {
     object.body.forEach(node => {
       if (is.prop(node)) {
         // emit properties
-        if (is.stream(node.type)) {
+        if (this.isPointerType(node.type)) {
           emitter.emitln(`${this.emitType(node.type)} ${_avoidKeywords(node.name)}{};`, this.level);
         } else {
           emitter.emitln(`shared_ptr<${this.emitType(node.type)}> ${_avoidKeywords(node.name)}{};`, this.level);
@@ -347,7 +347,7 @@ class Combinator extends CombinatorBase {
           emitter.emit(`explicit ${className}(`, this.level);
           let tmp = [];
           node.params.forEach(param => {
-            tmp.push(`const shared_ptr<${this.emitType(param.type)}>& ${_avoidKeywords(param.key)}`);
+            tmp.push(`const ${this.emitType(param.type)}& ${_avoidKeywords(param.key)}`);
             this.statements[param.key] = 'pointer';
           });
           let emit = new Emitter(this.config);
@@ -509,9 +509,9 @@ class Combinator extends CombinatorBase {
           emitter.emitln(`${prefix} = ${_avoidKeywords(prop.name)} ? boost::any(${_avoidKeywords(prop.name)}->toMap()) : boost::any(map<string,boost::any>({}));`, this.level);
         } else {
           if (is.array(parent_type)) {
-            emitter.emitln(`${prefix}.push_back(boost::any(${_avoidKeywords(prop.name)}.toMap()));`, this.level);
+            emitter.emitln(`${prefix}.push_back(boost::any(${_avoidKeywords(prop.name)}->toMap()));`, this.level);
           } else {
-            emitter.emitln(`${prefix} = boost::any(${_avoidKeywords(prop.name)}.toMap());`, this.level);
+            emitter.emitln(`${prefix} = boost::any(${_avoidKeywords(prop.name)}->toMap());`, this.level);
           }
         }
       } else {
@@ -558,7 +558,7 @@ class Combinator extends CombinatorBase {
       this.levelDown();
       emitter.emitln('}', this.level);
       if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(toVec${layer});`, this.level);
+        emitter.emitln(`${target} = make_shared<${this.emitType(type, true)}>(toVec${layer});`, this.level);
       } else {
         emitter.emitln(`${target} = toVec${layer};`, this.level);
       }
@@ -571,7 +571,7 @@ class Combinator extends CombinatorBase {
       this.levelDown();
       emitter.emitln('}', this.level);
       if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(toMap${layer});`, this.level);
+        emitter.emitln(`${target} = make_shared<${this.emitType(type, true)}>(toMap${layer});`, this.level);
       } else {
         emitter.emitln(`${target} = toMap${layer};`, this.level);
       }
@@ -587,7 +587,7 @@ class Combinator extends CombinatorBase {
       if (is.array(parent_type)) {
         emitter.emitln(`${target}.push_back(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
+        emitter.emitln(`${target} = make_shared<${this.emitType(type, true)}>(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else {
         emitter.emitln(`${target} = boost::any_cast<${this.emitType(type)}>(${source});`, this.level);
       }
@@ -599,7 +599,7 @@ class Combinator extends CombinatorBase {
           emitter.emitln(`${target}.push_back(${source});`, this.level);
         }
       } else if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(${source});`, this.level);
+        emitter.emitln(`${target} = ${source};`, this.level);
       } else {
         emitter.emitln(`${target} = ${this.emitType(type)}(${source});`, this.level);
       }
@@ -644,13 +644,13 @@ class Combinator extends CombinatorBase {
       emitter.emitln('}', this.level);
       if (prop.parent && is.array(prop.parent)) {
         if (layer === 1) {
-          emitter.emitln(`${realkey}.push_back(make_shared<${this.emitType(prop.type)}>(${expectName}));`, this.level);
+          emitter.emitln(`${realkey}.push_back(make_shared<${this.emitType(prop.type, true)}>(${expectName}));`, this.level);
         } else {
           emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
         }
       } else {
         if (layer === 1) {
-          emitter.emitln(`${_avoidKeywords(prop.name)} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
+          emitter.emitln(`${_avoidKeywords(prop.name)} = make_shared<${this.emitType(prop.type, true)}>(${expectName});`, this.level);
         } else {
           if (is.array(parent_type)) {
             emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
@@ -668,8 +668,8 @@ class Combinator extends CombinatorBase {
         let prop_type = this.emitType(prop.type);
         emitter.emitln(`if (typeid(map<string, boost::any>).name() == ${name}.type().name()) {`, this.level);
         this.levelUp();
-        emitter.emitln(`${prop_type} ${var_name};`, this.level);
-        emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
+        emitter.emitln(`${prop_type} ${var_name} = make_shared<${this.emitType(prop.type, true)}>();`, this.level);
+        emitter.emitln(`${var_name}->fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
         if (isProp) {
           this.emitFromMapItem(emitter, _avoidKeywords(prop.name), prop.type, var_name, parent_type, layer);
         } else {
@@ -719,6 +719,9 @@ class Combinator extends CombinatorBase {
       if (is.any(param.type)) {
         tmp.push(`const boost::any &${_avoidKeywords(param.key)}`);
         this.statements[param.key] = param.type;
+      } else if (this.isPointerType(param.type)) {
+        tmp.push(`${this.emitType(param.type)} ${_avoidKeywords(param.key)}`);
+        this.statements[param.key] = 'pointer';
       } else {
         tmp.push(`shared_ptr<${this.emitType(param.type)}> ${_avoidKeywords(param.key)}`);
         this.statements[param.key] = 'pointer';
@@ -738,7 +741,7 @@ class Combinator extends CombinatorBase {
     return str;
   }
 
-  emitType(type) {
+  emitType(type, notConvertToPtr = false) {
     if (!is.type(type)) {
       debug.stack('Inavalid type', type);
     }
@@ -771,13 +774,20 @@ class Combinator extends CombinatorBase {
     } else if (is.stream(type)) {
       return 'shared_ptr<Darabonba::Stream>';
     } else if (is.object(type)) {
+      let objName = '';
       if (!type.objectName) {
-        return 'class';
+        objName = 'void';
+      } else if (type.objectName === '$Exception' ||
+        type.objectName === '$ExceptionUnretryable' ||
+        type.objectName === '$Error') {
+        objName = this.addInclude(type.objectName);
+        return objName;
+      } else if (_startWith(type.objectName, '$')) {
+        objName = this.addInclude(type.objectName);
+      } else {
+        objName = type.objectName;
       }
-      if (_startWith(type.objectName, '$')) {
-        return this.addInclude(type.objectName);
-      }
-      return type.objectName;
+      return notConvertToPtr ? objName : `shared_ptr<${objName}>`;
     } else if (is.null(type)) {
       return 'nullptr';
     }
@@ -820,7 +830,7 @@ class Combinator extends CombinatorBase {
     if (node.params.length) {
       let tmp = [];
       node.params.forEach(param => {
-        tmp.push(`const shared_ptr<${this.emitType(param.type)}>& ${_avoidKeywords(param.key)}`);
+        tmp.push(`const ${this.emitType(param.type)}& ${_avoidKeywords(param.key)}`);
         this.statements[param.key] = 'pointer';
       });
       let emit = new Emitter(this.config);
@@ -908,12 +918,10 @@ class Combinator extends CombinatorBase {
     }
   }
 
-  isPointerPath(paths, lastPath) {
-    if (paths[0].name === '__request' || paths[0].name === '__response') {
-      return false;
-    }
+  isPointerPath(lastPath, paths) {
     if (lastPath.type === 'object' || lastPath.type === 'parent') {
-      return this.statements[lastPath.name] && this.statements[lastPath.name] === 'pointer';
+      let name = _convertStaticParam(lastPath.name);
+      return this.statements[name] && this.statements[name] === 'pointer';
     }
     if (lastPath.type === 'prop') {
       return true;
@@ -926,7 +934,8 @@ class Combinator extends CombinatorBase {
     let lastPath = {};
 
     paths.forEach((path, i) => {
-      let pathName = typeof path.name === 'string' ? path.name.replace('@', '_') : path.name;
+      let pathName = typeof path.name === 'string' ? path.name.replace('@', '_') : `${path.name}`;
+      pathName = _convertStaticParam(pathName);
       if (path.type === 'parent') {
         if (paths[i + 1] && _contain(paths[i + 1].type, 'static')) {
           prefix += `${this.config.client.name}`;
@@ -940,21 +949,21 @@ class Combinator extends CombinatorBase {
           }
         }
       } else if (path.type === 'object') {
-        prefix += `${_convertStaticParam(pathName)}`;
+        prefix += pathName;
       } else if (path.type === 'object_static') {
-        prefix += `${_convertStaticParam(pathName)}`;
+        prefix += pathName;
       } else if (path.type === 'call') {
-        let isPointer = this.isPointerPath(paths, lastPath);
+        let isPointer = this.isPointerPath(lastPath, paths);
         prefix += isPointer ? `->${_avoidKeywords(pathName)}(${params})` : `.${_avoidKeywords(pathName)}(${params})`;
       } else if (path.type === 'call_static') {
         prefix += `::${_avoidKeywords(pathName)}(${params})`;
       } else if (path.type === 'prop') {
-        let isPointer = this.isPointerPath(paths, lastPath);
+        let isPointer = this.isPointerPath(lastPath, paths);
         prefix += isPointer ? `->${_avoidKeywords(pathName)}` : `.${_avoidKeywords(pathName)}`;
       } else if (path.type === 'prop_static') {
         prefix += `::${pathName}`;
       } else if (path.type === 'map') {
-        let isPointer = this.isPointerPath(paths, lastPath);
+        let isPointer = this.isPointerPath(lastPath, paths);
         let path_name;
         if (path.isVar) {
           let varIsPointer = this.statements[pathName] && this.statements[pathName] === 'pointer';
@@ -1001,37 +1010,55 @@ class Combinator extends CombinatorBase {
     return this.emitType(expectedType);
   }
 
+  isPointerType(type) {
+    if (is.stream(type)) {
+      return true;
+    }
+    if (is.object(type)) {
+      if (type.objectName === '$Exception' ||
+        type.objectName === '$ExceptionUnretryable' ||
+        type.objectName === '$Error') {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
   isPointerVar(gram, ignore_to_map = false) {
     if (gram instanceof GrammerValue) {
       if (gram.type === 'null') {
         return true;
       }
     }
-
+    let grammerVar;
+    if (gram instanceof GrammerVar) {
+      grammerVar = gram;
+    }
     if (gram instanceof GrammerValue) {
-      let grammerVar;
       if (gram.type === 'var' && gram.value instanceof GrammerVar) {
         grammerVar = gram.value;
       }
       if (ignore_to_map && gram.type === 'behavior' && gram.value instanceof BehaviorToMap) {
         grammerVar = gram.value.grammer;
       }
-      if (grammerVar) {
-        if (this.statements[grammerVar.name] && this.statements[grammerVar.name] === 'pointer') {
-          return true;
-        }
-      } else if (gram.type === 'call' && gram.value instanceof GrammerCall && gram.value.type === 'prop') {
-        if (gram.value.path[0].name === '__request' || gram.value.path[0].name === '__response') {
-          if (gram.value.path[1].name === 'body') {
-            return true;
-          }
-          return false;
-        }
-        if (gram.value.path[gram.value.path.length - 1].type !== 'prop') {
-          return false;
-        }
+    }
+    if (grammerVar) {
+      let name = grammerVar.name ? _convertStaticParam(grammerVar.name) : '';
+      if (this.statements[name] && this.statements[name] === 'pointer') {
         return true;
       }
+    } else if (gram.type === 'call' && gram.value instanceof GrammerCall && gram.value.type === 'prop') {
+      if (gram.value.path[0].name === '__request' || gram.value.path[0].name === '__response') {
+        if (gram.value.path[1].name === 'body') {
+          return true;
+        }
+        return false;
+      }
+      if (gram.value.path[gram.value.path.length - 1].type !== 'prop') {
+        return false;
+      }
+      return true;
     }
     return false;
   }
@@ -1049,7 +1076,11 @@ class Combinator extends CombinatorBase {
         emitter.emit(`${name}`);
       }
       if (!this.statements[name]) {
-        this.statements[name] = gram.type;
+        if (this.isPointerType(gram.type)) {
+          this.statements[name] = 'pointer';
+        } else {
+          this.statements[name] = gram.type;
+        }
       }
     } else {
       debug.stack(gram);
@@ -1239,10 +1270,10 @@ class Combinator extends CombinatorBase {
           let isUnsetMethod = gram.path[0].name === 'Darabonba_Util::Client' && gram.path[1].name === 'isUnset';
           if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
             if (!this.isPointerVar(p, true)) {
-              emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
+              emit.emit(`make_shared<${this.emitType(p.dataType, true)}>(`);
             }
             this.grammer(emit, p.value.grammer, false, false);
-            if (!this.isPointerVar(p)) {
+            if (!this.isPointerVar(p, true)) {
               emit.emit(')');
             }
             tmp.push(emit.output);
@@ -1253,7 +1284,7 @@ class Combinator extends CombinatorBase {
             tmp.push(emit.output);
           } else if (gram.type === 'sys_func') {
             if (!this.isPointerVar(p)) {
-              emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
+              emit.emit(`make_shared<${this.emitType(p.dataType, true)}>(`);
               this.grammer(emit, p, false, false);
               emit.emit(')');
             } else {
@@ -1321,16 +1352,25 @@ class Combinator extends CombinatorBase {
 
     // emit right of expr
     if (gram.opt === Symbol.assign()) {
+      let isNewObject = false;
+      let right = null;
       if (gram.right instanceof GrammerValue && gram.right.type === 'instance' && gram.right.value instanceof GrammerNewObject) {
+        isNewObject = true;
+        right = gram.right.value;
+      } else if (gram.right instanceof GrammerNewObject) {
+        isNewObject = true;
+        right = gram.right;
+      }
+      if (isNewObject) {
         // is new object
         if (this.isPointerVar(gram.left)) {
           // new object to ptr property
           assignToPtr = true;
           emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
-          this.grammerNewObject(emitter, gram.right.value, assignToPtr, true, true);
+          this.grammerNewObject(emitter, right, assignToPtr, true, true);
           return;
         }
-        this.grammerNewObject(emitter, gram.right.value, assignToPtr, false);
+        this.grammerNewObject(emitter, right, assignToPtr, false);
         return;
       }
       emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
@@ -1344,7 +1384,7 @@ class Combinator extends CombinatorBase {
       }
       if (!toStream && this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
         let dataType = this.resolveDataType(gram.right);
-        if (is.stream(gram.right.dataType)) {
+        if (this.isPointerType(gram.right.dataType)) {
           this.grammerValue(emitter, gram.right, false, false);
         } else {
           emitter.emit(`make_shared<${dataType}>(`);
@@ -1530,10 +1570,12 @@ class Combinator extends CombinatorBase {
       params.forEach(p => {
         if (p instanceof GrammerValue && p.type === 'model_construct_params' && !p.value.length) {
           return;
+        } else if (p instanceof GrammerValue && p.type === 'model_construct_params') {
+          isPtrParam = false;
         }
         let emit = new Emitter(this.config);
         if (isPtrParam && !this.isPointerVar(p)) {
-          emit.emit(`make_shared<${this.emitType(p.dataType ? p.dataType : p.type)}>(`);
+          emit.emit(`make_shared<${this.emitType(p.dataType ? p.dataType : p.type, true)}>(`);
           this.grammer(emit, p, false, false);
           emit.emit(')');
         } else {
@@ -1562,7 +1604,8 @@ class Combinator extends CombinatorBase {
     if (gram.type === 'null') {
       this.grammerValue(emitter, new GrammerValue('null'), false, false);
     } else if (gram.type === 'grammer') {
-      if (this.isPointerVar(gram.expr)) {
+      let returnPointer = this.isPointerType(this.funcReturnType);
+      if (this.isPointerVar(gram.expr) && !returnPointer) {
         emitter.emit('*');
       }
       this.grammer(emitter, gram.expr, false, false);
@@ -1581,15 +1624,18 @@ class Combinator extends CombinatorBase {
   behaviorDoAction(emitter, behavior) {
     emitter.emit('', this.level);
     this.grammerVar(emitter, behavior.var);
-    emitter.emit(`= ${this.addInclude('$Core')}::${this.config.tea.core.doAction}(`);
+    emitter.emit(` = make_shared<Darabonba::Response>(${this.addInclude('$Core')}::${this.config.tea.core.doAction}(`);
     let params = [];
     behavior.params.forEach(p => {
       let emit = new Emitter(this.config);
+      if (this.isPointerVar(p)) {
+        emit.emit('*');
+      }
       this.grammerValue(emit, p);
       params.push(emit.output);
     });
     emitter.emit(params.join(', '));
-    emitter.emitln(');');
+    emitter.emitln('));');
     behavior.body.forEach(node => {
       this.grammer(emitter, node);
     });
@@ -1620,7 +1666,7 @@ class Combinator extends CombinatorBase {
   }
 
   behaviorToModel(emitter, behavior) {
-    emitter.emit(`${behavior.expected}(`);
+    emitter.emit(`make_shared<${behavior.expected}>(`);
     if (this.resolveDataType(behavior.grammer) !== 'map<string, boost::any>') {
       emitter.emit(`${this.config.tea.converter.name}::toGenericMap(`);
       this.grammer(emitter, behavior.grammer, false, false);

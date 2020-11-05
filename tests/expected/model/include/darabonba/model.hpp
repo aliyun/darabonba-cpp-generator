@@ -58,9 +58,9 @@ public:
   void fromMap(map<string, boost::any> m) override {
     if (m.find("subM") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["subM"].type().name()) {
-        shared_ptr<MSubM> model1 = make_shared<MSubM>();
-        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["subM"]));
-        subM = model1;
+        MSubM model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["subM"]));
+        subM = make_shared<MSubM>(model1);
       }
     }
   }
@@ -285,28 +285,28 @@ public:
     if (submodelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*submodelMap){
-        temp1[item1.first] = boost::any(item1.second->toMap());
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["submodelMap"] = boost::any(temp1);
     }
     if (mapModel) {
       map<string, boost::any> temp1;
       for(auto item1:*mapModel){
-        temp1[item1.first] = boost::any(item1.second->toMap());
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["mapModel"] = boost::any(temp1);
     }
     if (subarraymodel) {
       vector<boost::any> temp1;
       for(auto item1:*subarraymodel){
-        temp1.push_back(boost::any(item1->toMap()));
+        temp1.push_back(boost::any(item1.toMap()));
       }
       res["subarraymodel"] = boost::any(temp1);
     }
     if (subarray) {
       vector<boost::any> temp1;
       for(auto item1:*subarray){
-        temp1.push_back(boost::any(item1->toMap()));
+        temp1.push_back(boost::any(item1.toMap()));
       }
       res["subarray"] = boost::any(temp1);
     }
@@ -316,21 +316,21 @@ public:
     if (moduleModelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*moduleModelMap){
-        temp1[item1.first] = boost::any(item1.second->toMap());
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["moduleModelMap"] = boost::any(temp1);
     }
     if (subModelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*subModelMap){
-        temp1[item1.first] = boost::any(item1.second->toMap());
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["subModelMap"] = boost::any(temp1);
     }
     if (modelMap) {
       map<string, boost::any> temp1;
       for(auto item1:*modelMap){
-        temp1[item1.first] = boost::any(item1.second->toMap());
+        temp1[item1.first] = boost::any(item1.second.toMap());
       }
       res["modelMap"] = boost::any(temp1);
     }
@@ -360,7 +360,7 @@ public:
       for(auto item1:*complexMap){
         map<string, boost::any> temp2;
         for(auto item2:item1){
-          temp2[item2.first] = boost::any(item2.second->toMap());
+          temp2[item2.first] = boost::any(item2.second.toMap());
         }
         temp1 = boost::any(temp2);
       }
@@ -444,61 +444,61 @@ public:
     }
     if (m.find("submodel") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["submodel"].type().name()) {
-        shared_ptr<MyModelSubmodel> model1 = make_shared<MyModelSubmodel>();
-        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["submodel"]));
-        submodel = model1;
+        MyModelSubmodel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["submodel"]));
+        submodel = make_shared<MyModelSubmodel>(model1);
       }
     }
     if (m.find("submodelMap") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["submodelMap"].type().name()) {
-        map<string, shared_ptr<MyModelSubmodel>> expect1;
+        map<string, MyModelSubmodel> expect1;
         for(auto item1:boost::any_cast<map<string, boost::any>>(m["submodelMap"])){
           if (typeid(map<string, boost::any>).name() == item1.second.type().name()) {
-            shared_ptr<MyModelSubmodel> model2 = make_shared<MyModelSubmodel>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+            MyModelSubmodel model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
             expect1[item.first] = model2;
           }
         }
-        submodelMap = make_shared<map<string, shared_ptr<MyModelSubmodel>>>(expect1);
+        submodelMap = make_shared<map<string, MyModelSubmodel>>(expect1);
       }
     }
     if (m.find("mapModel") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["mapModel"].type().name()) {
-        map<string, shared_ptr<M>> expect1;
+        map<string, M> expect1;
         for(auto item1:boost::any_cast<map<string, boost::any>>(m["mapModel"])){
           if (typeid(map<string, boost::any>).name() == item1.second.type().name()) {
-            shared_ptr<M> model2 = make_shared<M>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+            M model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
             expect1[item.first] = model2;
           }
         }
-        mapModel = make_shared<map<string, shared_ptr<M>>>(expect1);
+        mapModel = make_shared<map<string, M>>(expect1);
       }
     }
     if (m.find("subarraymodel") != m.end()) {
       if (typeid(vector<boost::any>).name() == m["subarraymodel"].type().name()) {
-        vector<shared_ptr<MyModelSubarraymodel>> expect1;
+        vector<MyModelSubarraymodel> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["subarraymodel"])){
           if (typeid(map<string, boost::any>).name() == item1.type().name()) {
-            shared_ptr<MyModelSubarraymodel> model2 = make_shared<MyModelSubarraymodel>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            MyModelSubarraymodel model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
             expect1.push_back(model2);
           }
         }
-        subarraymodel = make_shared<vector<shared_ptr<MyModelSubarraymodel>>>(expect1);
+        subarraymodel = make_shared<vector<MyModelSubarraymodel>>(expect1);
       }
     }
     if (m.find("subarray") != m.end()) {
       if (typeid(vector<boost::any>).name() == m["subarray"].type().name()) {
-        vector<shared_ptr<M>> expect1;
+        vector<M> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["subarray"])){
           if (typeid(map<string, boost::any>).name() == item1.type().name()) {
-            shared_ptr<M> model2 = make_shared<M>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            M model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
             expect1.push_back(model2);
           }
         }
-        subarray = make_shared<vector<shared_ptr<M>>>(expect1);
+        subarray = make_shared<vector<M>>(expect1);
       }
     }
     if (m.find("maparray") != m.end()) {
@@ -518,50 +518,50 @@ public:
     }
     if (m.find("moduleModelMap") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["moduleModelMap"].type().name()) {
-        map<string, shared_ptr<Darabonba_Source::Request>> expect1;
+        map<string, Darabonba_Source::Request> expect1;
         for(auto item1:boost::any_cast<map<string, boost::any>>(m["moduleModelMap"])){
           if (typeid(map<string, boost::any>).name() == item1.second.type().name()) {
-            shared_ptr<Darabonba_Source::Request> model2 = make_shared<Darabonba_Source::Request>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+            Darabonba_Source::Request model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
             expect1[item.first] = model2;
           }
         }
-        moduleModelMap = make_shared<map<string, shared_ptr<Darabonba_Source::Request>>>(expect1);
+        moduleModelMap = make_shared<map<string, Darabonba_Source::Request>>(expect1);
       }
     }
     if (m.find("subModelMap") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["subModelMap"].type().name()) {
-        map<string, shared_ptr<MSubM>> expect1;
+        map<string, MSubM> expect1;
         for(auto item1:boost::any_cast<map<string, boost::any>>(m["subModelMap"])){
           if (typeid(map<string, boost::any>).name() == item1.second.type().name()) {
-            shared_ptr<MSubM> model2 = make_shared<MSubM>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+            MSubM model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
             expect1[item.first] = model2;
           }
         }
-        subModelMap = make_shared<map<string, shared_ptr<MSubM>>>(expect1);
+        subModelMap = make_shared<map<string, MSubM>>(expect1);
       }
     }
     if (m.find("modelMap") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["modelMap"].type().name()) {
-        map<string, shared_ptr<M>> expect1;
+        map<string, M> expect1;
         for(auto item1:boost::any_cast<map<string, boost::any>>(m["modelMap"])){
           if (typeid(map<string, boost::any>).name() == item1.second.type().name()) {
-            shared_ptr<M> model2 = make_shared<M>();
-            model2->fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
+            M model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
             expect1[item.first] = model2;
           }
         }
-        modelMap = make_shared<map<string, shared_ptr<M>>>(expect1);
+        modelMap = make_shared<map<string, M>>(expect1);
       }
     }
     if (m.find("moduleMap") != m.end()) {
       map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["moduleMap"]);
-      map<string, shared_ptr<Darabonba_Import::Client>> toMap1;
+      map<string, Darabonba_Import::Client> toMap1;
       for (auto item:map1) {
-         toMap1[item.first] = shared_ptr<Darabonba_Import::Client>(item.second);
+         toMap1[item.first] = Darabonba_Import::Client(item.second);
       }
-      moduleMap = make_shared<map<string, shared_ptr<Darabonba_Import::Client>>>(toMap1);
+      moduleMap = make_shared<map<string, Darabonba_Import::Client>>(toMap1);
     }
     if (m.find("object") != m.end()) {
       map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["object"]);
@@ -579,16 +579,16 @@ public:
     }
     if (m.find("existModel") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["existModel"].type().name()) {
-        shared_ptr<M> model1 = make_shared<M>();
-        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["existModel"]));
-        existModel = model1;
+        M model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["existModel"]));
+        existModel = make_shared<M>(model1);
       }
     }
     if (m.find("request") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["request"].type().name()) {
-        shared_ptr<Darabonba::Request> model1 = make_shared<Darabonba::Request>();
-        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["request"]));
-        request = model1;
+        Darabonba::Request model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["request"]));
+        request = make_shared<Darabonba::Request>(model1);
       }
     }
     if (m.find("complexList") != m.end()) {
@@ -610,21 +610,21 @@ public:
     }
     if (m.find("complexMap") != m.end()) {
       if (typeid(vector<boost::any>).name() == m["complexMap"].type().name()) {
-        vector<map<string, shared_ptr<MyModelSubmodel>>> expect1;
+        vector<map<string, MyModelSubmodel>> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["complexMap"])){
           if (typeid(map<string, boost::any>).name() == item1.type().name()) {
-            map<string, shared_ptr<MyModelSubmodel>> expect2;
+            map<string, MyModelSubmodel> expect2;
             for(auto item2:boost::any_cast<map<string, boost::any>>(item1)){
               if (typeid(map<string, boost::any>).name() == item2.second.type().name()) {
-                shared_ptr<MyModelSubmodel> model3 = make_shared<MyModelSubmodel>();
-                model3->fromMap(boost::any_cast<map<string, boost::any>>(item2.second));
+                MyModelSubmodel model3;
+                model3.fromMap(boost::any_cast<map<string, boost::any>>(item2.second));
                 expect2[item.first] = model3;
               }
             }
             expect1.push_back(expect2);
           }
         }
-        complexMap = make_shared<vector<map<string, shared_ptr<MyModelSubmodel>>>>(expect1);
+        complexMap = make_shared<vector<map<string, MyModelSubmodel>>>(expect1);
       }
     }
     if (m.find("numberfield") != m.end()) {
@@ -679,22 +679,22 @@ public:
   shared_ptr<map<string, string>> mapfield{};
   shared_ptr<string> name{};
   shared_ptr<MyModelSubmodel> submodel{};
-  shared_ptr<map<string, shared_ptr<MyModelSubmodel>>> submodelMap{};
-  shared_ptr<map<string, shared_ptr<M>>> mapModel{};
-  shared_ptr<vector<shared_ptr<MyModelSubarraymodel>>> subarraymodel{};
-  shared_ptr<vector<shared_ptr<M>>> subarray{};
+  shared_ptr<map<string, MyModelSubmodel>> submodelMap{};
+  shared_ptr<map<string, M>> mapModel{};
+  shared_ptr<vector<MyModelSubarraymodel>> subarraymodel{};
+  shared_ptr<vector<M>> subarray{};
   shared_ptr<vector<map<string, boost::any>>> maparray{};
-  shared_ptr<map<string, shared_ptr<Darabonba_Source::Request>>> moduleModelMap{};
-  shared_ptr<map<string, shared_ptr<MSubM>>> subModelMap{};
-  shared_ptr<map<string, shared_ptr<M>>> modelMap{};
-  shared_ptr<map<string, shared_ptr<Darabonba_Import::Client>>> moduleMap{};
+  shared_ptr<map<string, Darabonba_Source::Request>> moduleModelMap{};
+  shared_ptr<map<string, MSubM>> subModelMap{};
+  shared_ptr<map<string, M>> modelMap{};
+  shared_ptr<map<string, Darabonba_Import::Client>> moduleMap{};
   shared_ptr<map<string, boost::any>> object{};
   shared_ptr<Darabonba::Stream> readable{};
   shared_ptr<Darabonba::Stream> writable{};
   shared_ptr<M> existModel{};
   shared_ptr<Darabonba::Request> request{};
   shared_ptr<vector<vector<string>>> complexList{};
-  shared_ptr<vector<map<string, shared_ptr<MyModelSubmodel>>>> complexMap{};
+  shared_ptr<vector<map<string, MyModelSubmodel>>> complexMap{};
   shared_ptr<int> numberfield{};
   shared_ptr<int> integerField{};
   shared_ptr<double> floatField{};
@@ -736,9 +736,9 @@ public:
   void fromMap(map<string, boost::any> m) override {
     if (m.find("m") != m.end()) {
       if (typeid(map<string, boost::any>).name() == m["m"].type().name()) {
-        shared_ptr<MyModel> model1 = make_shared<MyModel>();
-        model1->fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
-        m = model1;
+        MyModel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
+        m = make_shared<MyModel>(model1);
       }
     }
   }

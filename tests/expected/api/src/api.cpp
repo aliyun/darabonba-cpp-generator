@@ -25,19 +25,19 @@ void Darabonba_Api::Client::hello() {
 }
 
 void Darabonba_Api::Client::helloRuntime() {
-  map<string, boost::any> runtime_ = map<string, boost::any>();
+  shared_ptr<map<string, boost::any>> runtime_ = make_shared<map<string, boost::any>>(map<string, boost::any>());
   shared_ptr<Darabonba::Request> _lastRequest;
-  std::exception _lastException;
-  int _now = 0;
-  int _retryTimes = 0;
-  while (Darabonba::Core::allowRetry(make_shared<boost::any>(runtime_["retry"]), make_shared<int>(_retryTimes), make_shared<int>(_now))) {
-    if (_retryTimes > 0) {
-      int _backoffTime = Darabonba::Core::getBackoffTime(make_shared<boost::any>(runtime_["backoff"]), make_shared<int>(_retryTimes));
-      if (_backoffTime > 0) {
-        Darabonba::Core::sleep(make_shared<int>(_backoffTime));
+  shared_ptr<std::exception> _lastException;
+  shared_ptr<int> _now = make_shared<int>(0);
+  shared_ptr<int> _retryTimes = make_shared<int>(0);
+  while (Darabonba::Core::allowRetry(make_shared<boost::any>((*runtime_)["retry"]), _retryTimes, _now)) {
+    if (*_retryTimes > 0) {
+      shared_ptr<int> _backoffTime = make_shared<int>(Darabonba::Core::getBackoffTime(make_shared<boost::any>((*runtime_)["backoff"]), _retryTimes));
+      if (*_backoffTime > 0) {
+        Darabonba::Core::sleep(_backoffTime);
       }
     }
-    _retryTimes = _retryTimes + 1;
+    _retryTimes = make_shared<int>(*_retryTimes + 1);
     try {
       shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
       request_->method = "GET";
@@ -51,7 +51,7 @@ void Darabonba_Api::Client::helloRuntime() {
     }
     catch (std::exception &e) {
       if (Darabonba::Core::isRetryable(e)) {
-        _lastException = e;
+        _lastException = make_shared<std::exception>(e);
         continue;
       }
       BOOST_THROW_EXCEPTION(e);

@@ -33,8 +33,8 @@ void Darabonba_Statements::Client::hello() {
   }
   Client::helloIf();
   !false;
-  string a;
-  a = "string";
+  shared_ptr<string> a;
+  a = make_shared<string>("string");
   return;
 }
 
@@ -66,8 +66,8 @@ void Darabonba_Statements::Client::helloWhile() {
 }
 
 void Darabonba_Statements::Client::helloDeclare() {
-  string hello = "world";
-  string helloNull;
-  hello = "hehe";
+  shared_ptr<string> hello = make_shared<string>("world");
+  shared_ptr<string> helloNull;
+  hello = make_shared<string>("hehe");
 }
 

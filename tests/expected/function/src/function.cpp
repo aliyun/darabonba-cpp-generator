@@ -16,11 +16,11 @@ void Darabonba_Function::Client::hello() {
 }
 
 map<string, string> Darabonba_Function::Client::helloMap() {
-  map<string, string> m = map<string, string>();
+  shared_ptr<map<string, string>> m = make_shared<map<string, string>>(map<string, string>());
   return Darabonba::Converter::merge(map<string, string>({
     {"key", "value"},
     {"key-1", "value-1"}
-  }), m);
+  }), !m ? map<string, string>() : *m);
 }
 
 vector<map<string, string>> Darabonba_Function::Client::helloArrayMap() {

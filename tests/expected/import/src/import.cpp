@@ -12,7 +12,7 @@ using namespace std;
 
 using namespace Darabonba_Import;
 
-Darabonba_Import::Client::Client(const vector<string>& id, const string& str) {
+Darabonba_Import::Client::Client(const shared_ptr<vector<string>>& id, const shared_ptr<string>& str) {
   _id = id;
   _str = str;
   BOOST_THROW_EXCEPTION(Darabonba::Error(map<string, string>({

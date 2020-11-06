@@ -1100,6 +1100,9 @@ class Combinator extends CombinatorBase {
       } else {
         emitter.emit(`${name}`);
       }
+      if (!this.hasStatement(name)) {
+        this.addStatement(name, gram.type);
+      }
     } else {
       debug.stack(gram);
     }
@@ -1308,6 +1311,9 @@ class Combinator extends CombinatorBase {
             emit.emit('make_shared<map<string, boost::any>>(');
             this.grammer(emit, p, false, false);
             emit.emit(')');
+            tmp.push(emit.output);
+          } else if (gram.type === 'sys_func' && isUnsetMethod) {
+            this.grammer(emit, p, false, false);
             tmp.push(emit.output);
           } else if (gram.type === 'sys_func') {
             if (!this.isPointerVar(p)) {

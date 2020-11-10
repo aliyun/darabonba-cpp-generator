@@ -943,7 +943,13 @@ class Combinator extends CombinatorBase {
     return false;
   }
 
-  resolveCallPath(paths, params = '') {
+  isUnsetMethod(gram) {
+    return gram.type === 'sys_func'
+      && gram.path[0].name === 'Darabonba_Util::Client'
+      && gram.path[1].name === 'isUnset';
+  }
+
+  resolveCallPath(paths, params = '', gram) {
     let prefix = '';
     let lastPathIndex = -1;
 
@@ -970,7 +976,11 @@ class Combinator extends CombinatorBase {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
         prefix += isPointer ? `->${_avoidKeywords(pathName)}(${params})` : `.${_avoidKeywords(pathName)}(${params})`;
       } else if (path.type === 'call_static') {
-        prefix += `::${_avoidKeywords(pathName)}(${params})`;
+        if (this.isUnsetMethod(gram)) {
+          prefix += `::${_avoidKeywords(pathName)}<${this.emitType(gram.params[0].dataType)}>(${params})`;
+        } else {
+          prefix += `::${_avoidKeywords(pathName)}(${params})`;
+        }
       } else if (path.type === 'prop') {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
         prefix += isPointer ? `->${_avoidKeywords(pathName)}` : `.${_avoidKeywords(pathName)}`;
@@ -1296,7 +1306,7 @@ class Combinator extends CombinatorBase {
         let tmp = [];
         gram.params.forEach(p => {
           let emit = new Emitter(this.config);
-          let isUnsetMethod = gram.path[0].name === 'Darabonba_Util::Client' && gram.path[1].name === 'isUnset';
+          let isUnsetMethod = this.isUnsetMethod(gram);
           if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
             let isPointer = this.isPointerVar(p, true);
             if (!isPointer) {
@@ -1359,14 +1369,14 @@ class Combinator extends CombinatorBase {
           }
         });
         params = tmp.join(', ');
-        emitter.emit(this.resolveCallPath(gram.path, params));
+        emitter.emit(this.resolveCallPath(gram.path, params, gram));
       } else {
-        emitter.emit(this.resolveCallPath(gram.path, params));
+        emitter.emit(this.resolveCallPath(gram.path, params, gram));
       }
     } else if (gram.type === 'prop') {
-      emitter.emit(this.resolveCallPath(gram.path));
+      emitter.emit(this.resolveCallPath(gram.path, '', gram));
     } else if (gram.type === 'key') {
-      emitter.emit(this.resolveCallPath(gram.path));
+      emitter.emit(this.resolveCallPath(gram.path, '', gram));
     } else {
       debug.stack(gram);
     }

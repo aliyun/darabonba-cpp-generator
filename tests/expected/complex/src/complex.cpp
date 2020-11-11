@@ -51,9 +51,9 @@ Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
       request_->method = "GET";
       request_->pathname = string("/" + *_pathname + "");
       request_->query = Darabonba_Import::Client::query(Darabonba::Converter::mapPointer(Darabonba::Converter::merge(map<string, boost::any>({
-        {"date", boost::any("2019")},
+        {"date", boost::any(string("2019"))},
         {"access", !mapAccess ? boost::any() : boost::any(*mapAccess)},
-        {"test", boost::any((*mapVal)["test"])}
+        {"test", boost::any(string((*mapVal)["test"]))}
       }), !request->header ? map<string, boost::any>() : request->header.toMap())));
       request_->body = Darabonba_Import::Client::body();
       _lastRequest = request_;
@@ -122,9 +122,9 @@ ComplexRequest Darabonba_Complex::Client::Complex3(shared_ptr<ComplexRequest> re
   shared_ptr<Darabonba::Request> _lastRequest = request_;
   shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
   shared_ptr<Darabonba::Response> resp = response_;
-  shared_ptr<Darabonba_Source::Request> req = make_shared<Darabonba_Source::Request>(map<string, string>({
-    {"accesskey", !request->accessKey ? string() : *request->accessKey},
-    {"region", !resp->statusMessage ? string() : *resp->statusMessage}
+  shared_ptr<Darabonba_Source::Request> req = make_shared<Darabonba_Source::Request>(map<string, boost::any>({
+    {"accesskey", !request->accessKey ? boost::any() : boost::any(*request->accessKey)},
+    {"region", !resp->statusMessage ? boost::any() : boost::any(*resp->statusMessage)}
   }));
   Client::array0(make_shared<map<string, boost::any>>(request->toMap()));
   req->accesskey = make_shared<string>("accesskey");
@@ -236,7 +236,7 @@ string Darabonba_Complex::Client::mapAccess3() {
 }
 
 void Darabonba_Complex::Client::mapAssign(shared_ptr<ComplexRequest> request, shared_ptr<string> name) {
-  request->configs->extra.insert(pair<string, string>("name", *name));
+  request->configs->extra->insert(pair<string, string>("name", *name));
 }
 
 string Darabonba_Complex::Client::TemplateString() {

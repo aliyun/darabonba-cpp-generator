@@ -432,10 +432,10 @@ public:
       stringarrayfield = make_shared<vector<string>>(toVec1);
     }
     if (m.find("mapfield") != m.end()) {
-      map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["mapfield"]);
+      map<string, string> map1 = boost::any_cast<map<string, string>>(m["mapfield"]);
       map<string, string> toMap1;
       for (auto item:map1) {
-         toMap1[item.first] = boost::any_cast<string>(item.second);
+         toMap1[item.first] = item.second;
       }
       mapfield = make_shared<map<string, string>>(toMap1);
     }
@@ -509,7 +509,7 @@ public:
           map<string, boost::any> map2 = boost::any_cast<map<string, boost::any>>(item);
           map<string, boost::any> toMap2;
           for (auto item:map2) {
-             toMap2[item.first] = boost::any_cast<boost::any>(item.second);
+             toMap2[item.first] = item.second;
           }
            toVec1 = toMap2;
         }
@@ -556,7 +556,7 @@ public:
       }
     }
     if (m.find("moduleMap") != m.end()) {
-      map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["moduleMap"]);
+      map<string, Darabonba_Import::Client> map1 = boost::any_cast<map<string, Darabonba_Import::Client>>(m["moduleMap"]);
       map<string, Darabonba_Import::Client> toMap1;
       for (auto item:map1) {
          toMap1[item.first] = Darabonba_Import::Client(item.second);
@@ -567,7 +567,7 @@ public:
       map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["object"]);
       map<string, boost::any> toMap1;
       for (auto item:map1) {
-         toMap1[item.first] = boost::any_cast<boost::any>(item.second);
+         toMap1[item.first] = item.second;
       }
       object = make_shared<map<string, boost::any>>(toMap1);
     }

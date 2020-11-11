@@ -94,10 +94,10 @@ public:
       value = make_shared<vector<string>>(toVec1);
     }
     if (m.find("extra") != m.end()) {
-      map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["extra"]);
+      map<string, string> map1 = boost::any_cast<map<string, string>>(m["extra"]);
       map<string, string> toMap1;
       for (auto item:map1) {
-         toMap1[item.first] = boost::any_cast<string>(item.second);
+         toMap1[item.first] = item.second;
       }
       extra = make_shared<map<string, string>>(toMap1);
     }

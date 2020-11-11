@@ -34,7 +34,11 @@ const {
   GrammerVar,
 
   BehaviorToMap,
+
   TypeItem,
+  TypeMap,
+  TypeString,
+  TypeGeneric
 } = require('../common/items');
 
 const assert = require('assert');
@@ -561,7 +565,7 @@ class Combinator extends CombinatorBase {
         emitter.emitln(`${target} = toVec${layer};`, this.level);
       }
     } else if (is.map(type)) {
-      emitter.emitln(`map<string, boost::any> map${layer} = boost::any_cast<map<string, boost::any>>(${source});`, this.level);
+      emitter.emitln(`map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}> map${layer} = boost::any_cast<map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>>(${source});`, this.level);
       emitter.emitln(`map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}> toMap${layer};`, this.level);
       emitter.emitln(`for (auto item:map${layer}) {`, this.level);
       this.levelUp();
@@ -587,7 +591,7 @@ class Combinator extends CombinatorBase {
       } else if (layer === 1) {
         emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else {
-        emitter.emitln(`${target} = boost::any_cast<${this.emitType(type)}>(${source});`, this.level);
+        emitter.emitln(`${target} = ${source};`, this.level);
       }
     } else if (is.object(type)) {
       if (is.array(parent_type)) {
@@ -920,14 +924,15 @@ class Combinator extends CombinatorBase {
 
   isPointerPath(lastPathIndex, paths) {
     const lastPath = paths[lastPathIndex];
-    if (lastPath.type === 'object' || lastPath.type === 'parent') {
+    if (lastPath.type === 'object') {
       let name = _convertStaticParam(lastPath.name);
       return this.isPtrStatement(name);
+    } else if (lastPath.type === 'parent') {
+      return true;
     }
     if (lastPath.type === 'prop') {
-      let parentPath;
       if (lastPathIndex > 0) {
-        parentPath = paths[lastPathIndex - 1];
+        let parentPath = paths[lastPathIndex - 1];
         if (parentPath.type === 'object') {
           let parentType = this.getStatementType(_convertStaticParam(parentPath.name));
           if (parentType.objectName === '$Request' || parentType.objectName === '$Response') {
@@ -1176,7 +1181,13 @@ class Combinator extends CombinatorBase {
               this.grammerValue(emitter, item, layer + 1);
             } else {
               emitter.emit('boost::any(');
-              this.grammerValue(emitter, item, layer + 1);
+              if (is.string(item.dataType)) {
+                emitter.emit('string(');
+                this.grammerValue(emitter, item, layer + 1);
+                emitter.emit(')');
+              } else {
+                this.grammerValue(emitter, item, layer + 1);
+              }
               emitter.emit(')');
             }
           } else {
@@ -1250,6 +1261,11 @@ class Combinator extends CombinatorBase {
       return;
     }
     if (gram.type === 'map' || gram.type === 'model_construct_params') {
+      if (gram.type === 'model_construct_params' && this.emitType(gram.dataType) !== 'map<string, boost::any>') {
+        gram.dataType = new TypeMap(
+          new TypeString(), new TypeGeneric()
+        );
+      }
       this.emitMap(emitter, gram, layer);
     } else if (gram.type === 'string') {
       emitter.emit(`"${gram.value}"`);
@@ -1750,7 +1766,12 @@ class Combinator extends CombinatorBase {
     let emit = new Emitter(this.config);
     this.grammerCall(emit, behavior.call);
     this.pushInclude('map');
-    emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
+    let paths = behavior.call.path;
+    if (this.isPointerPath(paths.length - 1, paths)) {
+      emitter.emit(`${emit.output}->insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
+    } else {
+      emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
+    }
     if (this.isPointerVar(behavior.value)) {
       emitter.emit('*');
     }

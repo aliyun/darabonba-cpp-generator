@@ -17,10 +17,10 @@ Darabonba_Comment::Client::Client() {
   // string declate comment
   shared_ptr<string> str = make_shared<string>("sss");
   // new model instance comment
-  shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, string>({
-    {"test", "test"},
+  shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, boost::any>({
+    {"test", boost::any(string("test"))},
     // test declare back comment
-    {"test2", "test2"},
+    {"test2", boost::any(string("test2"))},
     // test2 declare back comment
   }));
   shared_ptr<vector<boost::any>> array = make_shared<vector<boost::any>>(vector<boost::any>({
@@ -52,11 +52,11 @@ void Darabonba_Comment::Client::testAPI() {
     try {
       shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
       // new model instance comment
-      shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, string>({
+      shared_ptr<Test1> modelInstance = make_shared<Test1>(map<string, boost::any>({
         // test declare front comment
-        {"test", "test"},
+        {"test", boost::any(string("test"))},
         // test2 declare front comment
-        {"test2", "test2"}
+        {"test2", boost::any(string("test2"))}
       }));
       // number declare comment
       shared_ptr<int> num = make_shared<int>(123);

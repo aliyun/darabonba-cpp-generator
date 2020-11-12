@@ -38,7 +38,8 @@ const {
   TypeItem,
   TypeMap,
   TypeString,
-  TypeGeneric
+  TypeGeneric,
+  BehaviorTamplateString
 } = require('../common/items');
 
 const assert = require('assert');
@@ -104,7 +105,6 @@ class Combinator extends CombinatorBase {
     } else {
       debug.stack(className, this.thirdPackageNamespace);
     }
-
     if (!this.classNameMap[realFullClassName]) {
       const include = { import: realFullClassName, includeFileName, using };
       this.classNameMap[realFullClassName] = include;
@@ -123,11 +123,19 @@ class Combinator extends CombinatorBase {
     } else if (accessPath.length > 1 && this.thirdPackageNamespace[accessPath[0]]) {
       // is third package model
       realFullClassName = `${_name(this.thirdPackageScope[accessPath[0]])
-      }_${_name(accessPath[0])
+      }_${_name(this.thirdPackageNamespace[accessPath[0]])
       }::${_name(accessPath.slice(1).join('.'))
       }`;
       let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
-      let client = _toSnakeCase(_name(accessPath[0]));
+      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
+      includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
+      using = null;
+    } else if (accessPath.length === 1 && this.thirdPackageNamespace[accessPath[0]]) {
+      realFullClassName = `${_name(this.thirdPackageScope[accessPath[0]])
+      }_${_name(this.thirdPackageNamespace[accessPath[0]])
+      }::Client`;
+      let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
+      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
     } else {
@@ -135,6 +143,9 @@ class Combinator extends CombinatorBase {
       realFullClassName = _name(accessPath.join('.'));
       includeFileName = `<${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`;
       using = null;
+    }
+    if (realFullClassName === 'OSS') {
+      debug.halt(modelName, accessPath, this.thirdPackageScope, includeFileName);
     }
     if (!this.classNameMap[realFullClassName]) {
       const include = { import: realFullClassName, includeFileName, using };
@@ -613,7 +624,7 @@ class Combinator extends CombinatorBase {
   emitFromMapProp(emitter, name, prop, realkey, layer = 1, parent_type = null) {
     const isProp = realkey.indexOf('expect') !== 0 && !this.isClient(prop);
     if (isProp) {
-      emitter.emitln(`if (m.find("${realkey}") != m.end()) {`, this.level);
+      emitter.emitln(`if (m.find("${realkey}") != m.end() && !m["${realkey}"].empty()) {`, this.level);
       this.levelUp();
     }
 
@@ -954,6 +965,13 @@ class Combinator extends CombinatorBase {
       && gram.path[1].name === 'isUnset';
   }
 
+  useTmplMethod(gram) {
+    const useTmplMethods = ['isUnset', 'toArray'];
+    return gram.type === 'sys_func'
+      && gram.path[0].name === 'Darabonba_Util::Client'
+      && _contain(useTmplMethods, gram.path[1].name);
+  }
+
   resolveCallPath(paths, params = '', gram) {
     let prefix = '';
     let lastPathIndex = -1;
@@ -981,7 +999,7 @@ class Combinator extends CombinatorBase {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
         prefix += isPointer ? `->${_avoidKeywords(pathName)}(${params})` : `.${_avoidKeywords(pathName)}(${params})`;
       } else if (path.type === 'call_static') {
-        if (this.isUnsetMethod(gram)) {
+        if (this.useTmplMethod(gram)) {
           prefix += `::${_avoidKeywords(pathName)}<${this.emitType(gram.params[0].dataType)}>(${params})`;
         } else {
           prefix += `::${_avoidKeywords(pathName)}(${params})`;
@@ -1182,9 +1200,13 @@ class Combinator extends CombinatorBase {
             } else {
               emitter.emit('boost::any(');
               if (is.string(item.dataType)) {
-                emitter.emit('string(');
-                this.grammerValue(emitter, item, layer + 1);
-                emitter.emit(')');
+                if (item.type === 'behavior' && item.value instanceof BehaviorTamplateString) {
+                  this.grammerValue(emitter, item, layer + 1);
+                } else {
+                  emitter.emit('string(');
+                  this.grammerValue(emitter, item, layer + 1);
+                  emitter.emit(')');
+                }
               } else {
                 this.grammerValue(emitter, item, layer + 1);
               }

@@ -6,7 +6,6 @@
 #include <boost/throw_exception.hpp>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
-#include <darabonba/source.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -15,11 +14,11 @@ using namespace std;
 
 using namespace Darabonba_Complex;
 
-Darabonba_Complex::Client::Client(const shared_ptr<Darabonba_Source::Config>& config) : Darabonba_Import::Client(config) {
+Darabonba_Complex::Client::Client(const shared_ptr<Darabonba_Import::Config>& config) : Darabonba_Import::Client(config) {
   _configs[0] = *config;
 };
 
-Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client) {
+Darabonba_Import::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client) {
   request->validate();
   shared_ptr<map<string, boost::any>> runtime_ = make_shared<map<string, string>>(map<string, string>({
     {"timeouted", "retry"}
@@ -62,7 +61,7 @@ Darabonba_Source::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
         return nullptr;
       }
       else if (true || false) {
-        return Darabonba_Source::RuntimeObject();
+        return Darabonba_Import::RuntimeObject();
       }
       client->print(make_shared<map<string, boost::any>>(request->toMap()), make_shared<string>("1"));
       client->printAsync(make_shared<map<string, boost::any>>(request->toMap()), make_shared<string>("1"));
@@ -89,7 +88,7 @@ map<string, boost::any> Darabonba_Complex::Client::Complex2(shared_ptr<ComplexRe
   request->validate();
   shared_ptr<Darabonba::Request> request_ = make_shared<Darabonba::Request>();
   shared_ptr<string> name = make_shared<string>("complex");
-  shared_ptr<Darabonba_Source::Config> config = make_shared<Darabonba_Source::Config>();
+  shared_ptr<Darabonba_Import::Config> config = make_shared<Darabonba_Import::Config>();
   shared_ptr<Darabonba_Import::Client> client = make_shared<Darabonba_Import::Client>(config);
   request_->protocol = "HTTP";
   request_->port = 80;
@@ -122,7 +121,7 @@ ComplexRequest Darabonba_Complex::Client::Complex3(shared_ptr<ComplexRequest> re
   shared_ptr<Darabonba::Request> _lastRequest = request_;
   shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
   shared_ptr<Darabonba::Response> resp = response_;
-  shared_ptr<Darabonba_Source::Request> req = make_shared<Darabonba_Source::Request>(map<string, boost::any>({
+  shared_ptr<Darabonba_Import::Request> req = make_shared<Darabonba_Import::Request>(map<string, boost::any>({
     {"accesskey", !request->accessKey ? boost::any() : boost::any(*request->accessKey)},
     {"region", !resp->statusMessage ? boost::any() : boost::any(*resp->statusMessage)}
   }));
@@ -139,7 +138,7 @@ vector<string> Darabonba_Complex::Client::hello(shared_ptr<map<string, boost::an
   return Client::array1();
 }
 
-Darabonba_Source::Request Darabonba_Complex::Client::print(shared_ptr<Darabonba::Request> reqeust,
+Darabonba_Import::Request Darabonba_Complex::Client::print(shared_ptr<Darabonba::Request> reqeust,
                                                            shared_ptr<vector<ComplexRequest>> reqs,
                                                            shared_ptr<Darabonba::Response> response,
                                                            shared_ptr<map<string, string>> val) {
@@ -220,7 +219,7 @@ string Darabonba_Complex::Client::mapAccess(shared_ptr<ComplexRequest> request) 
   return *configInfo;
 }
 
-string Darabonba_Complex::Client::mapAccess2(shared_ptr<Darabonba_Source::Request> request) {
+string Darabonba_Complex::Client::mapAccess2(shared_ptr<Darabonba_Import::Request> request) {
   shared_ptr<string> configInfo = make_shared<string>((*request->configs->extra)["name"]);
   return *configInfo;
 }

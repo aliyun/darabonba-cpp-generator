@@ -7,7 +7,6 @@
 #include <boost/throw_exception.hpp>
 #include <darabonba/core.hpp>
 #include <darabonba/import.hpp>
-#include <darabonba/source.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -37,7 +36,7 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
-    if (m.find("Content") != m.end()) {
+    if (m.find("Content") != m.end() && !m["Content"].empty()) {
       content = make_shared<string>(boost::any_cast<string>(m["Content"]));
     }
   }
@@ -80,10 +79,10 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
-    if (m.find("key") != m.end()) {
+    if (m.find("key") != m.end() && !m["key"].empty()) {
       key = make_shared<string>(boost::any_cast<string>(m["key"]));
     }
-    if (m.find("value") != m.end()) {
+    if (m.find("value") != m.end() && !m["value"].empty()) {
       vector<string> toVec1;
       if (typeid(vector<boost::any>).name() == m["value"].type().name()) {
         vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["value"]);
@@ -93,7 +92,7 @@ public:
       }
       value = make_shared<vector<string>>(toVec1);
     }
-    if (m.find("extra") != m.end()) {
+    if (m.find("extra") != m.end() && !m["extra"].empty()) {
       map<string, string> map1 = boost::any_cast<map<string, string>>(m["extra"]);
       map<string, string> toMap1;
       for (auto item:map1) {
@@ -127,7 +126,7 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
-    if (m.find("PartNumber") != m.end()) {
+    if (m.find("PartNumber") != m.end() && !m["PartNumber"].empty()) {
       partNumber = make_shared<string>(boost::any_cast<string>(m["PartNumber"]));
     }
   }
@@ -195,13 +194,13 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
-    if (m.find("accessKey") != m.end()) {
+    if (m.find("accessKey") != m.end() && !m["accessKey"].empty()) {
       accessKey = make_shared<string>(boost::any_cast<string>(m["accessKey"]));
     }
-    if (m.find("Body") != m.end()) {
+    if (m.find("Body") != m.end() && !m["Body"].empty()) {
       body = make_shared<Darabonba::Stream>(boost::any_cast<Darabonba::Stream>(m["Body"]));
     }
-    if (m.find("Strs") != m.end()) {
+    if (m.find("Strs") != m.end() && !m["Strs"].empty()) {
       vector<string> toVec1;
       if (typeid(vector<boost::any>).name() == m["Strs"].type().name()) {
         vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["Strs"]);
@@ -211,24 +210,24 @@ public:
       }
       strs = make_shared<vector<string>>(toVec1);
     }
-    if (m.find("header") != m.end()) {
+    if (m.find("header") != m.end() && !m["header"].empty()) {
       if (typeid(map<string, boost::any>).name() == m["header"].type().name()) {
         ComplexRequestHeader model1;
         model1.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
         header = make_shared<ComplexRequestHeader>(model1);
       }
     }
-    if (m.find("Num") != m.end()) {
+    if (m.find("Num") != m.end() && !m["Num"].empty()) {
       Num = make_shared<int>(boost::any_cast<int>(m["Num"]));
     }
-    if (m.find("configs") != m.end()) {
+    if (m.find("configs") != m.end() && !m["configs"].empty()) {
       if (typeid(map<string, boost::any>).name() == m["configs"].type().name()) {
         ComplexRequestConfigs model1;
         model1.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
         configs = make_shared<ComplexRequestConfigs>(model1);
       }
     }
-    if (m.find("Part") != m.end()) {
+    if (m.find("Part") != m.end() && !m["Part"].empty()) {
       if (typeid(vector<boost::any>).name() == m["Part"].type().name()) {
         vector<ComplexRequestPart> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
@@ -255,13 +254,13 @@ public:
 };
 class Client : Darabonba_Import::Client {
 public:
-  shared_ptr<vector<Darabonba_Source::Config>> _configs{};
-  explicit Client(const shared_ptr<Darabonba_Source::Config>& config);
-  Darabonba_Source::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
+  shared_ptr<vector<Darabonba_Import::Config>> _configs{};
+  explicit Client(const shared_ptr<Darabonba_Import::Config>& config);
+  Darabonba_Import::RuntimeObject complex1(shared_ptr<ComplexRequest> request, shared_ptr<Darabonba_Import::Client> client);
   map<string, boost::any> Complex2(shared_ptr<ComplexRequest> request, shared_ptr<vector<string>> str, shared_ptr<map<string, string>> val);
   ComplexRequest Complex3(shared_ptr<ComplexRequest> request);
   vector<string> hello(shared_ptr<map<string, boost::any>> request, shared_ptr<vector<string>> strs);
-  static Darabonba_Source::Request print(shared_ptr<Darabonba::Request> reqeust,
+  static Darabonba_Import::Request print(shared_ptr<Darabonba::Request> reqeust,
                                          shared_ptr<vector<ComplexRequest>> reqs,
                                          shared_ptr<Darabonba::Response> response,
                                          shared_ptr<map<string, string>> val);
@@ -275,7 +274,7 @@ public:
   static vector<string> arrayAssign2(shared_ptr<string> config);
   static void arrayAssign3(shared_ptr<ComplexRequest> request, shared_ptr<string> config);
   static string mapAccess(shared_ptr<ComplexRequest> request);
-  static string mapAccess2(shared_ptr<Darabonba_Source::Request> request);
+  static string mapAccess2(shared_ptr<Darabonba_Import::Request> request);
   static string mapAccess3();
   static void mapAssign(shared_ptr<ComplexRequest> request, shared_ptr<string> name);
   string TemplateString();

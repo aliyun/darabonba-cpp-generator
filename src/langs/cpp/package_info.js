@@ -5,7 +5,7 @@ const os = require('os');
 const fs = require('fs');
 const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
-const { _toSnakeCase, _upperFirst, _avoidKeywords, _render } = require('../../lib/helper');
+const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
 
@@ -226,17 +226,19 @@ class PackageInfo extends BasePackageInfo {
         const res = this.resolveGitInfo(item);
         if (false !== res) {
           const { package_name, git_link, git_tag } = this.resolveGitInfo(item);
-          this.renderAuto(
-            tmpl_path,
-            path.join(this.config.dir, `external/${package_name}/CMakeLists.txt`), {
-              package_name: package_name,
-              git_link: git_link,
-              git_tag: git_tag,
-              project_name: this.project_name
-            }
-          );
-          libraries += `add_subdirectory(${package_name})${os.EOL}`;
-          this.imports.push(package_name);
+          if (!_contain(this.imports, package_name)) {
+            this.renderAuto(
+              tmpl_path,
+              path.join(this.config.dir, `external/${package_name}/CMakeLists.txt`), {
+                package_name: package_name,
+                git_link: git_link,
+                git_tag: git_tag,
+                project_name: this.project_name
+              }
+            );
+            libraries += `add_subdirectory(${package_name})${os.EOL}`;
+            this.imports.push(package_name);
+          }
         }
       });
     }

@@ -32,7 +32,7 @@ public:
   }
 
   void fromMap(map<string, boost::any> m) override {
-    if (m.find("test") != m.end()) {
+    if (m.find("test") != m.end() && !m["test"].empty()) {
       test = make_shared<string>(boost::any_cast<string>(m["test"]));
     }
   }

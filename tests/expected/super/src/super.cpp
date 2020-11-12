@@ -2,8 +2,7 @@
 
 #include <darabonba/super.hpp>
 #include <darabonba/import.hpp>
-#include <darabonba/source.hpp>
 
 using namespace Darabonba_Super;
 
-Darabonba_Super::Client::Client(const shared_ptr<Darabonba_Source::Config>& config) : Darabonba_Import::Client(config) {};
+Darabonba_Super::Client::Client(const shared_ptr<Darabonba_Import::Config>& config) : Darabonba_Import::Client(config) {};

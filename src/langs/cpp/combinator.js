@@ -461,7 +461,7 @@ class Combinator extends CombinatorBase {
             this.levelDown();
             emit.emitln('}', this.level);
           } else {
-            emit.emitln(`Darabonba::Model::validate${_upperFirst(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
+            emit.emitln(`${this.addInclude('$Model')}::validate${_upperFirst(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
           }
         }
       });
@@ -475,6 +475,22 @@ class Combinator extends CombinatorBase {
       emitter.emitln('void validate() override {}', this.level);
     }
     emitter.emitln();
+  }
+
+  emitMakeShared(type, data, need_cast = false) {
+    let type_str = typeof (type) === 'string' ? type : this.emitType(type);
+    let data_str;
+    if (typeof (data) === 'string') {
+      data_str = data;
+    } else {
+      const emit = new Emitter(this.config);
+      this.grammer(emit, data, false, false);
+      data_str = emit.output;
+    }
+    if (need_cast) {
+      return `make_shared<${type_str}>(boost::any_cast<${type_str}>(${data_str}))`;
+    }
+    return `make_shared<${type_str}>(${data_str})`;
   }
 
   emitToMapProp(emitter, prefix = 'res', prop, layer = 1, parent_type) {
@@ -571,7 +587,7 @@ class Combinator extends CombinatorBase {
       this.levelDown();
       emitter.emitln('}', this.level);
       if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(toVec${layer});`, this.level);
+        emitter.emitln(`${target} = ${this.emitMakeShared(type, `toVec${layer}`)};`, this.level);
       } else {
         emitter.emitln(`${target} = toVec${layer};`, this.level);
       }
@@ -584,23 +600,23 @@ class Combinator extends CombinatorBase {
       this.levelDown();
       emitter.emitln('}', this.level);
       if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(toMap${layer});`, this.level);
+        emitter.emitln(`${target} = ${this.emitMakeShared(type, `toMap${layer}`)};`, this.level);
       } else {
         emitter.emitln(`${target} = toMap${layer};`, this.level);
       }
     } else if (is.stream(type)) {
       if (is.array(parent_type)) {
-        emitter.emitln(`${target}.push_back(boost::any_cast<Darabonba::Stream>(${source}));`, this.level);
+        emitter.emitln(`${target}.push_back(boost::any_cast<${this.addInclude('$Stream')}>(${source}));`, this.level);
       } else if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<Darabonba::Stream>(boost::any_cast<Darabonba::Stream>(${source}));`, this.level);
+        emitter.emitln(`${target} = ${this.emitMakeShared(this.addInclude('$Stream'), source, true)};`, this.level);
       } else {
-        emitter.emitln(`${target} = boost::any_cast<Darabonba::Stream>(${source});`, this.level);
+        emitter.emitln(`${target} = boost::any_cast<${this.addInclude('$Stream')}>(${source});`, this.level);
       }
     } else if (is.base(type)) {
       if (is.array(parent_type)) {
         emitter.emitln(`${target}.push_back(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
       } else if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(boost::any_cast<${this.emitType(type)}>(${source}));`, this.level);
+        emitter.emitln(`${target} = ${this.emitMakeShared(type, source, true)};`, this.level);
       } else {
         emitter.emitln(`${target} = ${source};`, this.level);
       }
@@ -612,7 +628,7 @@ class Combinator extends CombinatorBase {
           emitter.emitln(`${target}.push_back(${source});`, this.level);
         }
       } else if (layer === 1) {
-        emitter.emitln(`${target} = make_shared<${this.emitType(type)}>(${source});`, this.level);
+        emitter.emitln(`${target} = ${this.emitMakeShared(type, source)};`, this.level);
       } else {
         emitter.emitln(`${target} = ${this.emitType(type)}(${source});`, this.level);
       }
@@ -657,13 +673,13 @@ class Combinator extends CombinatorBase {
       emitter.emitln('}', this.level);
       if (prop.parent && is.array(prop.parent)) {
         if (layer === 1) {
-          emitter.emitln(`${realkey}.push_back(make_shared<${this.emitType(prop.type)}>(${expectName}));`, this.level);
+          emitter.emitln(`${realkey}.push_back(${this.emitMakeShared(prop.type, expectName)};`, this.level);
         } else {
           emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
         }
       } else {
         if (layer === 1) {
-          emitter.emitln(`${_avoidKeywords(prop.name)} = make_shared<${this.emitType(prop.type)}>(${expectName});`, this.level);
+          emitter.emitln(`${_avoidKeywords(prop.name)} = ${this.emitMakeShared(prop.type, expectName)};`, this.level);
         } else {
           if (is.array(parent_type)) {
             emitter.emitln(`${realkey}.push_back(${expectName});`, this.level);
@@ -782,7 +798,7 @@ class Combinator extends CombinatorBase {
       this.pushInclude('map');
       type_str = `map<${this.emitType(type.keyType)}, ${this.emitType(type.valType)}>`;
     } else if (is.stream(type)) {
-      type_str = 'Darabonba::Stream';
+      type_str = this.addInclude('$Stream');
     } else if (is.object(type)) {
       let objName = '';
       if (!type.objectName) {
@@ -1348,26 +1364,19 @@ class Combinator extends CombinatorBase {
           if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
             let isPointer = this.isPointerVar(p, true);
             if (!isPointer) {
-              emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
-            }
-            this.grammer(emit, p.value.grammer, false, false);
-            if (!isPointer) {
-              emit.emit(')');
+              emit.emit(this.emitMakeShared(p.dataType, p.value.grammer));
+            } else {
+              this.grammer(emit, p.value.grammer, false, false);
             }
             tmp.push(emit.output);
           } else if (p.value instanceof BehaviorToMap && gram.type === 'sys_func') {
-            emit.emit('make_shared<map<string, boost::any>>(');
-            this.grammer(emit, p, false, false);
-            emit.emit(')');
-            tmp.push(emit.output);
+            tmp.push(this.emitMakeShared('map<string, boost::any>', p));
           } else if (gram.type === 'sys_func' && isUnsetMethod) {
             this.grammer(emit, p, false, false);
             tmp.push(emit.output);
           } else if (gram.type === 'sys_func') {
             if (!this.isPointerVar(p)) {
-              emit.emit(`make_shared<${this.emitType(p.dataType)}>(`);
-              this.grammer(emit, p, false, false);
-              emit.emit(')');
+              emit.emit(this.emitMakeShared(p.dataType, p));
             } else {
               this.grammer(emit, p, false, false);
             }
@@ -1387,7 +1396,7 @@ class Combinator extends CombinatorBase {
             if (this.isPtrStatement(p.value)) {
               tmp.push(p.value);
             } else {
-              tmp.push(`make_shared<${p.dataType}>(${p.value})`);
+              tmp.push(this.emitMakeShared(p.dataType, p.value));
             }
           } else if (!this.isPointerVar(p)) {
             this.grammer(emit, p, false, false);
@@ -1395,9 +1404,9 @@ class Combinator extends CombinatorBase {
             if (is.stream(p.dataType)) {
               tmp.push(emit.output);
             } else if (p.type === 'behavior' && p.value instanceof BehaviorToMap) {
-              tmp.push(`make_shared<map<string, boost::any>>(${emit.output})`);
+              tmp.push(this.emitMakeShared('map<string, boost::any>', emit.output));
             } else if (!this.isPointerVar(p)) {
-              tmp.push(`make_shared<${dataType}>(${emit.output})`);
+              tmp.push(this.emitMakeShared(dataType, emit.output));
             } else {
               tmp.push(emit.output);
             }
@@ -1488,9 +1497,7 @@ class Combinator extends CombinatorBase {
           this.grammer(emitter, gram.right, false, false);
         } else {
           this.exprIsAssignToPtr = this.isPointerVar(gram.left);
-          emitter.emit(`make_shared<${dataType}>(`);
-          this.grammer(emitter, gram.right, false, false);
-          emitter.emit(')');
+          emitter.emit(this.emitMakeShared(dataType, gram.right));
         }
       } else if (!this.isPointerVar(gram.left) && this.isPointerVar(gram.right)) {
         emitter.emit('*');
@@ -1682,9 +1689,7 @@ class Combinator extends CombinatorBase {
         }
         let emit = new Emitter(this.config);
         if (isPtrParam && !this.isPointerVar(p)) {
-          emit.emit(`make_shared<${this.emitType(p.dataType ? p.dataType : p.type)}>(`);
-          this.grammer(emit, p, false, false);
-          emit.emit(')');
+          emit.emit(this.emitMakeShared(p.dataType ? p.dataType : p.type, p));
         } else {
           this.grammerValue(emit, p, false, false);
         }
@@ -1731,7 +1736,7 @@ class Combinator extends CombinatorBase {
   behaviorDoAction(emitter, behavior) {
     emitter.emit('', this.level);
     this.grammerVar(emitter, behavior.var);
-    emitter.emit(` = make_shared<Darabonba::Response>(${this.addInclude('$Core')}::${this.config.tea.core.doAction}(`);
+    emitter.emit(` = make_shared<${this.addInclude('$Response')}>(${this.addInclude('$Core')}::${this.config.tea.core.doAction}(`);
     let params = [];
     behavior.params.forEach(p => {
       let emit = new Emitter(this.config);

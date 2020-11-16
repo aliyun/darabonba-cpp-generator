@@ -151,6 +151,7 @@ module.exports = {
       getBackoffTime: 'getBackoffTime',
       isRetryable: 'isRetryable',
     },
+    stream: { name: 'Darabonba::Stream' },
     model: { name: 'Darabonba::Model' },
     converter: { name: 'Darabonba::Converter' },
     response: { name: 'Darabonba::Response' },

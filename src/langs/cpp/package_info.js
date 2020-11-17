@@ -86,7 +86,7 @@ class PackageInfo extends BasePackageInfo {
 
   generateFiles() {
     const { git_scope, git_project } = this.resolveGitInfo(this.config);
-    if (this.config.packageInfo.files) {
+    if (this.config.packageInfo && this.config.packageInfo.files) {
       Object.keys(this.config.packageInfo.files).forEach((key) => {
         let tmpl_path = this.config.packageInfo.files[key].tmpl;
         let output_path = path.join(this.config.dir, this.config.packageInfo.files[key].path);
@@ -126,10 +126,9 @@ class PackageInfo extends BasePackageInfo {
   generateMainFiles() {
     let param_scope = _toSnakeCase(this.config.scope);
     let param_package = _avoidKeywords(_toSnakeCase(this.config.name));
-    let template = this.config.withTest ?
-      fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.test.tmpl'), 'utf-8') :
-      fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.tmpl'), 'utf-8');
+    let template;
     if (this.config.withTest) {
+      template = fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.test.tmpl'), 'utf-8');
       let tests_main_path = path.join(this.config.dir, 'tests/main.cpp');
       if (!fs.existsSync(tests_main_path)) {
         this.renderAuto(
@@ -146,7 +145,11 @@ class PackageInfo extends BasePackageInfo {
         }),
         param_import: this.imports.join(' ')
       });
+    } else if (this.config.exec) {
+      template = fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.exec.tmpl'), 'utf-8');
+      template = _render(template, { with_test: '' });
     } else {
+      template = fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.tmpl'), 'utf-8');
       template = _render(template, { with_test: '' });
     }
     this.renderContent(
@@ -194,18 +197,21 @@ class PackageInfo extends BasePackageInfo {
   }
 
   addGlobalPackage() {
-    const globalPackage = {
-      'Core': {
-        scope: 'darabonba',
-        name: 'core',
-        packageInfo: {
-          git: {
-            'scope': 'aliyun',
-            'project': 'tea-cpp'
+    let globalPackage = {};
+    if (!this.config.exec) {
+      globalPackage = {
+        'Core': {
+          scope: 'darabonba',
+          name: 'core',
+          packageInfo: {
+            git: {
+              'scope': 'aliyun',
+              'project': 'tea-cpp'
+            }
           }
         }
-      }
-    };
+      };
+    }
     Object.assign(this.requirePackage, globalPackage);
     if (this.config.cpp && this.config.cpp.require) {
       Object.assign(this.requirePackage, globalPackage, this.config.cpp.require);

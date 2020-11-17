@@ -156,12 +156,16 @@ class Combinator extends CombinatorBase {
   }
 
   combine(objects = []) {
-    if (this.config.packageInfo) {
+    if (this.config.packageInfo || this.config.exec) {
       const packageInfo = new PackageInfo(this.config);
       packageInfo.emit(this.thirdPackageDaraMeta, this.libraries, objects);
     }
-    this.combineHead(objects);
-    this.combineCode(objects);
+    if (this.config.exec) {
+      this.combineCode(objects);
+    } else {
+      this.combineHead(objects);
+      this.combineCode(objects);
+    }
   }
 
   combineHead(objects) {
@@ -255,9 +259,14 @@ class Combinator extends CombinatorBase {
       this.emitAnnotations(emitter, object.topAnnotation);
       emitter.emitln();
     }
-    emitter.emitln(`#include <${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`);
-    this.emitInclude(emitter);
-    emitter.emitln(`using namespace ${this.namespace};`).emitln();
+    if (!this.config.exec) {
+      emitter.emitln(`#include <${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`);
+      this.emitInclude(emitter);
+      emitter.emitln(`using namespace ${this.namespace};`).emitln();
+    } else {
+      this.emitInclude(emitter);
+    }
+
     outputPars.head = emitter.output;
 
     /***************************** combine output ******************************/
@@ -903,15 +912,22 @@ class Combinator extends CombinatorBase {
 
   emitFuncCode(emitter, func) {
     this.funcReturnType = func.return[0];
-    if (func.params.length) {
-      emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}(`);
-      this.emitParams(emitter, func.params);
-      emitter.emit(')');
+    if (this.config.exec) {
+      emitter.emitln(`int ${func.name}(int argc, char *argv[]) {`);
+      this.levelUp();
+      emitter.emitln('argv++;', this.level);
     } else {
-      emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}()`);
+      if (func.params.length) {
+        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}(`);
+        this.emitParams(emitter, func.params);
+        emitter.emit(')');
+      } else {
+        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}()`);
+      }
+      emitter.emitln(' {');
+      this.levelUp();
     }
-    emitter.emitln(' {');
-    this.levelUp();
+
     if (this.config.manual && func.body.length === 1 && func.body[0] instanceof GrammerThrows) {
       emitter.emitln('return "";', this.level);
     } else {

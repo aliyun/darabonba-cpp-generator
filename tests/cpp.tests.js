@@ -132,6 +132,12 @@ describe('C++ Generator', function () {
     ]);
   });
 
+  it('exec should ok', function () {
+    check('exec', [
+      'src/exec.cpp'
+    ]);
+  });
+
   it('alias should ok', function () {
     check('alias', [
       `src/alias${extCode}`,

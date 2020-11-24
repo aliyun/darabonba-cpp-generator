@@ -12,7 +12,10 @@ using namespace std;
 namespace Darabonba_Annotation {
 class Test : public Darabonba::Model {
 public:
+  shared_ptr<string> test{};
+
   Test() {}
+
   explicit Test(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -37,7 +40,6 @@ public:
     }
   }
 
-  shared_ptr<string> test{};
 
   ~Test() = default;
 };

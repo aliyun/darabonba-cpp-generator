@@ -16,7 +16,9 @@ using namespace std;
 namespace Darabonba_Model {
 class MSubM : public Darabonba::Model {
 public:
+
   MSubM() {}
+
   explicit MSubM(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -35,7 +37,10 @@ public:
 };
 class M : public Darabonba::Model {
 public:
+  shared_ptr<MSubM> subM{};
+
   M() {}
+
   explicit M(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -64,13 +69,14 @@ public:
     }
   }
 
-  shared_ptr<MSubM> subM{};
 
   ~M() = default;
 };
 class Class : public Darabonba::Model {
 public:
+
   Class() {}
+
   explicit Class(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -89,7 +95,10 @@ public:
 };
 class MyModelSubmodel : public Darabonba::Model {
 public:
+  shared_ptr<string> stringfield{};
+
   MyModelSubmodel() {}
+
   explicit MyModelSubmodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -114,13 +123,14 @@ public:
     }
   }
 
-  shared_ptr<string> stringfield{};
 
   ~MyModelSubmodel() = default;
 };
 class MyModelSubarraymodel : public Darabonba::Model {
 public:
+
   MyModelSubarraymodel() {}
+
   explicit MyModelSubarraymodel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -139,7 +149,47 @@ public:
 };
 class MyModel : public Darabonba::Model {
 public:
+  // keyword property
+  shared_ptr<string> delete_{};
+  shared_ptr<string> stringfield{};
+  shared_ptr<vector<uint8_t>> bytesfield{};
+  shared_ptr<vector<string>> stringarrayfield{};
+  shared_ptr<map<string, string>> mapfield{};
+  shared_ptr<string> name{};
+  shared_ptr<MyModelSubmodel> submodel{};
+  shared_ptr<map<string, MyModelSubmodel>> submodelMap{};
+  shared_ptr<map<string, M>> mapModel{};
+  shared_ptr<vector<MyModelSubarraymodel>> subarraymodel{};
+  shared_ptr<vector<M>> subarray{};
+  shared_ptr<vector<map<string, boost::any>>> maparray{};
+  shared_ptr<map<string, Darabonba_Import::Request>> moduleModelMap{};
+  shared_ptr<map<string, MSubM>> subModelMap{};
+  shared_ptr<map<string, M>> modelMap{};
+  shared_ptr<map<string, Darabonba_Import::Client>> moduleMap{};
+  shared_ptr<map<string, boost::any>> object{};
+  shared_ptr<Darabonba::Stream> readable{};
+  shared_ptr<Darabonba::Stream> writable{};
+  shared_ptr<M> existModel{};
+  shared_ptr<Darabonba::Request> request{};
+  shared_ptr<vector<vector<string>>> complexList{};
+  shared_ptr<vector<map<string, MyModelSubmodel>>> complexMap{};
+  shared_ptr<int> numberfield{};
+  shared_ptr<int> integerField{};
+  shared_ptr<double> floatField{};
+  shared_ptr<double> doubleField{};
+  shared_ptr<long> longField{};
+  shared_ptr<long> ulongField{};
+  shared_ptr<int> int8Field{};
+  shared_ptr<int> int16Field{};
+  shared_ptr<long> int32Field{};
+  shared_ptr<long> int64Field{};
+  shared_ptr<int> uint8Field{};
+  shared_ptr<int> uint16Field{};
+  shared_ptr<long> uint32Field{};
+  shared_ptr<long> uint64Field{};
+
   MyModel() {}
+
   explicit MyModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -670,50 +720,15 @@ public:
     }
   }
 
-  // keyword property
-  shared_ptr<string> delete_{};
-  shared_ptr<string> stringfield{};
-  shared_ptr<vector<uint8_t>> bytesfield{};
-  shared_ptr<vector<string>> stringarrayfield{};
-  shared_ptr<map<string, string>> mapfield{};
-  shared_ptr<string> name{};
-  shared_ptr<MyModelSubmodel> submodel{};
-  shared_ptr<map<string, MyModelSubmodel>> submodelMap{};
-  shared_ptr<map<string, M>> mapModel{};
-  shared_ptr<vector<MyModelSubarraymodel>> subarraymodel{};
-  shared_ptr<vector<M>> subarray{};
-  shared_ptr<vector<map<string, boost::any>>> maparray{};
-  shared_ptr<map<string, Darabonba_Import::Request>> moduleModelMap{};
-  shared_ptr<map<string, MSubM>> subModelMap{};
-  shared_ptr<map<string, M>> modelMap{};
-  shared_ptr<map<string, Darabonba_Import::Client>> moduleMap{};
-  shared_ptr<map<string, boost::any>> object{};
-  shared_ptr<Darabonba::Stream> readable{};
-  shared_ptr<Darabonba::Stream> writable{};
-  shared_ptr<M> existModel{};
-  shared_ptr<Darabonba::Request> request{};
-  shared_ptr<vector<vector<string>>> complexList{};
-  shared_ptr<vector<map<string, MyModelSubmodel>>> complexMap{};
-  shared_ptr<int> numberfield{};
-  shared_ptr<int> integerField{};
-  shared_ptr<double> floatField{};
-  shared_ptr<double> doubleField{};
-  shared_ptr<long> longField{};
-  shared_ptr<long> ulongField{};
-  shared_ptr<int> int8Field{};
-  shared_ptr<int> int16Field{};
-  shared_ptr<long> int32Field{};
-  shared_ptr<long> int64Field{};
-  shared_ptr<int> uint8Field{};
-  shared_ptr<int> uint16Field{};
-  shared_ptr<long> uint32Field{};
-  shared_ptr<long> uint64Field{};
 
   ~MyModel() = default;
 };
 class UseBeforeDefineModel : public Darabonba::Model {
 public:
+  shared_ptr<MyModel> m{};
+
   UseBeforeDefineModel() {}
+
   explicit UseBeforeDefineModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -742,7 +757,6 @@ public:
     }
   }
 
-  shared_ptr<MyModel> m{};
 
   ~UseBeforeDefineModel() = default;
 };

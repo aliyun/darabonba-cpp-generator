@@ -339,11 +339,9 @@ class Combinator extends CombinatorBase {
     let hasConstruct = false;
     if (object.type === 'model') {
       hasConstruct = true;
-      this.emitModelFunc(emitter, className, object);
-    } else {
-      emitter.emitln('public:', this.level);
-      this.levelUp();
     }
+    emitter.emitln('public:', this.level);
+    this.levelUp();
 
     // emit child nodes
     object.body.forEach(node => {
@@ -356,10 +354,11 @@ class Combinator extends CombinatorBase {
       } else if (is.func(node)) {
         let modify = _modify(node.modify);
         let returnType = this.emitType(node.return[0], true);
+        let func_name = _avoidKeywords(node.name);
         if (modify) {
-          emitter.emit(`${modify} ${returnType} ${node.name}(`, this.level);
+          emitter.emit(`${modify} ${returnType} ${func_name}(`, this.level);
         } else {
-          emitter.emit(`${returnType} ${node.name}(`, this.level);
+          emitter.emit(`${returnType} ${func_name}(`, this.level);
         }
         this.emitParams(emitter, node.params);
         emitter.emitln(');');
@@ -390,6 +389,10 @@ class Combinator extends CombinatorBase {
       }
     });
 
+    if (object.type === 'model') {
+      emitter.emitln();
+      this.emitModelFunc(emitter, className, object);
+    }
     emitter.emitln();
     if (!hasConstruct) {
       emitter.emitln(`${className}() {};`, this.level);
@@ -407,9 +410,8 @@ class Combinator extends CombinatorBase {
 
   emitModelFunc(emitter, className, object) {
     const notes = this.resolveNotes(object.body);
-    emitter.emitln('public:');
-    this.levelUp();
     emitter.emitln(`${className}() {}`, this.level);
+    emitter.emitln();
     emitter.emitln(`explicit ${className}(const std::map<string, boost::any> &config) : ${this.config.tea.model.name}(config) {`, this.level);
     this.levelUp();
     emitter.emits(this.level,
@@ -459,14 +461,10 @@ class Combinator extends CombinatorBase {
             emit.emitln('}', this.level);
           } else if (note.key === 'maximum' || note.key === 'minimum') {
             let opt = note.key === 'maximum' ? '>' : '<';
-            emit.emitln(`if (${_avoidKeywords(note.prop)} {`, this.level);
-            this.levelUp();
-            emit.emitln(`if (${_avoidKeywords(note.prop)} ${opt} ${val})) {`, this.level);
+            emit.emitln(`if (${_avoidKeywords(note.prop)} && *${_avoidKeywords(note.prop)} ${opt} ${val}) {`, this.level);
             this.pushInclude('throw_exception', this.level);
             this.levelUp();
             emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
-            this.levelDown();
-            emit.emitln('}');
             this.levelDown();
             emit.emitln('}', this.level);
           } else {
@@ -488,6 +486,9 @@ class Combinator extends CombinatorBase {
 
   emitMakeShared(type, data, need_cast = false) {
     let type_str = typeof (type) === 'string' ? type : this.emitType(type);
+    if (type_str === 'nullptr') {
+      return 'nullptr';
+    }
     let data_str;
     if (typeof (data) === 'string') {
       data_str = data;
@@ -834,6 +835,7 @@ class Combinator extends CombinatorBase {
     }
     return type_str;
   }
+
   emitAnnotation(emitter, annotation, level) {
     if (typeof level === 'undefined') {
       level = this.level;
@@ -912,17 +914,18 @@ class Combinator extends CombinatorBase {
 
   emitFuncCode(emitter, func) {
     this.funcReturnType = func.return[0];
+    let func_name = _avoidKeywords(func.name);
     if (this.config.exec) {
-      emitter.emitln(`int ${func.name}(int argc, char *argv[]) {`);
+      emitter.emitln(`int ${func_name}(int argc, char *argv[]) {`);
       this.levelUp();
       emitter.emitln('argv++;', this.level);
     } else {
       if (func.params.length) {
-        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}(`);
+        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func_name}(`);
         this.emitParams(emitter, func.params);
         emitter.emit(')');
       } else {
-        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func.name}()`);
+        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func_name}()`);
       }
       emitter.emitln(' {');
       this.levelUp();
@@ -1103,7 +1106,7 @@ class Combinator extends CombinatorBase {
   isPointerVar(gram, ignore_to_map = false) {
     if (gram instanceof GrammerValue) {
       if (gram.type === 'null') {
-        return true;
+        return false;
       }
     }
     let grammerVar;
@@ -1466,7 +1469,7 @@ class Combinator extends CombinatorBase {
     if (gram.right.type === 'null') {
       // not emit symbol&right if right of expr is null
       this.exprIsAssignToPtr = null;
-      return;
+      if (gram.left instanceof GrammerVar) { return; }
     }
 
     // emit right of expr
@@ -1795,11 +1798,13 @@ class Combinator extends CombinatorBase {
 
   behaviorToModel(emitter, behavior) {
     emitter.emit(`${behavior.expected}(`);
-    if (this.resolveDataType(behavior.grammer) !== 'map<string, boost::any>') {
+    let type = this.resolveDataType(behavior.grammer);
+    if (type === 'map<string, string>') {
       emitter.emit(`${this.config.tea.converter.name}::toGenericMap(`);
       this.grammer(emitter, behavior.grammer, false, false);
       emitter.emit(')');
     } else {
+      behavior.grammer.type = 'model_construct_params';
       this.grammer(emitter, behavior.grammer, false, false);
     }
     emitter.emit(')');
@@ -1811,6 +1816,9 @@ class Combinator extends CombinatorBase {
     this.pushInclude('map');
     let paths = behavior.call.path;
     if (this.isPointerPath(paths.length - 1, paths)) {
+      if (this.emitType(behavior.value.dataType) === 'nullptr') {
+        debug.halt(behavior.value);
+      }
       emitter.emit(`${emit.output}->insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
     } else {
       emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);

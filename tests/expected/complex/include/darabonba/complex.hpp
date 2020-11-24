@@ -16,7 +16,10 @@ using namespace std;
 namespace Darabonba_Complex {
 class ComplexRequestHeader : public Darabonba::Model {
 public:
+  shared_ptr<string> content{};
+
   ComplexRequestHeader() {}
+
   explicit ComplexRequestHeader(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -41,13 +44,17 @@ public:
     }
   }
 
-  shared_ptr<string> content{};
 
   ~ComplexRequestHeader() = default;
 };
 class ComplexRequestConfigs : public Darabonba::Model {
 public:
+  shared_ptr<string> key{};
+  shared_ptr<vector<string>> value{};
+  shared_ptr<map<string, string>> extra{};
+
   ComplexRequestConfigs() {}
+
   explicit ComplexRequestConfigs(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -102,15 +109,15 @@ public:
     }
   }
 
-  shared_ptr<string> key{};
-  shared_ptr<vector<string>> value{};
-  shared_ptr<map<string, string>> extra{};
 
   ~ComplexRequestConfigs() = default;
 };
 class ComplexRequestPart : public Darabonba::Model {
 public:
+  shared_ptr<string> partNumber{};
+
   ComplexRequestPart() {}
+
   explicit ComplexRequestPart(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -131,13 +138,21 @@ public:
     }
   }
 
-  shared_ptr<string> partNumber{};
 
   ~ComplexRequestPart() = default;
 };
 class ComplexRequest : public Darabonba::Model {
 public:
+  shared_ptr<string> accessKey{};
+  shared_ptr<Darabonba::Stream> body{};
+  shared_ptr<vector<string>> strs{};
+  shared_ptr<ComplexRequestHeader> header{};
+  shared_ptr<int> Num{};
+  shared_ptr<ComplexRequestConfigs> configs{};
+  shared_ptr<vector<ComplexRequestPart>> part{};
+
   ComplexRequest() {}
+
   explicit ComplexRequest(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -242,13 +257,6 @@ public:
     }
   }
 
-  shared_ptr<string> accessKey{};
-  shared_ptr<Darabonba::Stream> body{};
-  shared_ptr<vector<string>> strs{};
-  shared_ptr<ComplexRequestHeader> header{};
-  shared_ptr<int> Num{};
-  shared_ptr<ComplexRequestConfigs> configs{};
-  shared_ptr<vector<ComplexRequestPart>> part{};
 
   ~ComplexRequest() = default;
 };

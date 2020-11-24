@@ -18,6 +18,6 @@ Darabonba_Map::Client::Client(const shared_ptr<Darabonba_Import::Config>& config
 );
   _endpointMap["ap-northeast-1"];
   _endpointMap.insert(pair<string, string>("ap-northeast-1", ""));
-  _endpointMap.insert(pair<string, string>("test", "test"));
+  _endpointMap["test"] = "test";
 };
 

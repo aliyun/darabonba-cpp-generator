@@ -14,7 +14,13 @@ using namespace std;
 namespace Darabonba_Comment {
 class Test1 : public Darabonba::Model {
 public:
+  shared_ptr<string> test{};
+  // model的test back comment
+  shared_ptr<string> test2{};
+  // model的test2 back comment
+
   Test1() {}
+
   explicit Test1(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -48,16 +54,18 @@ public:
     }
   }
 
-  shared_ptr<string> test{};
-  // model的test back comment
-  shared_ptr<string> test2{};
-  // model的test2 back comment
 
   ~Test1() = default;
 };
 class Test2 : public Darabonba::Model {
 public:
+  // model的test front comment
+  shared_ptr<string> test{};
+  // model的test front comment
+  shared_ptr<string> test2{};
+
   Test2() {}
+
   explicit Test2(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -91,16 +99,20 @@ public:
     }
   }
 
-  // model的test front comment
-  shared_ptr<string> test{};
-  // model的test front comment
-  shared_ptr<string> test2{};
 
   ~Test2() = default;
 };
 class Test3 : public Darabonba::Model {
 public:
+  // model的test front comment
+  shared_ptr<string> test{};
+  // empty comment1
+  // empy comment2
+  shared_ptr<string> test1{};
+  // model的test back comment
+
   Test3() {}
+
   explicit Test3(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
@@ -134,12 +146,6 @@ public:
     }
   }
 
-  // model的test front comment
-  shared_ptr<string> test{};
-  // empty comment1
-  // empy comment2
-  shared_ptr<string> test1{};
-  // model的test back comment
 
   ~Test3() = default;
 };

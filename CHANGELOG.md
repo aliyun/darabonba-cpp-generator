@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 0.2.0 - 2020-11-25
+
+- Fix the problem when Function name is a keyword.
+- Optimized emit result.
+
 ## 0.2.0 - 2020-11-06
 
 - Optimized emit result.

@@ -55,7 +55,7 @@ public:
   }
 
 
-  ~Test1() = default;
+  virtual ~Test1() = default;
 };
 class Test2 : public Darabonba::Model {
 public:
@@ -100,7 +100,7 @@ public:
   }
 
 
-  ~Test2() = default;
+  virtual ~Test2() = default;
 };
 class Test3 : public Darabonba::Model {
 public:
@@ -147,7 +147,7 @@ public:
   }
 
 
-  ~Test3() = default;
+  virtual ~Test3() = default;
 };
 class Client {
 public:
@@ -159,7 +159,7 @@ public:
   static void staticFunc();
   static void testFunc(shared_ptr<string> str, shared_ptr<bool> val);
 
-  ~Client() = default;
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Comment
 

@@ -3,8 +3,6 @@
 #ifndef DARABONBA_STATEMENTS_H_
 #define DARABONBA_STATEMENTS_H_
 
-#include <darabonba/core.hpp>
-
 namespace Darabonba_Statements {
 class Client {
 public:
@@ -16,6 +14,7 @@ public:
   static void helloWhile();
   static void helloDeclare();
 
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Statements
 

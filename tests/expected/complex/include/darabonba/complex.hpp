@@ -45,7 +45,7 @@ public:
   }
 
 
-  ~ComplexRequestHeader() = default;
+  virtual ~ComplexRequestHeader() = default;
 };
 class ComplexRequestConfigs : public Darabonba::Model {
 public:
@@ -91,7 +91,7 @@ public:
     }
     if (m.find("value") != m.end() && !m["value"].empty()) {
       vector<string> toVec1;
-      if (typeid(vector<boost::any>).name() == m["value"].type().name()) {
+      if (typeid(vector<boost::any>) == m["value"].type()) {
         vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["value"]);
         for (auto item:vec1) {
            toVec1.push_back(boost::any_cast<string>(item));
@@ -110,7 +110,7 @@ public:
   }
 
 
-  ~ComplexRequestConfigs() = default;
+  virtual ~ComplexRequestConfigs() = default;
 };
 class ComplexRequestPart : public Darabonba::Model {
 public:
@@ -139,7 +139,7 @@ public:
   }
 
 
-  ~ComplexRequestPart() = default;
+  virtual ~ComplexRequestPart() = default;
 };
 class ComplexRequest : public Darabonba::Model {
 public:
@@ -217,7 +217,7 @@ public:
     }
     if (m.find("Strs") != m.end() && !m["Strs"].empty()) {
       vector<string> toVec1;
-      if (typeid(vector<boost::any>).name() == m["Strs"].type().name()) {
+      if (typeid(vector<boost::any>) == m["Strs"].type()) {
         vector<boost::any> vec1 = boost::any_cast<vector<boost::any>>(m["Strs"]);
         for (auto item:vec1) {
            toVec1.push_back(boost::any_cast<string>(item));
@@ -226,7 +226,7 @@ public:
       strs = make_shared<vector<string>>(toVec1);
     }
     if (m.find("header") != m.end() && !m["header"].empty()) {
-      if (typeid(map<string, boost::any>).name() == m["header"].type().name()) {
+      if (typeid(map<string, boost::any>) == m["header"].type()) {
         ComplexRequestHeader model1;
         model1.fromMap(boost::any_cast<map<string, boost::any>>(m["header"]));
         header = make_shared<ComplexRequestHeader>(model1);
@@ -236,17 +236,17 @@ public:
       Num = make_shared<int>(boost::any_cast<int>(m["Num"]));
     }
     if (m.find("configs") != m.end() && !m["configs"].empty()) {
-      if (typeid(map<string, boost::any>).name() == m["configs"].type().name()) {
+      if (typeid(map<string, boost::any>) == m["configs"].type()) {
         ComplexRequestConfigs model1;
         model1.fromMap(boost::any_cast<map<string, boost::any>>(m["configs"]));
         configs = make_shared<ComplexRequestConfigs>(model1);
       }
     }
     if (m.find("Part") != m.end() && !m["Part"].empty()) {
-      if (typeid(vector<boost::any>).name() == m["Part"].type().name()) {
+      if (typeid(vector<boost::any>) == m["Part"].type()) {
         vector<ComplexRequestPart> expect1;
         for(auto item1:boost::any_cast<vector<boost::any>>(m["Part"])){
-          if (typeid(map<string, boost::any>).name() == item1.type().name()) {
+          if (typeid(map<string, boost::any>) == item1.type()) {
             ComplexRequestPart model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
             expect1.push_back(model2);
@@ -258,7 +258,7 @@ public:
   }
 
 
-  ~ComplexRequest() = default;
+  virtual ~ComplexRequest() = default;
 };
 class Client : Darabonba_Import::Client {
 public:
@@ -289,7 +289,7 @@ public:
   void emptyModel();
   void tryCatch();
 
-  ~Client() = default;
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Complex
 

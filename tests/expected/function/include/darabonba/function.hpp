@@ -19,6 +19,7 @@ public:
   static void helloInterface();
 
   Client() {};
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Function
 

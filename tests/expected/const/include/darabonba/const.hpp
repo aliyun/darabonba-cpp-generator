@@ -10,10 +10,10 @@ using namespace std;
 namespace Darabonba_Const {
 class Client {
 public:
-  Client();
-  ~Client();
+  static string hello();
 
-  string hello();
+  Client() {};
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Const
 

@@ -3,8 +3,6 @@
 #ifndef DARABONBA_API_H_
 #define DARABONBA_API_H_
 
-#include <darabonba/core.hpp>
-
 namespace Darabonba_Api {
 class Client {
 public:
@@ -12,6 +10,7 @@ public:
   void hello();
   void helloRuntime();
 
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Api
 

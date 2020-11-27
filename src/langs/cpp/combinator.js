@@ -17,8 +17,8 @@ const {
   _upperFirst,
   _toSnakeCase,
   _avoidKeywords,
-  _convertStaticParam,
-  _startWith,
+  _camelCase,
+  _name
 } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 
@@ -43,10 +43,6 @@ const {
 } = require('../common/items');
 
 const assert = require('assert');
-
-function _name(name) {
-  return _avoidKeywords(name.split('.').map(item => _upperFirst(item)).join(''));
-}
 
 function _names(notes) {
   let nameMap = {};
@@ -84,8 +80,8 @@ class Combinator extends CombinatorBase {
     super(config, imports);
     this.eol = ';';
     this.classNameMap = {};
-    this.package = _name(this.config.name);
-    this.scope = _name(this.config.scope);
+    this.package = _upperFirst(_camelCase(_name(this.config.name)));
+    this.scope = _upperFirst(_camelCase(_name(this.config.scope)));
     this.namespace = `${this.scope}_${this.package}`;
     this.properties = {};
   }
@@ -100,7 +96,7 @@ class Combinator extends CombinatorBase {
       let scope = _toSnakeCase(_name(this.thirdPackageScope[className]));
       let client = _toSnakeCase(_name(this.thirdPackageNamespace[className]));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
-      realFullClassName = `${_name(this.thirdPackageScope[className])}_${_name(this.thirdPackageNamespace[className])}::Client`;
+      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[className]))}_${_upperFirst(_name(this.thirdPackageNamespace[className]))}::Client`;
       using = null;
     } else {
       debug.stack(className, this.thirdPackageNamespace);
@@ -122,8 +118,8 @@ class Combinator extends CombinatorBase {
       includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
     } else if (accessPath.length > 1 && this.thirdPackageNamespace[accessPath[0]]) {
       // is third package model
-      realFullClassName = `${_name(this.thirdPackageScope[accessPath[0]])
-      }_${_name(this.thirdPackageNamespace[accessPath[0]])
+      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
+      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
       }::${_name(accessPath.slice(1).join('.'))
       }`;
       let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
@@ -131,8 +127,8 @@ class Combinator extends CombinatorBase {
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
     } else if (accessPath.length === 1 && this.thirdPackageNamespace[accessPath[0]]) {
-      realFullClassName = `${_name(this.thirdPackageScope[accessPath[0]])
-      }_${_name(this.thirdPackageNamespace[accessPath[0]])
+      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
+      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
       }::Client`;
       let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
       let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
@@ -227,7 +223,7 @@ class Combinator extends CombinatorBase {
     const config = _deepClone(this.config);
     config.ext = '.' + this.config.header_ext;
     config.dir = `${config.dir}/include/${_toSnakeCase(this.scope)}`;
-    config.filename = _avoidKeywords(_toSnakeCase(this.package));
+    config.filename = _toSnakeCase(this.package);
     this.combineOutputParts(config, outputPars);
   }
 
@@ -273,7 +269,7 @@ class Combinator extends CombinatorBase {
     const config = _deepClone(this.config);
     config.ext = '.' + this.config.code_ext;
     config.dir = `${config.dir}/src/`;
-    config.filename = _avoidKeywords(_toSnakeCase(this.package));
+    config.filename = _toSnakeCase(this.package);
     this.combineOutputParts(config, outputPars);
   }
 
@@ -329,7 +325,7 @@ class Combinator extends CombinatorBase {
     if (object.type === 'model') {
       emitter.emit(`: public ${this.config.tea.model.name} `);
     } else if (object.extends.length) {
-      emitter.emit(`: ${object.extends[0]} `);
+      emitter.emit(`: ${this.resolveName(object.extends[0])} `);
     }
     emitter.emitln('{');
 
@@ -397,10 +393,7 @@ class Combinator extends CombinatorBase {
     if (!hasConstruct) {
       emitter.emitln(`${className}() {};`, this.level);
     }
-    let properties = object.body.filter(node => is.prop(node));
-    if (properties.length) {
-      emitter.emitln(`~${className}() = default;`, this.level);
-    }
+    emitter.emitln(`virtual ~${className}() = default;`, this.level);
 
     this.levelDown();
 
@@ -586,7 +579,7 @@ class Combinator extends CombinatorBase {
   emitFromMapItem(emitter, target, type, source, parent_type = null, layer = 1) {
     if (is.array(type)) {
       emitter.emitln(`vector<${this.emitType(type.itemType)}> toVec${layer};`, this.level);
-      emitter.emitln(`if (typeid(vector<boost::any>).name() == ${source}.type().name()) {`, this.level);
+      emitter.emitln(`if (typeid(vector<boost::any>) == ${source}.type()) {`, this.level);
       this.levelUp();
       emitter.emitln(`vector<boost::any> vec${layer} = boost::any_cast<vector<boost::any>>(${source});`, this.level);
       emitter.emitln(`for (auto item:vec${layer}) {`, this.level);
@@ -673,7 +666,7 @@ class Combinator extends CombinatorBase {
       }
       let temp_type = is.array(prop.type) ? 'vector<boost::any>' : 'map<string, boost::any>';
       let expected_type = this.emitType(prop.type);
-      emitter.emitln(`if (typeid(${temp_type}).name() == ${name}.type().name()) {`, this.level);
+      emitter.emitln(`if (typeid(${temp_type}) == ${name}.type()) {`, this.level);
       this.levelUp();
       emitter.emitln(`${expected_type} ${expectName};`, this.level);
       emitter.emitln(`for(auto item${layer}:boost::any_cast<${temp_type}>(${name})){`, this.level);
@@ -704,7 +697,7 @@ class Combinator extends CombinatorBase {
       if (!this.isClient(prop)) {
         // type is model
         let var_name = `model${layer}`;
-        emitter.emitln(`if (typeid(map<string, boost::any>).name() == ${name}.type().name()) {`, this.level);
+        emitter.emitln(`if (typeid(map<string, boost::any>) == ${name}.type()) {`, this.level);
         this.levelUp();
         emitter.emitln(`${this.emitType(prop.type)} ${var_name};`, this.level);
         emitter.emitln(`${var_name}.fromMap(boost::any_cast<map<string, boost::any>>(${name}));`, this.level);
@@ -810,20 +803,7 @@ class Combinator extends CombinatorBase {
     } else if (is.stream(type)) {
       type_str = this.addInclude('$Stream');
     } else if (is.object(type)) {
-      let objName = '';
-      if (!type.objectName) {
-        objName = 'void';
-      } else if (type.objectName === '$Exception' ||
-        type.objectName === '$ExceptionUnretryable' ||
-        type.objectName === '$Error') {
-        objName = this.addInclude(type.objectName);
-        return objName;
-      } else if (_startWith(type.objectName, '$')) {
-        objName = this.addInclude(type.objectName);
-      } else {
-        objName = type.objectName;
-      }
-      type_str = objName;
+      type_str = !type.objectName ? 'void' : this.resolveName(type.objectName);
     } else if (is.null(type)) {
       type_str = 'nullptr';
     }
@@ -892,7 +872,7 @@ class Combinator extends CombinatorBase {
         node.params.forEach(p => {
           tmp.push(p.key);
         });
-        emitter.emit(` : ${this.object.extends[0]}(${tmp.join(', ')})`);
+        emitter.emit(` : ${this.resolveName(this.object.extends[0])}(${tmp.join(', ')})`);
       }
     } else {
       emitter.emit(')');
@@ -953,7 +933,7 @@ class Combinator extends CombinatorBase {
     let is = false;
     Object.keys(this.thirdPackageDaraMeta).forEach(key => {
       const item = this.thirdPackageDaraMeta[key];
-      let namespace = `${_name(item.scope)}_${_name(item.name)}::Client`;
+      let namespace = `${_upperFirst(_name(item.scope))}_${_upperFirst(_name(item.name))}::Client`;
       if (namespace === client_name) {
         is = true;
       }
@@ -971,7 +951,7 @@ class Combinator extends CombinatorBase {
   isPointerPath(lastPathIndex, paths) {
     const lastPath = paths[lastPathIndex];
     if (lastPath.type === 'object') {
-      let name = _convertStaticParam(lastPath.name);
+      let name = _name(lastPath.name);
       return this.isPtrStatement(name);
     } else if (lastPath.type === 'parent') {
       return true;
@@ -980,7 +960,7 @@ class Combinator extends CombinatorBase {
       if (lastPathIndex > 0) {
         let parentPath = paths[lastPathIndex - 1];
         if (parentPath.type === 'object') {
-          let parentType = this.getStatementType(_convertStaticParam(parentPath.name));
+          let parentType = this.getStatementType(_name(parentPath.name));
           if (parentType.objectName === '$Request' || parentType.objectName === '$Response') {
             if (lastPath.name === 'body') {
               return true;
@@ -996,14 +976,14 @@ class Combinator extends CombinatorBase {
 
   isUnsetMethod(gram) {
     return gram.type === 'sys_func'
-      && gram.path[0].name === 'Darabonba_Util::Client'
+      && gram.path[0].name === '^Util'
       && gram.path[1].name === 'isUnset';
   }
 
   useTmplMethod(gram) {
     const useTmplMethods = ['isUnset', 'toArray'];
     return gram.type === 'sys_func'
-      && gram.path[0].name === 'Darabonba_Util::Client'
+      && gram.path[0].name === '^Util'
       && _contain(useTmplMethods, gram.path[1].name);
   }
 
@@ -1013,7 +993,7 @@ class Combinator extends CombinatorBase {
 
     paths.forEach((path, i) => {
       let pathName = typeof path.name === 'string' ? path.name.replace('@', '_') : `${path.name}`;
-      pathName = _convertStaticParam(pathName);
+      pathName = _name(pathName);
       if (path.type === 'parent') {
         if (paths[i + 1] && _contain(paths[i + 1].type, 'static')) {
           prefix += `${this.config.client.name}`;
@@ -1026,22 +1006,20 @@ class Combinator extends CombinatorBase {
             prefix += `${pathName}`;
           }
         }
-      } else if (path.type === 'object') {
-        prefix += pathName;
-      } else if (path.type === 'object_static') {
-        prefix += pathName;
+      } else if (path.type === 'object' || path.type === 'object_static') {
+        prefix += this.resolveName(pathName);
       } else if (path.type === 'call') {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
-        prefix += isPointer ? `->${_avoidKeywords(pathName)}(${params})` : `.${_avoidKeywords(pathName)}(${params})`;
+        prefix += isPointer ? `->${pathName}(${params})` : `.${pathName}(${params})`;
       } else if (path.type === 'call_static') {
         if (this.useTmplMethod(gram)) {
-          prefix += `::${_avoidKeywords(pathName)}<${this.emitType(gram.params[0].dataType)}>(${params})`;
+          prefix += `::${pathName}<${this.emitType(gram.params[0].dataType)}>(${params})`;
         } else {
-          prefix += `::${_avoidKeywords(pathName)}(${params})`;
+          prefix += `::${pathName}(${params})`;
         }
       } else if (path.type === 'prop') {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
-        prefix += isPointer ? `->${_avoidKeywords(pathName)}` : `.${_avoidKeywords(pathName)}`;
+        prefix += isPointer ? `->${pathName}` : `.${pathName}`;
       } else if (path.type === 'prop_static') {
         prefix += `::${pathName}`;
       } else if (path.type === 'map') {
@@ -1063,7 +1041,21 @@ class Combinator extends CombinatorBase {
           prefix += `[${path_name}]`;
         }
       } else if (path.type === 'list') {
-        prefix += `[${pathName}]`;
+        let isPointer = this.isPointerPath(lastPathIndex, paths);
+        let path_name = pathName;
+        if (path.isVar) {
+          let varIsPointer = this.isPtrStatement(pathName);
+          if (varIsPointer) {
+            path_name = `*${pathName}`;
+          } else {
+            path_name = pathName;
+          }
+        }
+        if (isPointer) {
+          prefix = `(*${prefix})[${path_name}]`;
+        } else {
+          prefix += `[${path_name}]`;
+        }
       } else {
         debug.stack(paths);
       }
@@ -1096,6 +1088,14 @@ class Combinator extends CombinatorBase {
     return this.emitType(expectedType);
   }
 
+  resolveName(name, _avoidKeywords = true) {
+    name = super.resolveName(name, _avoidKeywords);
+    if (_contain(name, '.')) {
+      name = name.split('.').map(s => _upperFirst(s)).join('');
+    }
+    return name;
+  }
+
   isPointerType(type) {
     if (is.stream(type)) {
       return true;
@@ -1123,7 +1123,7 @@ class Combinator extends CombinatorBase {
       }
     }
     if (grammerVar && grammerVar instanceof GrammerVar) {
-      let name = grammerVar.name ? _convertStaticParam(grammerVar.name) : '';
+      let name = grammerVar.name ? _name(grammerVar.name) : '';
       if (this.isPtrStatement(name)) {
         return true;
       }
@@ -1158,9 +1158,9 @@ class Combinator extends CombinatorBase {
   /**************************************** grammer ****************************************/
   grammerVar(emitter, gram, emitType = true) {
     let name = gram.name ? gram.name : gram.key;
-    name = _convertStaticParam(name);
+    name = _name(name);
     if (gram.varType === 'static_class') {
-      emitter.emit(`${_convertStaticParam(name)}::class`);
+      emitter.emit(`${name}::class`);
     } else if (gram.varType === 'var' || gram.varType === 'const') {
       if (!this.hasStatement(name) && emitType) {
         emitter.emit(`shared_ptr<${this.emitType(gram.type)}> ${name}`);
@@ -1688,9 +1688,9 @@ class Combinator extends CombinatorBase {
   grammerNewObject(emitter, gram, isAssign = true, isPtrParam = false) {
     let objectName = gram.name;
     if (!this.exprIsAssignToPtr && isAssign) {
-      emitter.emit(`${objectName}(`);
+      emitter.emit(`${this.resolveName(objectName)}(`);
     } else if (isAssign) {
-      emitter.emit(`make_shared<${objectName}>(`);
+      emitter.emit(`make_shared<${this.resolveName(objectName)}>(`);
     }
     let tmp = [];
     let params;
@@ -1836,7 +1836,6 @@ class Combinator extends CombinatorBase {
 
   behaviorTamplateString(emitter, behavior) {
     let tmp = [];
-    this.pushInclude('cast');
     behavior.items.forEach(item => {
       let emit = new Emitter(this.config);
       if (this.isPointerVar(item)) {
@@ -1850,13 +1849,14 @@ class Combinator extends CombinatorBase {
         this.grammer(emit, item, false, false);
         emit.emit(')');
       } else {
+        this.pushInclude('cast');
         emit.emit('boost::lexical_cast<string>(');
         this.grammer(emit, item, false, false);
         emit.emit(')');
       }
       tmp.push(emit.output);
     });
-    emitter.emit(`string(${tmp.join(' + ')})`);
+    emitter.emit(`${tmp.filter(s => s !== '""').map(s => `string(${s})`).join(' + ')}`);
   }
 }
 module.exports = Combinator;

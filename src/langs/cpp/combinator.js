@@ -174,14 +174,18 @@ class Combinator extends CombinatorBase {
     emitter.emitln(`namespace ${this.namespace} {`);
     this.definedModels = [];
     const self = this;
+    // Fix the problem when used before definition
     const findUndefinedModel = function (type) {
-      if (is.object(type) && !_contain(this.definedModels, type.objectName)) {
-        const [obj] = models.filter(node => node.name === type.objectName);
-        if (obj) {
-          obj.body.filter(node => is.prop(node)).forEach(item => {
-            findUndefinedModel.call(self, item.type);
-          });
-          this.emitModel(emitter, obj);
+      if (is.object(type)) {
+        let objectName = this.resolveName(type.objectName);
+        if (!_contain(this.definedModels, objectName)) {
+          const [obj] = models.filter(node => node.name === objectName);
+          if (obj) {
+            obj.body.filter(node => is.prop(node)).forEach(item => {
+              findUndefinedModel.call(self, item.type);
+            });
+            this.emitModel(emitter, obj);
+          }
         }
       } else if (is.array(type)) {
         findUndefinedModel.call(self, type.itemType);

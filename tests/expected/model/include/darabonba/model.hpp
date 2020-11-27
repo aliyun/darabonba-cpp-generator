@@ -95,43 +95,6 @@ public:
 
   virtual ~Class() = default;
 };
-class UseBeforeDefineModel : public Darabonba::Model {
-public:
-  shared_ptr<MyModel> m{};
-
-  UseBeforeDefineModel() {}
-
-  explicit UseBeforeDefineModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
-    fromMap(config);
-  };
-
-  void validate() override {
-    if (!m) {
-      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("m is required.")));
-    }
-  }
-
-  map<string, boost::any> toMap() override {
-    map<string, boost::any> res;
-    if (m) {
-      res["m"] = m ? boost::any(m->toMap()) : boost::any(map<string,boost::any>({}));
-    }
-    return res;
-  }
-
-  void fromMap(map<string, boost::any> m) override {
-    if (m.find("m") != m.end() && !m["m"].empty()) {
-      if (typeid(map<string, boost::any>) == m["m"].type()) {
-        MyModel model1;
-        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
-        m = make_shared<MyModel>(model1);
-      }
-    }
-  }
-
-
-  virtual ~UseBeforeDefineModel() = default;
-};
 class MyModelSubmodel : public Darabonba::Model {
 public:
   shared_ptr<string> stringfield{};
@@ -771,6 +734,43 @@ public:
 
 
   virtual ~MyModel() = default;
+};
+class UseBeforeDefineModel : public Darabonba::Model {
+public:
+  shared_ptr<MyModel> m{};
+
+  UseBeforeDefineModel() {}
+
+  explicit UseBeforeDefineModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {
+    if (!m) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("m is required.")));
+    }
+  }
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (m) {
+      res["m"] = m ? boost::any(m->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("m") != m.end() && !m["m"].empty()) {
+      if (typeid(map<string, boost::any>) == m["m"].type()) {
+        MyModel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
+        m = make_shared<MyModel>(model1);
+      }
+    }
+  }
+
+
+  virtual ~UseBeforeDefineModel() = default;
 };
 class Client {
 public:

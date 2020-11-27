@@ -387,11 +387,7 @@ public:
       res["modelMap"] = boost::any(temp1);
     }
     if (moduleMap) {
-      map<string, boost::any> temp1;
-      for(auto item1:*moduleMap){
-        temp1[item1.first] = boost::any(item1.second.toMap());
-      }
-      res["moduleMap"] = boost::any(temp1);
+      res["moduleMap"] = boost::any(*moduleMap);
     }
     if (object) {
       res["object"] = boost::any(*object);
@@ -612,17 +608,12 @@ public:
       }
     }
     if (m.find("moduleMap") != m.end() && !m["moduleMap"].empty()) {
-      if (typeid(map<string, boost::any>) == m["moduleMap"].type()) {
-        map<string, Darabonba_Import::Client> expect1;
-        for(auto item1:boost::any_cast<map<string, boost::any>>(m["moduleMap"])){
-          if (typeid(map<string, boost::any>) == item1.second.type()) {
-            Darabonba_Import::Client model2;
-            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
-          }
-        }
-        moduleMap = make_shared<map<string, Darabonba_Import::Client>>(expect1);
+      map<string, Darabonba_Import::Client> map1 = boost::any_cast<map<string, Darabonba_Import::Client>>(m["moduleMap"]);
+      map<string, Darabonba_Import::Client> toMap1;
+      for (auto item:map1) {
+         toMap1[item.first] = Darabonba_Import::Client(item.second);
       }
+      moduleMap = make_shared<map<string, Darabonba_Import::Client>>(toMap1);
     }
     if (m.find("object") != m.end() && !m["object"].empty()) {
       map<string, boost::any> map1 = boost::any_cast<map<string, boost::any>>(m["object"]);

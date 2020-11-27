@@ -1188,8 +1188,14 @@ class Combinator extends CombinatorBase {
     let keyType = this.emitType(gram.dataType.keyType);
     let valType = this.emitType(gram.dataType.valType);
 
-    items = gram.value.filter(i => !i.isExpand);
-    expandItems = gram.value.filter(i => i.isExpand);
+    if (Array.isArray(gram.value)) {
+      items = gram.value.filter(i => !i.isExpand);
+      expandItems = gram.value.filter(i => i.isExpand);
+    } else if (!gram.value.isExpand) {
+      items.push(gram.value);
+    } else {
+      expandItems.push(gram.value);
+    }
 
     if (!items.length && !expandItems.length) {
       emitter.emit(`map<${keyType}, ${valType}>()`);
@@ -1372,7 +1378,8 @@ class Combinator extends CombinatorBase {
       emitter.emit(_symbol(Symbol.reverse()));
       this.grammerValue(emitter, gram.value);
     } else {
-      debug.stack(gram);
+      // debug.stack(gram);
+      this.grammer(emitter, gram, false, false);
     }
   }
 

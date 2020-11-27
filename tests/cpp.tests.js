@@ -78,8 +78,8 @@ describe('C++ Generator', function () {
 
   it('const should ok', function () {
     check('const', [
-      `src/const_${extCode}`,
-      `include/darabonba/const_${extHead}`
+      `src/const${extCode}`,
+      `include/darabonba/const${extHead}`
     ]);
   });
 

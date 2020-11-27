@@ -41,7 +41,7 @@ public:
   }
 
 
-  ~Test() = default;
+  virtual ~Test() = default;
 };
 class Client {
 public:
@@ -50,7 +50,7 @@ public:
   void testAPI();
   static void testFunc();
 
-  ~Client() = default;
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Annotation
 

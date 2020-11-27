@@ -10,6 +10,7 @@ class Client : Darabonba_Import::Client {
 public:
   explicit Client(const shared_ptr<Darabonba_Import::Config>& config);
 
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Super
 

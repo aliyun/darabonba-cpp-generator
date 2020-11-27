@@ -5,7 +5,9 @@
 
 using namespace std;
 
-string Darabonba_Const::Client::hello(){
-  return "Hello " + "World!" + "";
+using namespace Darabonba_Const;
+
+string Darabonba_Const::Client::hello() {
+  return string("Hello ") + string("World!");
 }
 

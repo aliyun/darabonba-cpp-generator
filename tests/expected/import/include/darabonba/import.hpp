@@ -17,7 +17,7 @@ public:
   explicit Client(const shared_ptr<vector<string>>& id, const shared_ptr<string>& str);
   static void Sample(shared_ptr<Darabonba_Source::Client> client);
 
-  ~Client() = default;
+  virtual ~Client() = default;
 };
 } // namespace Darabonba_Import
 

@@ -190,6 +190,7 @@ public:
   shared_ptr<int> uint16Field{};
   shared_ptr<long> uint32Field{};
   shared_ptr<long> uint64Field{};
+  shared_ptr<long> numberPattern{};
 
   MyModel() {}
 
@@ -308,6 +309,12 @@ public:
     }
     if (!uint64Field) {
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("uint64Field is required.")));
+    }
+    if (numberPattern && *numberPattern > 100) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("numberPattern is required.")));
+    }
+    if (numberPattern && *numberPattern < 0) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("numberPattern is required.")));
     }
   }
 
@@ -459,6 +466,9 @@ public:
     }
     if (uint64Field) {
       res["uint64Field"] = boost::any(*uint64Field);
+    }
+    if (numberPattern) {
+      res["pattern"] = boost::any(*numberPattern);
     }
     return res;
   }
@@ -720,6 +730,9 @@ public:
     }
     if (m.find("uint64Field") != m.end() && !m["uint64Field"].empty()) {
       uint64Field = make_shared<long>(boost::any_cast<long>(m["uint64Field"]));
+    }
+    if (m.find("pattern") != m.end() && !m["pattern"].empty()) {
+      numberPattern = make_shared<long>(boost::any_cast<long>(m["pattern"]));
     }
   }
 

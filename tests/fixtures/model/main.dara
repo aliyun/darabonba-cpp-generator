@@ -51,4 +51,5 @@ model MyModel = {
   uint16Field: uint16,
   uint32Field: uint32,
   uint64Field: uint64,
+  numberPattern?: int64(name='pattern', default=50, description='pattern', example=10, format='int64', maximum=100, minimum=0, pattern='[0-9]{1,3}'),
 };

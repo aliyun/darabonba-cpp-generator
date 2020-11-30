@@ -1,6 +1,11 @@
 # ChangeLog
 
-## 0.2.0 - 2020-11-25
+## 0.2.2 - 2020-11-30
+
+- Fix an issue when using "Model" before definitions.
+- Optimized resolve object name.
+
+## 0.2.1 - 2020-11-25
 
 - Fix the problem when Function name is a keyword.
 - Optimized emit result.

@@ -464,6 +464,12 @@ class Combinator extends CombinatorBase {
             emit.emitln(`BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("${prop.name} is required.")));`, this.level);
             this.levelDown();
             emit.emitln('}', this.level);
+          } else if (note.key === 'pattern') {
+            if (is.string(prop.type)) {
+              emit.emitln(`${this.addInclude('$Model')}::validatePattern("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
+            } else {
+              debug.warning(`Only supported string for validate pattern. ${prop.getParent().name}::${prop.name} type is ${this.emitType(prop.type)}.`);
+            }
           } else {
             emit.emitln(`${this.addInclude('$Model')}::validate${_upperFirst(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
           }

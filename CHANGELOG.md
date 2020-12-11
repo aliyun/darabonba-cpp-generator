@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 0.2.3 - 2020-12-11
+
+- Not validate pattern if prop is not string.
+- Fix wrong spelling.
+
 ## 0.2.2 - 2020-11-30
 
 - Fix an issue when using "Model" before definitions.

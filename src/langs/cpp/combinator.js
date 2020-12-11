@@ -140,9 +140,6 @@ class Combinator extends CombinatorBase {
       includeFileName = `<${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`;
       using = null;
     }
-    if (realFullClassName === 'OSS') {
-      debug.halt(modelName, accessPath, this.thirdPackageScope, includeFileName);
-    }
     if (!this.classNameMap[realFullClassName]) {
       const include = { import: realFullClassName, includeFileName, using };
       this.classNameMap[realFullClassName] = include;
@@ -1232,9 +1229,6 @@ class Combinator extends CombinatorBase {
           this.emitAnnotation(emitter, item);
           return;
         }
-        if (is.undefined(item.key)) {
-          debug.halt(item);
-        }
         emitter.emit(`{"${item.key}", `, this.level);
         let isAny = is.any(gram.dataType.valType);
         if (this.isPointerVar(item)) {
@@ -1834,9 +1828,6 @@ class Combinator extends CombinatorBase {
     this.pushInclude('map');
     let paths = behavior.call.path;
     if (this.isPointerPath(paths.length - 1, paths)) {
-      if (this.emitType(behavior.value.dataType) === 'nullptr') {
-        debug.halt(behavior.value);
-      }
       emitter.emit(`${emit.output}->insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
     } else {
       emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);

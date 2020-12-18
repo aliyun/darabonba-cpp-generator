@@ -73,8 +73,6 @@ function _needRecur(prop_type) {
   return false;
 }
 
-var statements = {};
-
 class Combinator extends CombinatorBase {
   constructor(config, imports) {
     super(config, imports);
@@ -84,6 +82,7 @@ class Combinator extends CombinatorBase {
     this.scope = _upperFirst(_camelCase(_name(this.config.scope)));
     this.namespace = `${this.scope}_${this.package}`;
     this.properties = {};
+    this.statements = {};
   }
 
   addInclude(className) {
@@ -241,7 +240,7 @@ class Combinator extends CombinatorBase {
     /******************************* emit body *******************************/
     let emitter = new Emitter(this.config);
     object.body.forEach(node => {
-      statements = _deepClone(this.properties);
+      this.statements = _deepClone(this.properties);
       if (is.func(node)) {
         this.emitFuncCode(emitter, node);
       } else if (is.construct(node)) {
@@ -611,6 +610,8 @@ class Combinator extends CombinatorBase {
       emitter.emitln('}', this.level);
       if (layer === 1) {
         emitter.emitln(`${target} = ${this.emitMakeShared(type, `toMap${layer}`)};`, this.level);
+      } else if (is.array(parent_type)) {
+        emitter.emitln(`${target}.push_back(toMap${layer});`, this.level);
       } else {
         emitter.emitln(`${target} = toMap${layer};`, this.level);
       }
@@ -1145,22 +1146,22 @@ class Combinator extends CombinatorBase {
     if (null === pointer) {
       pointer = this.isPointerType(type);
     }
-    statements[name] = { type, pointer };
+    this.statements[name] = { type, pointer };
   }
 
   isPtrStatement(name) {
-    return statements[name] && statements[name].pointer;
+    return this.statements[name] && this.statements[name].pointer;
   }
 
   hasStatement(name) {
-    return !statements[name] ? false : true;
+    return !this.statements[name] ? false : true;
   }
 
   getStatementType(name) {
-    if (!statements[name]) {
-      debug.stack('Undefined statement!', name, statements);
+    if (!this.statements[name]) {
+      debug.stack('Undefined statement!', name, this.statements);
     }
-    return statements[name].type;
+    return this.statements[name].type;
   }
 
   /**************************************** grammer ****************************************/

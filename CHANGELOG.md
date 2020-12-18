@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.0 - 2020-12-18
+
+- The first official version release of the Darabonba Code Generator for C++ Version 1.0.0 on NPM. 
+- See https://www.npmjs.com/package/@darabonba/cpp-generator for more information.
+
 ## 0.2.3 - 2020-12-11
 
 - Not validate pattern if prop is not string.

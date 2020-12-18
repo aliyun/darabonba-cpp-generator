@@ -573,7 +573,7 @@ public:
           for (auto item:map2) {
              toMap2[item.first] = item.second;
           }
-           toVec1 = toMap2;
+           toVec1.push_back(toMap2);
         }
       }
       maparray = make_shared<vector<map<string, boost::any>>>(toVec1);

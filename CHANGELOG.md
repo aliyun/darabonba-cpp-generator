@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.1 - 2020-12-25
+
+- Fix emit result on `exec` mode.
+
 ## 1.0.0 - 2020-12-18
 
 - The first official release version of the Darabonba Code Generator for C++.

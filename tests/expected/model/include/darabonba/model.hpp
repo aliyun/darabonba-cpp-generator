@@ -518,7 +518,7 @@ public:
           if (typeid(map<string, boost::any>) == item1.second.type()) {
             MyModelSubmodel model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
+            expect1[item1.first] = model2;
           }
         }
         submodelMap = make_shared<map<string, MyModelSubmodel>>(expect1);
@@ -531,7 +531,7 @@ public:
           if (typeid(map<string, boost::any>) == item1.second.type()) {
             M model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
+            expect1[item1.first] = model2;
           }
         }
         mapModel = make_shared<map<string, M>>(expect1);
@@ -585,7 +585,7 @@ public:
           if (typeid(map<string, boost::any>) == item1.second.type()) {
             Darabonba_Import::Request model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
+            expect1[item1.first] = model2;
           }
         }
         moduleModelMap = make_shared<map<string, Darabonba_Import::Request>>(expect1);
@@ -598,7 +598,7 @@ public:
           if (typeid(map<string, boost::any>) == item1.second.type()) {
             MSubM model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
+            expect1[item1.first] = model2;
           }
         }
         subModelMap = make_shared<map<string, MSubM>>(expect1);
@@ -611,7 +611,7 @@ public:
           if (typeid(map<string, boost::any>) == item1.second.type()) {
             M model2;
             model2.fromMap(boost::any_cast<map<string, boost::any>>(item1.second));
-            expect1[item.first] = model2;
+            expect1[item1.first] = model2;
           }
         }
         modelMap = make_shared<map<string, M>>(expect1);
@@ -680,7 +680,7 @@ public:
               if (typeid(map<string, boost::any>) == item2.second.type()) {
                 MyModelSubmodel model3;
                 model3.fromMap(boost::any_cast<map<string, boost::any>>(item2.second));
-                expect2[item.first] = model3;
+                expect2[item2.first] = model3;
               }
             }
             expect1.push_back(expect2);

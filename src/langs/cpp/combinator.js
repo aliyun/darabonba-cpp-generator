@@ -351,6 +351,9 @@ class Combinator extends CombinatorBase {
         let modify = _modify(node.modify);
         let returnType = this.emitType(node.return[0], true);
         let func_name = _avoidKeywords(node.name);
+        if (this.config.exec && func_name === 'main') {
+          return;
+        }
         if (modify) {
           emitter.emit(`${modify} ${returnType} ${func_name}(`, this.level);
         } else {
@@ -670,7 +673,7 @@ class Combinator extends CombinatorBase {
       } else {
         p.name = `item${layer}.second`;
         nextName = `item${layer}.second`;
-        nextExpectName = `${expectName}[item.first]`;
+        nextExpectName = `${expectName}[item${layer}.first]`;
       }
       let temp_type = is.array(prop.type) ? 'vector<boost::any>' : 'map<string, boost::any>';
       let expected_type = this.emitType(prop.type);
@@ -903,17 +906,19 @@ class Combinator extends CombinatorBase {
   emitFuncCode(emitter, func) {
     this.funcReturnType = func.return[0];
     let func_name = _avoidKeywords(func.name);
-    if (this.config.exec) {
-      emitter.emitln(`int ${func_name}(int argc, char *argv[]) {`);
+    func_name = this.config.exec ? func_name : `${this.namespace}::Client::${func_name}`;
+    if (this.config.exec && func.name === 'main') {
+      const argv = func.params[0].key;
+      emitter.emitln(`int main(int argc, char *${argv}[]) {`);
       this.levelUp();
-      emitter.emitln('argv++;', this.level);
+      emitter.emitln(`${argv}++;`, this.level);
     } else {
       if (func.params.length) {
-        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func_name}(`);
+        emitter.emit(`${this.emitType(func.return[0], true)} ${func_name}(`);
         this.emitParams(emitter, func.params);
         emitter.emit(')');
       } else {
-        emitter.emit(`${this.emitType(func.return[0], true)} ${this.namespace}::Client::${func_name}()`);
+        emitter.emit(`${this.emitType(func.return[0], true)} ${func_name}()`);
       }
       emitter.emitln(' {');
       this.levelUp();
@@ -1021,10 +1026,18 @@ class Combinator extends CombinatorBase {
         let isPointer = this.isPointerPath(lastPathIndex, paths);
         prefix += isPointer ? `->${pathName}(${params})` : `.${pathName}(${params})`;
       } else if (path.type === 'call_static') {
-        if (this.useTmplMethod(gram)) {
-          prefix += `::${pathName}<${this.emitType(gram.params[0].dataType)}>(${params})`;
+        if (this.config.exec && prefix === 'Client') {
+          if (this.useTmplMethod(gram)) {
+            prefix = `${pathName}<${this.emitType(gram.params[0].dataType)}>(${params})`;
+          } else {
+            prefix = `${pathName}(${params})`;
+          }
         } else {
-          prefix += `::${pathName}(${params})`;
+          if (this.useTmplMethod(gram)) {
+            prefix += `::${pathName}<${this.emitType(gram.params[0].dataType)}>(${params})`;
+          } else {
+            prefix += `::${pathName}(${params})`;
+          }
         }
       } else if (path.type === 'prop') {
         let isPointer = this.isPointerPath(lastPathIndex, paths);

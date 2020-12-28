@@ -169,35 +169,9 @@ class Combinator extends CombinatorBase {
     let emitter = new Emitter(this.config);
     emitter.emitln(`namespace ${this.namespace} {`);
     this.definedModels = [];
-    const self = this;
+    this.models = models;
     // Fix the problem when used before definition
-    const findUndefinedModel = function (type) {
-      if (is.object(type)) {
-        let objectName = this.resolveName(type.objectName);
-        if (!_contain(this.definedModels, objectName)) {
-          const [obj] = models.filter(node => node.name === objectName);
-          if (obj) {
-            obj.body.filter(node => is.prop(node)).forEach(item => {
-              findUndefinedModel.call(self, item.type);
-            });
-            this.emitModel(emitter, obj);
-          }
-        }
-      } else if (is.array(type)) {
-        findUndefinedModel.call(self, type.itemType);
-      } else if (is.map(type)) {
-        findUndefinedModel.call(self, type.valType);
-      }
-    };
-    models.forEach(model => {
-      if (_contain(this.definedModels, model.name)) {
-        return;
-      }
-      model.body.filter(node => is.prop(node)).forEach(item => {
-        findUndefinedModel.call(self, item.type);
-      });
-      this.emitModel(emitter, model);
-    });
+    models.forEach(model => this.emitModel(emitter, model));
     this.emitClass(emitter, client);
     emitter.emitln(`} // namespace ${this.namespace}`);
     outputPars.body = emitter.output;
@@ -304,13 +278,19 @@ class Combinator extends CombinatorBase {
   }
 
   emitModel(emitter, model) {
-    if (_contain(this.definedModels, model.name)) {
+    const model_name = this.resolveName(model.name);
+    if (_contain(this.definedModels, model_name)) {
       return;
     }
-    this.definedModels.push(model.name);
     if (model.subObject.length) {
-      model.subObject.forEach(obj => this.emitClass(emitter, obj));
+      model.subObject.forEach(node => {
+        this.emitModel(emitter, node);
+      });
     }
+    model.body.filter(node => is.prop(node)).forEach(item => {
+      this.findUndefinedModel(emitter, item.type);
+    });
+    this.definedModels.push(model_name);
     this.emitClass(emitter, model);
   }
 
@@ -937,6 +917,26 @@ class Combinator extends CombinatorBase {
   }
 
   /**************************************** analyze ****************************************/
+
+  findUndefinedModel(emitter, type) {
+    const models = this.models;
+    if (is.object(type)) {
+      let objectName = this.resolveName(type.objectName);
+      if (!_contain(this.definedModels, objectName)) {
+        const [obj] = models.filter(node => node.name === objectName);
+        if (obj) {
+          obj.body.filter(node => is.prop(node)).forEach(item => {
+            this.findUndefinedModel(emitter, item.type);
+          });
+          this.emitModel(emitter, obj);
+        }
+      }
+    } else if (is.array(type)) {
+      this.findUndefinedModel(emitter, type.itemType);
+    } else if (is.map(type)) {
+      this.findUndefinedModel(emitter, type.valType);
+    }
+  }
 
   isClient(prop) {
     let client_name = prop.objectName ? prop.objectName : prop.type.objectName;

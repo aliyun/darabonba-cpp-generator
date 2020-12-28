@@ -7,8 +7,15 @@ model M = {
 model Class = {};
 
 model useBeforeDefineModel = {
-  m: MyModel
+  m: MyModel,
+  subModel: {
+    useBeforeDefineModel: UseBeforeDefineModelOnSubModel
+  }
 };
+
+model UseBeforeDefineModelOnSubModel = {
+  m: MyModel,
+}
 
 model MyModel = {
   // keyword property

@@ -739,13 +739,13 @@ public:
 
   virtual ~MyModel() = default;
 };
-class UseBeforeDefineModel : public Darabonba::Model {
+class UseBeforeDefineModelOnSubModel : public Darabonba::Model {
 public:
   shared_ptr<MyModel> m{};
 
-  UseBeforeDefineModel() {}
+  UseBeforeDefineModelOnSubModel() {}
 
-  explicit UseBeforeDefineModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+  explicit UseBeforeDefineModelOnSubModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
     fromMap(config);
   };
 
@@ -769,6 +769,94 @@ public:
         MyModel model1;
         model1.fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
         m = make_shared<MyModel>(model1);
+      }
+    }
+  }
+
+
+  virtual ~UseBeforeDefineModelOnSubModel() = default;
+};
+class UseBeforeDefineModelSubModel : public Darabonba::Model {
+public:
+  shared_ptr<UseBeforeDefineModelOnSubModel> useBeforeDefineModel{};
+
+  UseBeforeDefineModelSubModel() {}
+
+  explicit UseBeforeDefineModelSubModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {
+    if (!useBeforeDefineModel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("useBeforeDefineModel is required.")));
+    }
+  }
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (useBeforeDefineModel) {
+      res["useBeforeDefineModel"] = useBeforeDefineModel ? boost::any(useBeforeDefineModel->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("useBeforeDefineModel") != m.end() && !m["useBeforeDefineModel"].empty()) {
+      if (typeid(map<string, boost::any>) == m["useBeforeDefineModel"].type()) {
+        UseBeforeDefineModelOnSubModel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["useBeforeDefineModel"]));
+        useBeforeDefineModel = make_shared<UseBeforeDefineModelOnSubModel>(model1);
+      }
+    }
+  }
+
+
+  virtual ~UseBeforeDefineModelSubModel() = default;
+};
+class UseBeforeDefineModel : public Darabonba::Model {
+public:
+  shared_ptr<MyModel> m{};
+  shared_ptr<UseBeforeDefineModelSubModel> subModel{};
+
+  UseBeforeDefineModel() {}
+
+  explicit UseBeforeDefineModel(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {
+    if (!m) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("m is required.")));
+    }
+    if (!subModel) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subModel is required.")));
+    }
+  }
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (m) {
+      res["m"] = m ? boost::any(m->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    if (subModel) {
+      res["subModel"] = subModel ? boost::any(subModel->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("m") != m.end() && !m["m"].empty()) {
+      if (typeid(map<string, boost::any>) == m["m"].type()) {
+        MyModel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["m"]));
+        m = make_shared<MyModel>(model1);
+      }
+    }
+    if (m.find("subModel") != m.end() && !m["subModel"].empty()) {
+      if (typeid(map<string, boost::any>) == m["subModel"].type()) {
+        UseBeforeDefineModelSubModel model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["subModel"]));
+        subModel = make_shared<UseBeforeDefineModelSubModel>(model1);
       }
     }
   }

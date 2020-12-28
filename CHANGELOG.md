@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.2 - 2020-12-28
+
+- Fix the emit order of sub-model code.
+- Supported self reference.
+
 ## 1.0.1 - 2020-12-25
 
 - Fix emit result on `exec` mode.

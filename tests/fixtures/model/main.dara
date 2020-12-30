@@ -17,6 +17,28 @@ model UseBeforeDefineModelOnSubModel = {
   m: MyModel,
 }
 
+model ComplexStruct {
+  aa?: string(name='aa', description='aaa'),
+  bb?: float(name='bb', description='b'),
+  cc?: SimpleStruct(name='cc'),
+  dd?: ComplexStruct(name='dd'),
+  ee?: TestType(name='ee'),
+}
+
+model SimpleStruct {
+  aa?: string(name='aa', description='a'),
+  bb?: float(name='bb', description='b'),
+}
+
+model TestType {
+  a?: float(name='a', description='aa'),
+  b?: [ 
+    {
+      c?: string(name='c', description='c'),
+    }
+  ](name='b', description='b'),
+}
+
 model MyModel = {
   // keyword property
   delete: string(name='Delete'),

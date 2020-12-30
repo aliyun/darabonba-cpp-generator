@@ -864,6 +864,190 @@ public:
 
   virtual ~UseBeforeDefineModel() = default;
 };
+class SimpleStruct : public Darabonba::Model {
+public:
+  shared_ptr<string> aa{};
+  shared_ptr<double> bb{};
+
+  SimpleStruct() {}
+
+  explicit SimpleStruct(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {}
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (aa) {
+      res["aa"] = boost::any(*aa);
+    }
+    if (bb) {
+      res["bb"] = boost::any(*bb);
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("aa") != m.end() && !m["aa"].empty()) {
+      aa = make_shared<string>(boost::any_cast<string>(m["aa"]));
+    }
+    if (m.find("bb") != m.end() && !m["bb"].empty()) {
+      bb = make_shared<double>(boost::any_cast<double>(m["bb"]));
+    }
+  }
+
+
+  virtual ~SimpleStruct() = default;
+};
+class TestTypeB : public Darabonba::Model {
+public:
+  shared_ptr<string> c{};
+
+  TestTypeB() {}
+
+  explicit TestTypeB(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {}
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (c) {
+      res["c"] = boost::any(*c);
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("c") != m.end() && !m["c"].empty()) {
+      c = make_shared<string>(boost::any_cast<string>(m["c"]));
+    }
+  }
+
+
+  virtual ~TestTypeB() = default;
+};
+class TestType : public Darabonba::Model {
+public:
+  shared_ptr<double> a{};
+  shared_ptr<vector<TestTypeB>> b{};
+
+  TestType() {}
+
+  explicit TestType(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {}
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (a) {
+      res["a"] = boost::any(*a);
+    }
+    if (b) {
+      vector<boost::any> temp1;
+      for(auto item1:*b){
+        temp1.push_back(boost::any(item1.toMap()));
+      }
+      res["b"] = boost::any(temp1);
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("a") != m.end() && !m["a"].empty()) {
+      a = make_shared<double>(boost::any_cast<double>(m["a"]));
+    }
+    if (m.find("b") != m.end() && !m["b"].empty()) {
+      if (typeid(vector<boost::any>) == m["b"].type()) {
+        vector<TestTypeB> expect1;
+        for(auto item1:boost::any_cast<vector<boost::any>>(m["b"])){
+          if (typeid(map<string, boost::any>) == item1.type()) {
+            TestTypeB model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            expect1.push_back(model2);
+          }
+        }
+        b = make_shared<vector<TestTypeB>>(expect1);
+      }
+    }
+  }
+
+
+  virtual ~TestType() = default;
+};
+class ComplexStruct : public Darabonba::Model {
+public:
+  shared_ptr<string> aa{};
+  shared_ptr<double> bb{};
+  shared_ptr<SimpleStruct> cc{};
+  shared_ptr<ComplexStruct> dd{};
+  shared_ptr<TestType> ee{};
+
+  ComplexStruct() {}
+
+  explicit ComplexStruct(const std::map<string, boost::any> &config) : Darabonba::Model(config) {
+    fromMap(config);
+  };
+
+  void validate() override {}
+
+  map<string, boost::any> toMap() override {
+    map<string, boost::any> res;
+    if (aa) {
+      res["aa"] = boost::any(*aa);
+    }
+    if (bb) {
+      res["bb"] = boost::any(*bb);
+    }
+    if (cc) {
+      res["cc"] = cc ? boost::any(cc->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    if (dd) {
+      res["dd"] = dd ? boost::any(dd->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    if (ee) {
+      res["ee"] = ee ? boost::any(ee->toMap()) : boost::any(map<string,boost::any>({}));
+    }
+    return res;
+  }
+
+  void fromMap(map<string, boost::any> m) override {
+    if (m.find("aa") != m.end() && !m["aa"].empty()) {
+      aa = make_shared<string>(boost::any_cast<string>(m["aa"]));
+    }
+    if (m.find("bb") != m.end() && !m["bb"].empty()) {
+      bb = make_shared<double>(boost::any_cast<double>(m["bb"]));
+    }
+    if (m.find("cc") != m.end() && !m["cc"].empty()) {
+      if (typeid(map<string, boost::any>) == m["cc"].type()) {
+        SimpleStruct model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["cc"]));
+        cc = make_shared<SimpleStruct>(model1);
+      }
+    }
+    if (m.find("dd") != m.end() && !m["dd"].empty()) {
+      if (typeid(map<string, boost::any>) == m["dd"].type()) {
+        ComplexStruct model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["dd"]));
+        dd = make_shared<ComplexStruct>(model1);
+      }
+    }
+    if (m.find("ee") != m.end() && !m["ee"].empty()) {
+      if (typeid(map<string, boost::any>) == m["ee"].type()) {
+        TestType model1;
+        model1.fromMap(boost::any_cast<map<string, boost::any>>(m["ee"]));
+        ee = make_shared<TestType>(model1);
+      }
+    }
+  }
+
+
+  virtual ~ComplexStruct() = default;
+};
 class Client {
 public:
 

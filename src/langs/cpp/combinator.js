@@ -288,6 +288,9 @@ class Combinator extends CombinatorBase {
       });
     }
     model.body.filter(node => is.prop(node)).forEach(item => {
+      if (is.object(item.type) && this.resolveName(item.type.objectName)=== model_name) {
+        return;
+      } 
       this.findUndefinedModel(emitter, item.type);
     });
     this.definedModels.push(model_name);
@@ -926,6 +929,9 @@ class Combinator extends CombinatorBase {
         const [obj] = models.filter(node => node.name === objectName);
         if (obj) {
           obj.body.filter(node => is.prop(node)).forEach(item => {
+            if (is.object(item.type) && this.resolveName(item.type.objectName)=== objectName) {
+              return;
+            } 
             this.findUndefinedModel(emitter, item.type);
           });
           this.emitModel(emitter, obj);

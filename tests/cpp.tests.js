@@ -6,7 +6,6 @@ require('mocha-sinon');
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
-require('mocha-sinon');
 
 const DSL = require('@darabonba/parser');
 

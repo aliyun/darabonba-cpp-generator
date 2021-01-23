@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.3 - 2021-01-23
+
+- Fix the path name of GrammerCall.
+- Fix the emit result of resolve multi conditions AST.
+
 ## 1.0.2 - 2020-12-28
 
 - Fix the emit order of sub-model code.

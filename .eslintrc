@@ -54,7 +54,18 @@
     "no-undefined": 1,
     "no-undef": 2,
     "global-require": 0,
-    "no-console": 0
+    "no-console": 0,
+    "key-spacing": [
+      2,
+      {
+        "beforeColon": false,
+        "afterColon": true
+      }
+    ],
+    "eol-last": [
+      2,
+      "always"
+    ]
   },
   "env": {
     "es6": true,
@@ -69,7 +80,7 @@
     "beforeEach": true
   },
   "parserOptions": {
-    "ecmaVersion": 10,
+    "ecmaVersion": 2018,
     "sourceType": "script",
     "ecmaFeatures": {}
   },

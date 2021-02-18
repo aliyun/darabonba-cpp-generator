@@ -107,20 +107,6 @@ describe('emitter should be ok', function () {
     expect(emitter.indent(1)).to.be.eql('    ');
   });
 
-  it('fixed should be ok', function () {
-    const emitter = new Emitter();
-    emitter.fixed('this is test string.', 25);
-    expect(emitter.output).to.be.eql('this is test string.     ');
-
-    emitter.output = '';
-    emitter.fixed('this is test string.', 25, 'r');
-    expect(emitter.output).to.be.eql('     this is test string.');
-
-    emitter.output = '';
-    emitter.fixed('this is test string.', 30, 'm');
-    expect(emitter.output).to.be.eql('     this is test string.     ');
-  });
-
   it('emit should be ok', function () {
     const emitter = new Emitter();
     emitter.emit('emit some string');
@@ -139,13 +125,6 @@ describe('emitter should be ok', function () {
     expect(emitter.output).to.be.eql('');
     emitter.emits(0, 'row1', 'row2');
     expect(emitter.output).to.be.eql('row1' + emitter.eol + 'row2' + emitter.eol);
-  });
-
-  it('erase should be ok', function () {
-    const emitter = new Emitter();
-    emitter.emit('full string');
-    emitter.erase(3);
-    expect(emitter.output).to.be.eql('full str');
   });
 
   it('currRow should be ok', function () {

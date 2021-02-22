@@ -53,7 +53,7 @@ Darabonba_Import::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
         {"access", !mapAccess ? boost::any() : boost::any(*mapAccess)},
         {"test", boost::any(string((*mapVal)["[object Object]"]))}
       }), !request->header ? map<string, boost::any>() : request->header.toMap())));
-      request_->body = Darabonba_Import::Client::body();
+      request_->body = Darabonba::Converter::toStream(Darabonba_Import::Client::body());
       _lastRequest = request_;
       shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_, runtime_));
       if (true && true) {
@@ -99,7 +99,7 @@ map<string, boost::any> Darabonba_Complex::Client::Complex2(shared_ptr<ComplexRe
     {"protocol", request_->protocol}
   }));
   (*val)["[object Object]"];
-  request_->body = Darabonba_Import::Client::body();
+  request_->body = Darabonba::Converter::toStream(Darabonba_Import::Client::body());
   shared_ptr<Darabonba::Request> _lastRequest = request_;
   shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
 }
@@ -115,7 +115,7 @@ ComplexRequest Darabonba_Complex::Client::Complex3(shared_ptr<ComplexRequest> re
   request_->query = Darabonba_Import::Client::query(make_shared<map<string, string>>({
     {"date", "2019"}
   }));
-  request_->body = Darabonba_Import::Client::body();
+  request_->body = Darabonba::Converter::toStream(Darabonba_Import::Client::body());
   request_->headers.insert(pair<string, string>("host", "hello"));
   shared_ptr<Darabonba::Request> _lastRequest = request_;
   shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));

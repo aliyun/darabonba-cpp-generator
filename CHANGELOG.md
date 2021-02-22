@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.4 - 2021-02-22
+
+- Fix emit result of `toStream`.
+
 ## 1.0.3 - 2021-01-23
 
 - Fix the path name of GrammerCall.

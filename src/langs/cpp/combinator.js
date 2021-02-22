@@ -288,9 +288,9 @@ class Combinator extends CombinatorBase {
       });
     }
     model.body.filter(node => is.prop(node)).forEach(item => {
-      if (is.object(item.type) && this.resolveName(item.type.objectName)=== model_name) {
+      if (is.object(item.type) && this.resolveName(item.type.objectName) === model_name) {
         return;
-      } 
+      }
       this.findUndefinedModel(emitter, item.type);
     });
     this.definedModels.push(model_name);
@@ -929,9 +929,9 @@ class Combinator extends CombinatorBase {
         const [obj] = models.filter(node => node.name === objectName);
         if (obj) {
           obj.body.filter(node => is.prop(node)).forEach(item => {
-            if (is.object(item.type) && this.resolveName(item.type.objectName)=== objectName) {
+            if (is.object(item.type) && this.resolveName(item.type.objectName) === objectName) {
               return;
-            } 
+            }
             this.findUndefinedModel(emitter, item.type);
           });
           this.emitModel(emitter, obj);
@@ -1531,32 +1531,39 @@ class Combinator extends CombinatorBase {
       }
       emitter.emit(` ${_symbol(gram.opt)} `); // emit symbol of expr
       let toStream = false;
-      if (gram.left instanceof GrammerValue && gram.left.type === 'call' && gram.left.value.path[1].name === 'body') {
+      let leftIsPointer;
+      let leftDataType = this.resolveDataType(gram.left);
+      if (leftDataType !== 'Darabonba::Stream' && gram.left instanceof GrammerValue && gram.left.type === 'call' && gram.left.value.path[1].name === 'body') {
         const k = gram.left.value.path.map(item => item.name).join('.');
         toStream = k === '__request.body' && is.string(gram.right.dataType);
+        leftIsPointer = true;
+      } else {
+        toStream = leftDataType=== 'Darabonba::Stream';
+        leftIsPointer = this.isPointerVar(gram.left);
       }
+      let rightIsPointer = this.isPointerVar(gram.right);
       if (toStream) {
         emitter.emit(`${this.config.tea.converter.name}::toStream(`);
       }
-
-      if (!toStream && this.isPointerVar(gram.left) && !this.isPointerVar(gram.right)) {
-        let dataType = this.resolveDataType(gram.right);
-        if (dataType === null) {
-          dataType = this.resolveDataType(gram.left);
-        }
-        if (this.isPointerType(gram.right.dataType)) {
-          this.grammer(emitter, gram.right, false, false);
-        } else {
-          this.exprIsAssignToPtr = this.isPointerVar(gram.left);
-          emitter.emit(this.emitMakeShared(dataType, gram.right));
-        }
-      } else if (!this.isPointerVar(gram.left) && this.isPointerVar(gram.right)) {
-        emitter.emit('*');
-        this.grammer(emitter, gram.right, false, false);
-      } else if (this.isPointerVar(gram.left) && this.isPointerVar(gram.right)) {
+      let dataType = this.resolveDataType(gram.right);
+      if (dataType === null) {
+        dataType = this.resolveDataType(gram.left);
+      }
+      if (leftIsPointer && rightIsPointer) {
         if (toStream) {
           emitter.emit('*');
         }
+        this.exprIsAssignToPtr = true;
+        this.grammer(emitter, gram.right, false, false);
+      } else if (leftIsPointer && !rightIsPointer) {
+        this.exprIsAssignToPtr = true;
+        if (toStream) {
+          this.grammer(emitter, gram.right, false, false);
+        } else {
+          emitter.emit(this.emitMakeShared(dataType, gram.right));
+        }
+      } else if (!leftIsPointer && rightIsPointer) {
+        emitter.emit('*');
         this.grammer(emitter, gram.right, false, false);
       } else {
         this.grammer(emitter, gram.right, false, false);

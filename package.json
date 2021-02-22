@@ -1,6 +1,6 @@
 {
   "name": "@darabonba/cpp-generator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "The SDK generator for C++",
   "main": "src/generator",
   "directories": {

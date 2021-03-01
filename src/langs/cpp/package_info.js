@@ -3,15 +3,16 @@
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const debug = require('../../lib/debug');
+const { debug } = require('@axiosleo/cli-tool');
 const BasePackageInfo = require('../common/package_info');
-const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain } = require('../../lib/helper');
+const { _upper_first, _snake_case, _render } = require('@axiosleo/cli-tool/src/helper/str');
+const { _avoidKeywords, _contain } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
 
 class PackageInfo extends BasePackageInfo {
   emit(requirePackage, libraries, objects) {
-    this.project_name = `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`;
+    this.project_name = `${_snake_case(this.config.scope)}_${_snake_case(this.config.name)}`;
     this.imports = [];
     const [object] = objects.filter(obj => obj.type === 'client');
     this.client = object;
@@ -51,7 +52,7 @@ class PackageInfo extends BasePackageInfo {
     let git_project = '';
     let git_link = '';
     let git_tag = 'master';
-    const package_name = `${_toSnakeCase(config.scope)}_${_toSnakeCase(config.name)}`;
+    const package_name = `${_snake_case(config.scope)}_${_snake_case(config.name)}`;
     let package_info;
     if (config.packageInfo) {
       package_info = config.packageInfo;
@@ -93,11 +94,11 @@ class PackageInfo extends BasePackageInfo {
         this.renderAuto(
           tmpl_path,
           output_path, {
-            scope: _upperFirst(this.config.scope),
+            scope: _upper_first(this.config.scope),
             name: this.config.name,
             git_scope: git_scope,
             git_project: git_project,
-            project_name: `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`
+            project_name: `${_snake_case(this.config.scope)}_${_snake_case(this.config.name)}`
           }
         );
       });
@@ -124,8 +125,8 @@ class PackageInfo extends BasePackageInfo {
   }
 
   generateMainFiles() {
-    let param_scope = _toSnakeCase(this.config.scope);
-    let param_package = _avoidKeywords(_toSnakeCase(this.config.name));
+    let param_scope = _snake_case(this.config.scope);
+    let param_package = _avoidKeywords(_snake_case(this.config.name));
     let template;
     if (this.config.withTest) {
       template = fs.readFileSync(path.join(__dirname, './files/main/CMakeLists.txt.test.tmpl'), 'utf-8');
@@ -183,8 +184,8 @@ class PackageInfo extends BasePackageInfo {
     this.renderAuto(
       path.join(__dirname, './files/cmake/cmake.in'),
       path.join(this.config.dir, `cmake/${this.project_name}Config.cmake.in`), {
-        param_scope: _toSnakeCase(this.config.scope),
-        param_package: _avoidKeywords(_toSnakeCase(this.config.name)),
+        param_scope: _snake_case(this.config.scope),
+        param_package: _avoidKeywords(_snake_case(this.config.name)),
         param_import: this.imports.join(' ')
       }
     );

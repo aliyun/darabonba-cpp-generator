@@ -1,23 +1,20 @@
 'use strict';
 
-const debug = require('../../lib/debug');
+const { debug } = require('@axiosleo/cli-tool');
 const CombinatorBase = require('../common/combinator');
 const PackageInfo = require('./package_info');
 
 const {
   Symbol,
 } = require('../common/enum');
-
+const { _upper_first, _caml_case, _snake_case } = require('@axiosleo/cli-tool/src/helper/str');
+const { _deep_clone } = require('@axiosleo/cli-tool/src/helper/obj');
 const {
   is,
   _symbol,
   _modify,
   _contain,
-  _deepClone,
-  _upperFirst,
-  _toSnakeCase,
   _avoidKeywords,
-  _camelCase,
   _name
 } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
@@ -78,8 +75,8 @@ class Combinator extends CombinatorBase {
     super(config, imports);
     this.eol = ';';
     this.classNameMap = {};
-    this.package = _upperFirst(_camelCase(_name(this.config.name)));
-    this.scope = _upperFirst(_camelCase(_name(this.config.scope)));
+    this.package = _caml_case(_name(this.config.name));
+    this.scope = _caml_case(_name(this.config.scope));
     this.namespace = `${this.scope}_${this.package}`;
     this.properties = {};
     this.statements = {};
@@ -89,13 +86,13 @@ class Combinator extends CombinatorBase {
     let realFullClassName, includeFileName, using;
     if (_contain(className, '$')) {
       realFullClassName = this.coreClass(className);
-      includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
+      includeFileName = `<${_snake_case(this.config.tea.name)}/${_snake_case(this.config.tea.header)}>`;
     } else if (this.thirdPackageNamespace[className]) {
       // is third package
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[className]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[className]));
+      let scope = _snake_case(_name(this.thirdPackageScope[className]));
+      let client = _snake_case(_name(this.thirdPackageNamespace[className]));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[className]))}_${_upperFirst(_name(this.thirdPackageNamespace[className]))}::Client`;
+      realFullClassName = `${_upper_first(_name(this.thirdPackageScope[className]))}_${_upper_first(_name(this.thirdPackageNamespace[className]))}::Client`;
       using = null;
     } else {
       debug.stack(className, this.thirdPackageNamespace);
@@ -114,29 +111,29 @@ class Combinator extends CombinatorBase {
     let accessPath = modelName.split('.');
     if (_contain(modelName, '$')) {
       realFullClassName = this.coreClass(modelName);
-      includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
+      includeFileName = `<${_snake_case(this.config.tea.name)}/${_snake_case(this.config.tea.header)}>`;
     } else if (accessPath.length > 1 && this.thirdPackageNamespace[accessPath[0]]) {
       // is third package model
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
-      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
+      realFullClassName = `${_upper_first(_name(this.thirdPackageScope[accessPath[0]]))
+      }_${_upper_first(_name(this.thirdPackageNamespace[accessPath[0]]))
       }::${_name(accessPath.slice(1).join('.'))
       }`;
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
+      let scope = _snake_case(_name(this.thirdPackageScope[accessPath[0]]));
+      let client = _snake_case(_name(this.thirdPackageNamespace[accessPath[0]]));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
     } else if (accessPath.length === 1 && this.thirdPackageNamespace[accessPath[0]]) {
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
-      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
+      realFullClassName = `${_upper_first(_name(this.thirdPackageScope[accessPath[0]]))
+      }_${_upper_first(_name(this.thirdPackageNamespace[accessPath[0]]))
       }::Client`;
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
+      let scope = _snake_case(_name(this.thirdPackageScope[accessPath[0]]));
+      let client = _snake_case(_name(this.thirdPackageNamespace[accessPath[0]]));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
     } else {
       // self model
       realFullClassName = _name(accessPath.join('.'));
-      includeFileName = `<${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`;
+      includeFileName = `<${_snake_case(this.scope)}/${_snake_case(this.package)}.${this.config.header_ext}>`;
       using = null;
     }
     if (!this.classNameMap[realFullClassName]) {
@@ -194,10 +191,10 @@ class Combinator extends CombinatorBase {
     outputPars.foot = emitter.output;
 
     /***************************** combine output ******************************/
-    const config = _deepClone(this.config);
+    const config = _deep_clone(this.config);
     config.ext = '.' + this.config.header_ext;
-    config.dir = `${config.dir}/include/${_toSnakeCase(this.scope)}`;
-    config.filename = _toSnakeCase(this.package);
+    config.dir = `${config.dir}/include/${_snake_case(this.scope)}`;
+    config.filename = _snake_case(this.package);
     this.combineOutputParts(config, outputPars);
   }
 
@@ -214,7 +211,7 @@ class Combinator extends CombinatorBase {
     /******************************* emit body *******************************/
     let emitter = new Emitter(this.config);
     object.body.forEach(node => {
-      this.statements = _deepClone(this.properties);
+      this.statements = _deep_clone(this.properties);
       if (is.func(node)) {
         this.emitFuncCode(emitter, node);
       } else if (is.construct(node)) {
@@ -230,7 +227,7 @@ class Combinator extends CombinatorBase {
       emitter.emitln();
     }
     if (!this.config.exec) {
-      emitter.emitln(`#include <${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`);
+      emitter.emitln(`#include <${_snake_case(this.scope)}/${_snake_case(this.package)}.${this.config.header_ext}>`);
       this.emitInclude(emitter);
       emitter.emitln(`using namespace ${this.namespace};`).emitln();
     } else {
@@ -240,17 +237,17 @@ class Combinator extends CombinatorBase {
     outputPars.head = emitter.output;
 
     /***************************** combine output ******************************/
-    const config = _deepClone(this.config);
+    const config = _deep_clone(this.config);
     config.ext = '.' + this.config.code_ext;
     config.dir = `${config.dir}/src/`;
-    config.filename = _toSnakeCase(this.package);
+    config.filename = _snake_case(this.package);
     this.combineOutputParts(config, outputPars);
   }
 
   emitInclude(emitter) {
     let includeFileSet = [];
     let includeList = this.includeList.concat(this.includeModelList);
-    const selfInclude = `<${_toSnakeCase(this.scope)}/${_toSnakeCase(this.package)}.${this.config.header_ext}>`;
+    const selfInclude = `<${_snake_case(this.scope)}/${_snake_case(this.package)}.${this.config.header_ext}>`;
 
     if (includeList.length) {
       includeList.filter(item => item.includeFileName !== selfInclude).sort(function (a, b) {
@@ -301,7 +298,7 @@ class Combinator extends CombinatorBase {
     /***************************** initialize include list and class name ******************************/
     this.includeList = this.includeList.concat(object.includeList);
     this.includeModelList = this.includeModelList.concat(object.includeModelList);
-    const className = object.name.split('.').map(item => _upperFirst(item)).join('');
+    const className = object.name.split('.').map(item => _upper_first(item)).join('');
 
     /***************************** emit class header ******************************/
     emitter.emit(`class ${className} `);
@@ -453,7 +450,7 @@ class Combinator extends CombinatorBase {
               debug.warning(`Only supported string for validate pattern. ${prop.getParent().name}::${prop.name} type is ${this.emitType(prop.type)}.`);
             }
           } else {
-            emit.emitln(`${this.addInclude('$Model')}::validate${_upperFirst(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
+            emit.emitln(`${this.addInclude('$Model')}::validate${_upper_first(note.key)}("${_avoidKeywords(note.prop)}", ${_avoidKeywords(note.prop)}, ${val});`, this.level);
           }
         }
       });
@@ -953,7 +950,7 @@ class Combinator extends CombinatorBase {
     let is = false;
     Object.keys(this.thirdPackageDaraMeta).forEach(key => {
       const item = this.thirdPackageDaraMeta[key];
-      let namespace = `${_upperFirst(_name(item.scope))}_${_upperFirst(_name(item.name))}::Client`;
+      let namespace = `${_upper_first(_name(item.scope))}_${_upper_first(_name(item.name))}::Client`;
       if (namespace === client_name) {
         is = true;
       }
@@ -1119,7 +1116,7 @@ class Combinator extends CombinatorBase {
   resolveName(name, _avoidKeywords = true) {
     name = super.resolveName(name, _avoidKeywords);
     if (_contain(name, '.')) {
-      name = name.split('.').map(s => _upperFirst(s)).join('');
+      name = name.split('.').map(s => _upper_first(s)).join('');
     }
     return name;
   }
@@ -1538,7 +1535,7 @@ class Combinator extends CombinatorBase {
         toStream = k === '__request.body' && is.string(gram.right.dataType);
         leftIsPointer = true;
       } else {
-        toStream = leftDataType=== 'Darabonba::Stream';
+        toStream = leftDataType === 'Darabonba::Stream';
         leftIsPointer = this.isPointerVar(gram.left);
       }
       let rightIsPointer = this.isPointerVar(gram.right);

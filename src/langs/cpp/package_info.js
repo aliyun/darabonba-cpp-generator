@@ -8,6 +8,7 @@ const BasePackageInfo = require('../common/package_info');
 const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
+const dara = require('../common/dara');
 
 class PackageInfo extends BasePackageInfo {
   emit(requirePackage, libraries, objects) {
@@ -229,6 +230,9 @@ class PackageInfo extends BasePackageInfo {
     if (keys.length > 0) {
       Object.keys(this.requirePackage).forEach(key => {
         const item = this.requirePackage[key];
+        if (dara.exclude(item.scope, item.name)) {
+          return;
+        }
         const res = this.resolveGitInfo(item);
         if (false !== res) {
           const { package_name, git_link, git_tag } = this.resolveGitInfo(item);

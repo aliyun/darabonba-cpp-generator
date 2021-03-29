@@ -144,6 +144,13 @@ describe('C++ Generator', function () {
     ]);
   });
 
+  it('number should ok', function () {
+    check('number', [
+      `src/number${extCode}`,
+      `include/darabonba/number${extHead}`
+    ]);
+  });
+
   it('package should ok', function () {
     check('package', [
       'CMakeLists.txt',

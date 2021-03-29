@@ -3,6 +3,8 @@
 const debug = require('../../lib/debug');
 const CombinatorBase = require('../common/combinator');
 const PackageInfo = require('./package_info');
+const dara = require('../common/dara');
+const modules = require('./modules');
 
 const {
   Symbol,
@@ -1099,6 +1101,68 @@ class Combinator extends CombinatorBase {
     return prefix;
   }
 
+  resolveParams(gram) {
+    let tmp = [];
+    gram.params.forEach(p => {
+      let emit = new Emitter(this.config);
+      let isUnsetMethod = this.isUnsetMethod(gram);
+      if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
+        let isPointer = this.isPointerVar(p, true);
+        if (!isPointer) {
+          emit.emit(this.emitMakeShared(p.dataType, p.value.grammer));
+        } else {
+          this.grammer(emit, p.value.grammer, false, false);
+        }
+        tmp.push(emit.output);
+      } else if (p.value instanceof BehaviorToMap && gram.type === 'sys_func') {
+        tmp.push(this.emitMakeShared('map<string, boost::any>', p));
+      } else if (gram.type === 'sys_func' && isUnsetMethod) {
+        this.grammer(emit, p, false, false);
+        tmp.push(emit.output);
+      } else if (gram.type === 'sys_func') {
+        if (!this.isPointerVar(p)) {
+          emit.emit(this.emitMakeShared(p.dataType, p));
+        } else {
+          this.grammer(emit, p, false, false);
+        }
+        tmp.push(emit.output);
+      } else if (p instanceof GrammerVar && p.type.objectName === '$Exception') {
+        this.grammer(emit, p, false, false);
+        tmp.push(`${emit.output}`);
+      } else if (p instanceof GrammerValue && p.type === 'map' && p.needCast) {
+        this.pushInclude('darabonba_core');
+        emit.emit(`${this.config.tea.converter.name}::mapPointer(`);
+        this.grammerValue(emit, p);
+        emit.emit(')');
+        tmp.push(emit.output);
+      } else if (p.type === 'var' && is.object(p.value.type) && p.value.varType === 'static_class') {
+        tmp.push('nullptr');
+      } else if (p.type === 'param') {
+        if (this.isPtrStatement(p.value)) {
+          tmp.push(p.value);
+        } else {
+          tmp.push(this.emitMakeShared(p.dataType, p.value));
+        }
+      } else if (!this.isPointerVar(p)) {
+        this.grammer(emit, p, false, false);
+        let dataType = this.resolveDataType(p);
+        if (is.stream(p.dataType)) {
+          tmp.push(emit.output);
+        } else if (p.type === 'behavior' && p.value instanceof BehaviorToMap) {
+          tmp.push(this.emitMakeShared('map<string, boost::any>', emit.output));
+        } else if (!this.isPointerVar(p)) {
+          tmp.push(this.emitMakeShared(dataType, emit.output));
+        } else {
+          tmp.push(emit.output);
+        }
+      } else {
+        this.grammerValue(emit, p);
+        tmp.push(emit.output);
+      }
+    });
+    return tmp.join(', ');
+  }
+
   resolveDataType(gram) {
     let expectedType = null;
     if (gram.returnType) {
@@ -1406,71 +1470,19 @@ class Combinator extends CombinatorBase {
 
   grammerCall(emitter, gram) {
     if (gram.type === 'sys_func' || gram.type === 'method') {
-      let params = '';
-      if (gram.params.length > 0) {
-        let tmp = [];
-        gram.params.forEach(p => {
-          let emit = new Emitter(this.config);
-          let isUnsetMethod = this.isUnsetMethod(gram);
-          if (p.value instanceof BehaviorToMap && gram.type === 'sys_func' && isUnsetMethod) {
-            let isPointer = this.isPointerVar(p, true);
-            if (!isPointer) {
-              emit.emit(this.emitMakeShared(p.dataType, p.value.grammer));
-            } else {
-              this.grammer(emit, p.value.grammer, false, false);
-            }
-            tmp.push(emit.output);
-          } else if (p.value instanceof BehaviorToMap && gram.type === 'sys_func') {
-            tmp.push(this.emitMakeShared('map<string, boost::any>', p));
-          } else if (gram.type === 'sys_func' && isUnsetMethod) {
-            this.grammer(emit, p, false, false);
-            tmp.push(emit.output);
-          } else if (gram.type === 'sys_func') {
-            if (!this.isPointerVar(p)) {
-              emit.emit(this.emitMakeShared(p.dataType, p));
-            } else {
-              this.grammer(emit, p, false, false);
-            }
-            tmp.push(emit.output);
-          } else if (p instanceof GrammerVar && p.type.objectName === '$Exception') {
-            this.grammer(emit, p, false, false);
-            tmp.push(`${emit.output}`);
-          } else if (p instanceof GrammerValue && p.type === 'map' && p.needCast) {
-            this.pushInclude('darabonba_core');
-            emit.emit(`${this.config.tea.converter.name}::mapPointer(`);
-            this.grammerValue(emit, p);
-            emit.emit(')');
-            tmp.push(emit.output);
-          } else if (p.type === 'var' && is.object(p.value.type) && p.value.varType === 'static_class') {
-            tmp.push('nullptr');
-          } else if (p.type === 'param') {
-            if (this.isPtrStatement(p.value)) {
-              tmp.push(p.value);
-            } else {
-              tmp.push(this.emitMakeShared(p.dataType, p.value));
-            }
-          } else if (!this.isPointerVar(p)) {
-            this.grammer(emit, p, false, false);
-            let dataType = this.resolveDataType(p);
-            if (is.stream(p.dataType)) {
-              tmp.push(emit.output);
-            } else if (p.type === 'behavior' && p.value instanceof BehaviorToMap) {
-              tmp.push(this.emitMakeShared('map<string, boost::any>', emit.output));
-            } else if (!this.isPointerVar(p)) {
-              tmp.push(this.emitMakeShared(dataType, emit.output));
-            } else {
-              tmp.push(emit.output);
-            }
-          } else {
-            this.grammerValue(emit, p);
-            tmp.push(emit.output);
+      const obj = this.judge(gram);
+      if (obj !== null) {
+        const resolve_method = dara.resolve(...Object.values(obj));
+        if (resolve_method !== null) {
+          if (!modules[resolve_method]) {
+            debug.stack(`Unsupported method : ${resolve_method}`);
           }
-        });
-        params = tmp.join(', ');
-        emitter.emit(this.resolveCallPath(gram.path, params, gram));
-      } else {
-        emitter.emit(this.resolveCallPath(gram.path, params, gram));
+          modules[resolve_method].call(this, emitter, gram);
+          return;
+        }
       }
+      let params = gram.params.length > 0 ? this.resolveParams(gram) : '';
+      emitter.emit(this.resolveCallPath(gram.path, params, gram));
     } else if (gram.type === 'prop') {
       emitter.emit(this.resolveCallPath(gram.path, '', gram));
     } else if (gram.type === 'key') {
@@ -1538,7 +1550,7 @@ class Combinator extends CombinatorBase {
         toStream = k === '__request.body' && is.string(gram.right.dataType);
         leftIsPointer = true;
       } else {
-        toStream = leftDataType=== 'Darabonba::Stream';
+        toStream = leftDataType === 'Darabonba::Stream';
         leftIsPointer = this.isPointerVar(gram.left);
       }
       let rightIsPointer = this.isPointerVar(gram.right);

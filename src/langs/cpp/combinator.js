@@ -1886,7 +1886,7 @@ class Combinator extends CombinatorBase {
     let tmp = [];
     behavior.items.forEach(item => {
       let emit = new Emitter(this.config);
-      if (this.isPointerVar(item)) {
+      if (this.isPointerVar(item) && !is.any(item.dataType)) {
         emit.emit('*');
       }
       if (is.string(item.dataType)) {

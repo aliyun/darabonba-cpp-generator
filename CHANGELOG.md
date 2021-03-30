@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.5 - 2021-03-30
+
+- Fix emit result.
+- Supported number operations.
+
 ## 1.0.4 - 2021-02-22
 
 - Fix emit result of `toStream`.

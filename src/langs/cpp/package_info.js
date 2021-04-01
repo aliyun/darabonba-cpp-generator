@@ -5,28 +5,18 @@ const os = require('os');
 const fs = require('fs');
 const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
-const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain } = require('../../lib/helper');
+const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain, _deepClone } = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
 const dara = require('../common/dara');
 
 class PackageInfo extends BasePackageInfo {
-  emit(requirePackage, libraries, objects) {
+  emit(objects) {
     this.project_name = `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`;
-    this.imports = [];
     const [object] = objects.filter(obj => obj.type === 'client');
     this.client = object;
-    Object.keys(libraries).forEach((key) => {
-      if (!requirePackage[key]) {
-        const lib_path = path.join(this.config.pkgDir, libraries[key]);
-        if (fs.existsSync(path.join(lib_path, 'Teafile'))) {
-          requirePackage[key] = JSON.parse(fs.readFileSync(path.join(lib_path, 'Teafile')));
-        } else if (fs.existsSync(path.join(lib_path, 'Darafile'))) {
-          requirePackage[key] = JSON.parse(fs.readFileSync(path.join(lib_path, 'Darafile')));
-        }
-      }
-    });
-    this.requirePackage = requirePackage;
+    this.imports = [];
+    this.dependencies = _deepClone(this.dependencies);
 
     // generate external
     this.generateExternal();
@@ -198,10 +188,9 @@ class PackageInfo extends BasePackageInfo {
   }
 
   addGlobalPackage() {
-    let globalPackage = {};
     if (!this.config.exec) {
-      globalPackage = {
-        'Core': {
+      this.dependencies['Core'] = {
+        meta: {
           scope: 'darabonba',
           name: 'core',
           packageInfo: {
@@ -209,13 +198,12 @@ class PackageInfo extends BasePackageInfo {
               'scope': 'aliyun',
               'project': 'tea-cpp'
             }
-          }
-        }
+          },
+        },
+        scope: 'darabonba',
+        package_name: 'core',
+        client_name: 'client',
       };
-    }
-    Object.assign(this.requirePackage, globalPackage);
-    if (this.config.cpp && this.config.cpp.require) {
-      Object.assign(this.requirePackage, globalPackage, this.config.cpp.require);
     }
   }
 
@@ -225,17 +213,18 @@ class PackageInfo extends BasePackageInfo {
       path.join(__dirname, './files/external/CMakeLists.txt.test.tmpl') :
       path.join(__dirname, './files/external/CMakeLists.txt.tmpl');
     this.addGlobalPackage();
-    let keys = Object.keys(this.requirePackage);
+    let keys = Object.keys(this.dependencies);
     let libraries = '';
     if (keys.length > 0) {
-      Object.keys(this.requirePackage).forEach(key => {
-        const item = this.requirePackage[key];
-        if (dara.exclude(item.scope, item.name)) {
+      keys.forEach(key => {
+        const item = this.dependencies[key];
+        const meta = item.meta;
+        if (dara.exclude(item.scope, meta.name)) {
           return;
         }
-        const res = this.resolveGitInfo(item);
+        const res = this.resolveGitInfo(meta);
         if (false !== res) {
-          const { package_name, git_link, git_tag } = this.resolveGitInfo(item);
+          const { package_name, git_link, git_tag } = this.resolveGitInfo(meta);
           if (!_contain(this.imports, package_name)) {
             this.renderAuto(
               tmpl_path,

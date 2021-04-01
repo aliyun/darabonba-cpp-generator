@@ -76,8 +76,8 @@ function _needRecur(prop_type) {
 }
 
 class Combinator extends CombinatorBase {
-  constructor(config, imports) {
-    super(config, imports);
+  constructor(config, dependencies) {
+    super(config, dependencies);
     this.eol = ';';
     this.classNameMap = {};
     this.package = _upperFirst(_camelCase(_name(this.config.name)));
@@ -89,18 +89,20 @@ class Combinator extends CombinatorBase {
 
   addInclude(className) {
     let realFullClassName, includeFileName, using;
+    const dependencies = this.dependencies;
     if (_contain(className, '$')) {
       realFullClassName = this.coreClass(className);
       includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
-    } else if (this.thirdPackageNamespace[className]) {
+    } else if (dependencies[className]) {
+      const info = dependencies[className];
       // is third package
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[className]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[className]));
+      let scope = _toSnakeCase(_name(info.scope));
+      let client = _toSnakeCase(_name(info.package_name));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[className]))}_${_upperFirst(_name(this.thirdPackageNamespace[className]))}::Client`;
+      realFullClassName = `${_upperFirst(_name(info.scope))}_${_upperFirst(_name(info.package_name))}::Client`;
       using = null;
     } else {
-      debug.stack(className, this.thirdPackageNamespace);
+      debug.stack(`Class Name Error : ${className}`, dependencies);
     }
     if (!this.classNameMap[realFullClassName]) {
       const include = { import: realFullClassName, includeFileName, using };
@@ -114,25 +116,28 @@ class Combinator extends CombinatorBase {
   addModelInclude(modelName) {
     let realFullClassName, includeFileName, using;
     let accessPath = modelName.split('.');
+    const dependencies = this.dependencies;
     if (_contain(modelName, '$')) {
       realFullClassName = this.coreClass(modelName);
       includeFileName = `<${_toSnakeCase(this.config.tea.name)}/${_toSnakeCase(this.config.tea.header)}>`;
-    } else if (accessPath.length > 1 && this.thirdPackageNamespace[accessPath[0]]) {
+    } else if (accessPath.length > 1 && dependencies[accessPath[0]]) {
+      const info = dependencies[accessPath[0]];
       // is third package model
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
-      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
+      realFullClassName = `${_upperFirst(_name(info.scope))
+      }_${_upperFirst(_name(info.package_name))
       }::${_name(accessPath.slice(1).join('.'))
       }`;
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
+      let scope = _toSnakeCase(_name(info.scope));
+      let client = _toSnakeCase(_name(info.package_name));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
-    } else if (accessPath.length === 1 && this.thirdPackageNamespace[accessPath[0]]) {
-      realFullClassName = `${_upperFirst(_name(this.thirdPackageScope[accessPath[0]]))
-      }_${_upperFirst(_name(this.thirdPackageNamespace[accessPath[0]]))
+    } else if (accessPath.length === 1 && dependencies[accessPath[0]]) {
+      const info = dependencies[accessPath[0]];
+      realFullClassName = `${_upperFirst(_name(info.scope))
+      }_${_upperFirst(_name(info.package_name))
       }::Client`;
-      let scope = _toSnakeCase(_name(this.thirdPackageScope[accessPath[0]]));
-      let client = _toSnakeCase(_name(this.thirdPackageNamespace[accessPath[0]]));
+      let scope = _toSnakeCase(_name(info.scope));
+      let client = _toSnakeCase(_name(info.package_name));
       includeFileName = `<${scope}/${client}.${this.config.header_ext}>`;
       using = null;
     } else {
@@ -151,8 +156,8 @@ class Combinator extends CombinatorBase {
 
   combine(objects = []) {
     if (this.config.packageInfo || this.config.exec) {
-      const packageInfo = new PackageInfo(this.config);
-      packageInfo.emit(this.thirdPackageDaraMeta, this.libraries, objects);
+      const packageInfo = new PackageInfo(this.config, this.dependencies);
+      packageInfo.emit(objects);
     }
     if (this.config.exec) {
       this.combineCode(objects);
@@ -952,15 +957,11 @@ class Combinator extends CombinatorBase {
     if (client_name && client_name.indexOf('Client') < 0) {
       return false;
     }
-    let is = false;
-    Object.keys(this.thirdPackageDaraMeta).forEach(key => {
-      const item = this.thirdPackageDaraMeta[key];
-      let namespace = `${_upperFirst(_name(item.scope))}_${_upperFirst(_name(item.name))}::Client`;
-      if (namespace === client_name) {
-        is = true;
-      }
+    return Object.keys(this.dependencies).some((key) => {
+      const item = this.dependencies[key];
+      let namespace = `${_upperFirst(_name(item.scope))}_${_upperFirst(_name(item.package_name))}::Client`;
+      return namespace === client_name;
     });
-    return is;
   }
 
   pushInclude(includeName) {

@@ -5,7 +5,6 @@ const Emitter = require('../../lib/emitter');
 
 const {
   Grammer,
-  GrammerCall,
   GrammerThrows,
 
   Behavior,
@@ -56,27 +55,6 @@ class BaseCombinator {
       return this.config.tea[key].name;
     }
     debug.stack('Unsupported core class name : ' + objName);
-  }
-
-  judge(grammer) {
-    if (!(grammer instanceof GrammerCall)) {
-      return null;
-    }
-    if (grammer.path.length !== 2) {
-      return null;
-    }
-    if (grammer.path[0].type !== 'object_static' || grammer.path[1].type !== 'call_static') {
-      return null;
-    }
-    if (grammer.path[0].name[0] !== '^') {
-      return null;
-    }
-    const name = grammer.path[0].name.substr(1);
-    const scope = this.dependencies[name].scope;
-    if (!scope) {
-      return null;
-    }
-    return { scope, package_name: name, method_name: grammer.path[1].name };
   }
 
   resolveNotes(nodes) {

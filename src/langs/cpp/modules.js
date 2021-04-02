@@ -44,5 +44,5 @@ function binary_operation(emitter, gram) {
 
 module.exports = {
   parse,
-  binary_operation
+  binary_operation,
 };

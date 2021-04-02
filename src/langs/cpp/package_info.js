@@ -5,10 +5,17 @@ const os = require('os');
 const fs = require('fs');
 const debug = require('../../lib/debug');
 const BasePackageInfo = require('../common/package_info');
-const { _toSnakeCase, _upperFirst, _avoidKeywords, _render, _contain, _deepClone } = require('../../lib/helper');
+const {
+  _render,
+  _contain,
+  _deepClone,
+  _upperFirst,
+  _toSnakeCase,
+  _avoidKeywords,
+  _isExcludePackage
+} = require('../../lib/helper');
 const Emitter = require('../../lib/emitter');
 const { FuncItem } = require('../common/items');
-const dara = require('../common/dara');
 
 class PackageInfo extends BasePackageInfo {
   emit(objects) {
@@ -219,7 +226,7 @@ class PackageInfo extends BasePackageInfo {
       keys.forEach(key => {
         const item = this.dependencies[key];
         const meta = item.meta;
-        if (dara.exclude(item.scope, meta.name)) {
+        if (_isExcludePackage(item.scope, meta.name)) {
           return;
         }
         const res = this.resolveGitInfo(meta);

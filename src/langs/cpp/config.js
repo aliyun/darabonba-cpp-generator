@@ -170,5 +170,30 @@ module.exports = {
     boost_any: { import: 'boost_any', alias: null, includeFileName: '<boost/any.hpp>', using: null },
     throw_exception: { import: 'throw_exception', alias: null, includeFileName: '<boost/throw_exception.hpp>', using: null },
     cast: { import: 'boost_lexical_cast', alias: null, includeFileName: '<boost/lexical_cast.hpp>', using: null }
+  },
+  modules: {
+    darabonba: {
+      Number: { // darabonba package name
+        exclude: true,
+        methods: {
+          // the name of method in package
+          // <method-name> : <method-alias-name>
+          'parseInt': 'parse',
+          'parseLong': 'parse',
+          'parseFloat': 'parse',
+          'parseDouble': 'parse',
+          'itol': 'parse',
+          'ltoi': 'parse',
+          'add': 'binary_operation',
+          'sub': 'binary_operation',
+          'mul': 'binary_operation',
+          'div': 'binary_operation',
+          'gt': 'binary_operation',
+          'gte': 'binary_operation',
+          'lt': 'binary_operation',
+          'lte': 'binary_operation'
+        }
+      }
+    }
   }
 };

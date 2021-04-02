@@ -3,7 +3,6 @@
 const debug = require('../../lib/debug');
 const CombinatorBase = require('../common/combinator');
 const PackageInfo = require('./package_info');
-const dara = require('../common/dara');
 const modules = require('./modules');
 
 const {
@@ -19,6 +18,7 @@ const {
   _upperFirst,
   _toSnakeCase,
   _avoidKeywords,
+  _resolveGrammerCall,
   _camelCase,
   _name
 } = require('../../lib/helper');
@@ -1471,16 +1471,13 @@ class Combinator extends CombinatorBase {
 
   grammerCall(emitter, gram) {
     if (gram.type === 'sys_func' || gram.type === 'method') {
-      const obj = this.judge(gram);
-      if (obj !== null) {
-        const resolve_method = dara.resolve(...Object.values(obj));
-        if (resolve_method !== null) {
-          if (!modules[resolve_method]) {
-            debug.stack(`Unsupported method : ${resolve_method}`);
-          }
-          modules[resolve_method].call(this, emitter, gram);
-          return;
+      const resolve_method = _resolveGrammerCall(gram, this.dependencies);
+      if (resolve_method !== null) {
+        if (!modules[resolve_method]) {
+          debug.stack(`Unsupported method : ${resolve_method}`);
         }
+        modules[resolve_method].call(this, emitter, gram);
+        return;
       }
       let params = gram.params.length > 0 ? this.resolveParams(gram) : '';
       emitter.emit(this.resolveCallPath(gram.path, params, gram));

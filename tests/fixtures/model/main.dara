@@ -54,6 +54,7 @@ model MyModel = {
   mapModel: map[string]M,
   subarraymodel: [ {} ],
   subarray: [ M ],
+  selfArray: [ MyModel ],
   maparray: [ map[string]any ],
   moduleModelMap: map[string]Source.Request,
   subModelMap: map[string]M.subM,

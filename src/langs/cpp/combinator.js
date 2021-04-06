@@ -297,8 +297,12 @@ class Combinator extends CombinatorBase {
     model.body.filter(node => is.prop(node)).forEach(item => {
       if (is.object(item.type) && this.resolveName(item.type.objectName) === model_name) {
         return;
+      } else if (is.array(item.type) && this.resolveName(item.type.itemType.objectName) === model_name) {
+        return;
+      } else if (is.map(item.type) && this.resolveName(item.type.valType.objectName) === model_name) {
+        return;
       }
-      this.findUndefinedModel(emitter, item.type);
+      this.findUndefinedModel(emitter, item.type, [model_name]);
     });
     this.definedModels.push(model_name);
     this.emitClass(emitter, model);
@@ -928,27 +932,54 @@ class Combinator extends CombinatorBase {
 
   /**************************************** analyze ****************************************/
 
-  findUndefinedModel(emitter, type) {
+  findUndefinedModel(emitter, type, parentObject = []) {
     const models = this.models;
     if (is.object(type)) {
       let objectName = this.resolveName(type.objectName);
+      if (parentObject.indexOf(objectName) < 0) {
+        parentObject.push(objectName);
+      }
       if (!_contain(this.definedModels, objectName)) {
         const [obj] = models.filter(node => node.name === objectName);
         if (obj) {
           obj.body.filter(node => is.prop(node)).forEach(item => {
-            if (is.object(item.type) && this.resolveName(item.type.objectName) === objectName) {
-              return;
+            if (is.object(item.type)) {
+              const typeObjectName = this.resolveName(item.type.objectName);
+              if (typeObjectName === objectName) {
+                return;
+              } else if (parentObject.indexOf(typeObjectName) < 0) {
+                parentObject.push(typeObjectName);
+              }
             }
-            this.findUndefinedModel(emitter, item.type);
+            this.findUndefinedModel(emitter, item.type, parentObject);
           });
           this.emitModel(emitter, obj);
         }
       }
     } else if (is.array(type)) {
-      this.findUndefinedModel(emitter, type.itemType);
+      if (is.object(type.itemType)) {
+        const objectName = this.resolveName(type.itemType.objectName);
+        if (parentObject && parentObject.indexOf(objectName) > -1) {
+          return;
+        }
+        parentObject.push(objectName);
+        this.findUndefinedModel(emitter, type.itemType, parentObject);
+      } else {
+        this.findUndefinedModel(emitter, type.itemType, parentObject);
+      }
     } else if (is.map(type)) {
-      this.findUndefinedModel(emitter, type.valType);
+      if (is.object(type.valType)) {
+        const objectName = this.resolveName(type.valType.objectName);
+        if (parentObject && parentObject.indexOf(objectName) > -1) {
+          return;
+        }
+        parentObject.push(objectName);
+        this.findUndefinedModel(emitter, type.valType, parentObject);
+      } else {
+        this.findUndefinedModel(emitter, type.valType, parentObject);
+      }
     }
+    return parentObject;
   }
 
   isClient(prop) {

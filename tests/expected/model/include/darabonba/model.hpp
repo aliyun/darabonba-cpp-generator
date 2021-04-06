@@ -164,6 +164,7 @@ public:
   shared_ptr<map<string, M>> mapModel{};
   shared_ptr<vector<MyModelSubarraymodel>> subarraymodel{};
   shared_ptr<vector<M>> subarray{};
+  shared_ptr<vector<MyModel>> selfArray{};
   shared_ptr<vector<map<string, boost::any>>> maparray{};
   shared_ptr<map<string, Darabonba_Import::Request>> moduleModelMap{};
   shared_ptr<map<string, MSubM>> subModelMap{};
@@ -231,6 +232,9 @@ public:
     }
     if (!subarray) {
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("subarray is required.")));
+    }
+    if (!selfArray) {
+      BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("selfArray is required.")));
     }
     if (!maparray) {
       BOOST_THROW_EXCEPTION(boost::enable_error_info(std::runtime_error("maparray is required.")));
@@ -368,6 +372,13 @@ public:
         temp1.push_back(boost::any(item1.toMap()));
       }
       res["subarray"] = boost::any(temp1);
+    }
+    if (selfArray) {
+      vector<boost::any> temp1;
+      for(auto item1:*selfArray){
+        temp1.push_back(boost::any(item1.toMap()));
+      }
+      res["selfArray"] = boost::any(temp1);
     }
     if (maparray) {
       res["maparray"] = boost::any(*maparray);
@@ -561,6 +572,19 @@ public:
           }
         }
         subarray = make_shared<vector<M>>(expect1);
+      }
+    }
+    if (m.find("selfArray") != m.end() && !m["selfArray"].empty()) {
+      if (typeid(vector<boost::any>) == m["selfArray"].type()) {
+        vector<MyModel> expect1;
+        for(auto item1:boost::any_cast<vector<boost::any>>(m["selfArray"])){
+          if (typeid(map<string, boost::any>) == item1.type()) {
+            MyModel model2;
+            model2.fromMap(boost::any_cast<map<string, boost::any>>(item1));
+            expect1.push_back(model2);
+          }
+        }
+        selfArray = make_shared<vector<MyModel>>(expect1);
       }
     }
     if (m.find("maparray") != m.end() && !m["maparray"].empty()) {

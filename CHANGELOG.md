@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.6 2021-04-06
+
+- Fix Model self-reference.
+
 ## 1.0.5 - 2021-03-30
 
 - Fix emit result.

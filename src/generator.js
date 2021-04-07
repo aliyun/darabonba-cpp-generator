@@ -29,7 +29,7 @@ function readModuleMeta(module_dir, pkg_dir, lock) {
   return JSON.parse(fs.readFileSync(filepath));
 }
 
-function resolveDependencies(ast) {
+function resolveDependencies(lang, config, ast) {
   const imports = ast.imports;
   const dependencies = {
     // Package ID : { meta, scope, package_name, client_name, client_alias }
@@ -38,18 +38,23 @@ function resolveDependencies(ast) {
     return dependencies;
   }
 
-  const self_client_name = this.config.clientName ? this.config.clientName.toLowerCase() : this.config.client.name.toLowerCase();
-  const libraries = this.config.libraries;
-  const lock = readLock(this.config.pkgDir);
-  const lang = this.lang;
-  const default_client_name = this.config.client.name;
-  const default_model_dir = this.config.model.dir;
+  const self_client_name = config.clientName
+    ? config.clientName.toLowerCase()
+    : config.client.name.toLowerCase();
+  const libraries = config.libraries;
+  const lock = readLock(config.pkgDir);
+  const default_client_name = config.client.name;
+  const default_model_dir = config.model.dir;
 
   let package_sets = [];
   let client_sets = [];
   ast.imports.forEach((item) => {
     const aliasId = item.lexeme;
-    const meta = readModuleMeta(libraries[aliasId], this.config.pkgDir, lock);
+    const meta = readModuleMeta(
+      libraries[aliasId],
+      config.pkgDir,
+      lock
+    );
     const scope = meta.scope;
     let package_name = meta.name;
     let client_name = default_client_name;
@@ -98,8 +103,8 @@ function getCombinator(lang, configOriginal, denpendencies) {
   return new Combinator(config, denpendencies);
 }
 
-function resolveAST(type, ast, globalAST) {
-  const combinator = getCombinator(this.lang, this.config);
+function resolveAST(lang, config, type, ast, globalAST) {
+  const combinator = getCombinator(lang, config);
   let resolver;
   switch (type) {
   case 'client':
@@ -131,22 +136,32 @@ class Generator {
       dir: meta.outputDir,
     };
     const meta_lang_config = !meta[lang] ? {} : meta[lang];
-    this.config = _assignObject(config, common_config, lang_config, meta, meta_lang_config);
+    this.config = _assignObject(
+      config,
+      common_config,
+      lang_config,
+      meta,
+      meta_lang_config
+    );
   }
 
   visit(ast) {
-    const dependencies = resolveDependencies.call(this, ast);
-    if (this.config.clientName) {
-      this.config.client.name = this.config.clientName;
+    const lang = this.lang;
+    const config = this.config;
+
+    // return objects;
+    const dependencies = resolveDependencies(lang, config, ast);
+    if (config.clientName) {
+      config.client.name = config.clientName;
     }
-    if (this.config.modelDirName) {
-      this.config.model.dir = this.config.modelDirName;
+    if (config.modelDirName) {
+      config.model.dir = config.modelDirName;
     }
 
     const objects = [];
 
     // combine client code
-    const clientObjectItem = resolveAST.call(this, 'client', ast, ast);
+    const clientObjectItem = resolveAST(lang, config, 'client', ast, ast);
     objects.push(clientObjectItem);
 
     // combine model code
@@ -154,20 +169,20 @@ class Generator {
       return item.type === 'model';
     }).forEach((model) => {
       const modelName = model.modelName.lexeme;
-      const modelObjectItem = resolveAST.call(this, 'model', model, ast);
+      const modelObjectItem = resolveAST(lang, config, 'model', model, ast);
       if (ast.models) {
         Object.keys(ast.models).filter((key) => {
           return key.startsWith(modelName + '.');
         }).forEach((key) => {
           const subModel = ast.models[key];
-          const subModelObjectItem = resolveAST.call(this, 'model', subModel, ast);
+          const subModelObjectItem = resolveAST(lang, config, 'model', subModel, ast);
           modelObjectItem.subObject.push(subModelObjectItem);
         });
       }
       objects.push(modelObjectItem);
     });
 
-    const combinator = getCombinator(this.lang, this.config, dependencies);
+    const combinator = getCombinator(lang, config, dependencies);
     combinator.combine(objects);
     return objects;
   }

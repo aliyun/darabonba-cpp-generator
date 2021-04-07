@@ -43,5 +43,6 @@ module.exports = {
     request: { name: 'TeaRequest' },
     exception: { name: 'TeaException' },
     exceptionUnretryable: { name: 'TeaUnretryableException' },
-  }
+  },
+  modules: {}
 };

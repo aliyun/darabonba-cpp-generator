@@ -4,6 +4,7 @@ const defaultConfig = require('../common/config');
 
 module.exports = {
   ...defaultConfig,
+  advanced: false,
   indent: '  ',
   keywords: [
     'alignas',

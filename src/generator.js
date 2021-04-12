@@ -2,10 +2,12 @@
 
 const path = require('path');
 const fs = require('fs');
+const debug = require('./lib/debug');
 
 const { _deepClone, _assignObject } = require('./lib/helper');
 const ClientResolver = require('./resolver/client');
 const ModelResolver = require('./resolver/model');
+const DSL = require('@darabonba/parser');
 
 function readLock(pkg_dir) {
   const filepath = path.join(pkg_dir, '.libraries.json');
@@ -13,6 +15,13 @@ function readLock(pkg_dir) {
     throw new Error('The `.libraries.json` file could not be found. Please execute "dara install" first.');
   }
   return JSON.parse(fs.readFileSync(filepath, 'utf8'));
+}
+
+function readMetafile(module_dir) {
+  const filepath = fs.existsSync(path.join(module_dir, 'Teafile'))
+    ? path.join(module_dir, 'Teafile')
+    : path.join(module_dir, 'Darafile');
+  return JSON.parse(fs.readFileSync(filepath));
 }
 
 function readModuleMeta(module_dir, pkg_dir, lock) {
@@ -23,16 +32,13 @@ function readModuleMeta(module_dir, pkg_dir, lock) {
       module_dir = path.join(pkg_dir, lock[module_dir]);
     }
   }
-  const filepath = fs.existsSync(path.join(module_dir, 'Teafile'))
-    ? path.join(module_dir, 'Teafile')
-    : path.join(module_dir, 'Darafile');
-  return JSON.parse(fs.readFileSync(filepath));
+  return readMetafile(module_dir);
 }
 
 function resolveDependencies(lang, config, ast) {
   const imports = ast.imports;
   const dependencies = {
-    // Package ID : { meta, scope, package_name, client_name, client_alias }
+    // Package AliasID : { meta, scope, package_name, client_name, client_alias }
   };
   if (!imports || !imports.length) {
     return dependencies;
@@ -55,6 +61,11 @@ function resolveDependencies(lang, config, ast) {
       config.pkgDir,
       lock
     );
+    meta.libraries = {
+      lock: lock[libraries[aliasId]],
+      tag: libraries[aliasId],
+      alias_id: aliasId
+    };
     const scope = meta.scope;
     let package_name = meta.name;
     let client_name = default_client_name;
@@ -71,7 +82,7 @@ function resolveDependencies(lang, config, ast) {
     }
     // check package name duplication
     if (package_sets.indexOf(package_name.toLowerCase()) > 0) {
-      throw new Error(`The package name (${package_name}) has been defined in ${aliasId} dara package.`);
+      debug.stack(`The package name (${package_name}) has been defined in ${aliasId} dara package.`);
     }
     package_sets.push(package_name.toLowerCase());
 
@@ -120,6 +131,59 @@ function resolveAST(lang, config, type, ast, globalAST) {
   return objectItem;
 }
 
+function resolveObject(lang, config, ast, dependencies) {
+  const objects = [];
+
+  // combine client code
+  const clientObjectItem = resolveAST(lang, config, 'client', ast, ast);
+  objects.push(clientObjectItem);
+
+  // combine model code
+  ast.moduleBody.nodes.filter((item) => {
+    return item.type === 'model';
+  }).forEach((model) => {
+    const modelName = model.modelName.lexeme;
+    const modelObjectItem = resolveAST(lang, config, 'model', model, ast);
+    if (ast.models) {
+      Object.keys(ast.models).filter((key) => {
+        return key.startsWith(modelName + '.');
+      }).forEach((key) => {
+        const subModel = ast.models[key];
+        const subModelObjectItem = resolveAST(lang, config, 'model', subModel, ast);
+        modelObjectItem.subObject.push(subModelObjectItem);
+      });
+    }
+    objects.push(modelObjectItem);
+  });
+
+  const combinator = getCombinator(lang, config, dependencies);
+  combinator.combine(objects);
+  return objects;
+}
+
+function resolveLibraries(pkg_dir, dependencies) {
+  const lock = readLock(pkg_dir);
+  Object.keys(dependencies).forEach((pack) => {
+    const lib = dependencies[pack];
+    const libraries = lib.meta.libraries;
+    const basepath = path.join(pkg_dir, libraries.lock);
+    const meta = readMetafile(basepath);
+    if (meta.libraries && Object.keys(meta.libraries).length > 0) {
+      const obj = {};
+      Object.keys(meta.libraries).forEach(item => {
+        if (lock[meta.libraries[item]]) {
+          obj[meta.libraries[item]] = lock[meta.libraries[item]].replace('libraries/', '../');
+        }
+      });
+      fs.writeFileSync(path.join(basepath, '.libraries.json'), JSON.stringify(obj, null, 2));
+    }
+    // resolve sub package AST
+    let mainFilePath = path.join(basepath, meta.main);
+    const content = fs.readFileSync(mainFilePath, 'utf-8');
+    dependencies[pack].ast = DSL.parse(content, mainFilePath);
+  });
+}
+
 class Generator {
   constructor(meta = {}, lang = 'cpp') {
     if (!meta.outputDir) {
@@ -151,40 +215,16 @@ class Generator {
 
     // return objects;
     const dependencies = resolveDependencies(lang, config, ast);
+    if (config.advanced) {
+      resolveLibraries(config.pkgDir, dependencies);
+    }
     if (config.clientName) {
       config.client.name = config.clientName;
     }
     if (config.modelDirName) {
       config.model.dir = config.modelDirName;
     }
-
-    const objects = [];
-
-    // combine client code
-    const clientObjectItem = resolveAST(lang, config, 'client', ast, ast);
-    objects.push(clientObjectItem);
-
-    // combine model code
-    ast.moduleBody.nodes.filter((item) => {
-      return item.type === 'model';
-    }).forEach((model) => {
-      const modelName = model.modelName.lexeme;
-      const modelObjectItem = resolveAST(lang, config, 'model', model, ast);
-      if (ast.models) {
-        Object.keys(ast.models).filter((key) => {
-          return key.startsWith(modelName + '.');
-        }).forEach((key) => {
-          const subModel = ast.models[key];
-          const subModelObjectItem = resolveAST(lang, config, 'model', subModel, ast);
-          modelObjectItem.subObject.push(subModelObjectItem);
-        });
-      }
-      objects.push(modelObjectItem);
-    });
-
-    const combinator = getCombinator(lang, config, dependencies);
-    combinator.combine(objects);
-    return objects;
+    return resolveObject(lang, config, ast, dependencies);
   }
 }
 

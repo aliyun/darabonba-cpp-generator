@@ -26,6 +26,7 @@ const {
   ConstructItem,
   AnnotationItem,
   GrammerCall,
+  Grammer,
 } = require('../langs/common/items');
 
 let config = {};
@@ -53,6 +54,7 @@ const is = {
   func: a => a instanceof FuncItem,
   construct: a => a instanceof ConstructItem,
   annotation: a => a instanceof AnnotationItem,
+  grammer: a => a instanceof Grammer
 };
 
 function _config(langConfig = null) {

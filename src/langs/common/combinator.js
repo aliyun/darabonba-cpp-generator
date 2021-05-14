@@ -18,6 +18,7 @@ const {
   _config,
   _upperFirst,
   _lowerFirst,
+  is,
 } = require('../../lib/helper.js');
 
 class BaseCombinator {
@@ -81,11 +82,11 @@ class BaseCombinator {
       path_name = emit.output;
     } else {
       path_name = `${path_name}`;
-      if (path_name.indexOf('^') === 0) {
+      if (path_name.indexOf('^') === 0) { // Client
         path_name = this.addInclude(path_name.substr(1));
-      } else if (path_name.indexOf('#') === 0) {
+      } else if (path_name.indexOf('#') === 0) { // Model
         path_name = this.addModelInclude(path_name.substr(1));
-      } else if (path_name.indexOf('$') === 0) {
+      } else if (path_name.indexOf('$') === 0) { // System : Tea Core Class
         path_name = this.addInclude(path_name);
       }
     }
@@ -183,6 +184,15 @@ class BaseCombinator {
       emit.emitln(this.eol);
     }
     emitter = null;
+  }
+
+  gramRender(gram) {
+    if (!is.grammer(gram)) {
+      return '';
+    }
+    let emitter = new Emitter(this.config);
+    this.grammer(emitter, gram, false, false);
+    return emitter.output;
   }
 
   grammerNewLine(emitter, gram) {

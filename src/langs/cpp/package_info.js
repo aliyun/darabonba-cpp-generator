@@ -20,7 +20,7 @@ const { FuncItem } = require('../common/items');
 class PackageInfo extends BasePackageInfo {
   emit(objects) {
     this.project_name = `${_toSnakeCase(this.config.scope)}_${_toSnakeCase(this.config.name)}`;
-    const [object] = objects.filter(obj => obj.type === 'client');
+    const object = objects.find(obj => obj.type === 'client');
     this.client = object;
     this.imports = [];
     this.dependencies = _deepClone(this.dependencies);

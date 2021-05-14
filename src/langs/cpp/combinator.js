@@ -34,6 +34,7 @@ const {
   GrammerValue,
   GrammerCall,
   GrammerVar,
+  Grammer,
 
   BehaviorToMap,
 
@@ -1094,6 +1095,8 @@ class Combinator extends CombinatorBase {
           } else {
             path_name = pathName;
           }
+        } else if (path.name instanceof Grammer) {
+          path_name = super.resolveName(path.name);
         } else {
           path_name = `"${pathName}"`;
         }
@@ -1112,6 +1115,8 @@ class Combinator extends CombinatorBase {
           } else {
             path_name = pathName;
           }
+        } else if (path.name instanceof Grammer) {
+          path_name = super.resolveName(path.name);
         }
         if (isPointer) {
           prefix = `(*${prefix})[${path_name}]`;
@@ -1895,10 +1900,11 @@ class Combinator extends CombinatorBase {
     this.grammerCall(emit, behavior.call);
     this.pushInclude('map');
     let paths = behavior.call.path;
+    let key = super.resolveName(behavior.key);
     if (this.isPointerPath(paths.length - 1, paths)) {
-      emitter.emit(`${emit.output}->insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
+      emitter.emit(`${emit.output}->insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${key}", `, this.level);
     } else {
-      emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${behavior.key}", `, this.level);
+      emitter.emit(`${emit.output}.insert(pair<string, ${this.emitType(behavior.value.dataType)}>("${key}", `, this.level);
     }
     if (this.isPointerVar(behavior.value)) {
       emitter.emit('*');

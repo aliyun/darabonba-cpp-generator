@@ -43,7 +43,7 @@ Darabonba_Import::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
       })
 );
       shared_ptr<string> version = make_shared<string>(string("/") + string("2019-01-08") + string(*_pathname));
-      shared_ptr<string> mapAccess = make_shared<string>(_API["[object Object]"]);
+      shared_ptr<string> mapAccess = make_shared<string>(_API[version]);
       request_->protocol = *_protocol;
       request_->port = 80;
       request_->method = "GET";
@@ -51,7 +51,7 @@ Darabonba_Import::RuntimeObject Darabonba_Complex::Client::complex1(shared_ptr<C
       request_->query = Darabonba_Import::Client::query(Darabonba::Converter::mapPointer(Darabonba::Converter::merge(map<string, boost::any>({
         {"date", boost::any(string("2019"))},
         {"access", !mapAccess ? boost::any() : boost::any(*mapAccess)},
-        {"test", boost::any(string((*mapVal)["[object Object]"]))}
+        {"test", boost::any(string((*mapVal)["test"]))}
       }), !request->header ? map<string, boost::any>() : request->header.toMap())));
       request_->body = Darabonba::Converter::toStream(Darabonba_Import::Client::body());
       _lastRequest = request_;
@@ -98,7 +98,7 @@ map<string, boost::any> Darabonba_Complex::Client::Complex2(shared_ptr<ComplexRe
     {"version", "2019-01-08"},
     {"protocol", request_->protocol}
   }));
-  (*val)["[object Object]"];
+  (*val)["test"];
   request_->body = Darabonba::Converter::toStream(Darabonba_Import::Client::body());
   shared_ptr<Darabonba::Request> _lastRequest = request_;
   shared_ptr<Darabonba::Response> response_ = make_shared<Darabonba::Response>(Darabonba::Core::doAction(request_));
@@ -160,7 +160,7 @@ string Darabonba_Complex::Client::arrayAccess() {
     "b",
     "c"
   }));
-  shared_ptr<string> config = make_shared<string>((*configs)[[object Object]]);
+  shared_ptr<string> config = make_shared<string>((*configs)[0]);
   return *config;
 }
 
@@ -173,12 +173,12 @@ string Darabonba_Complex::Client::arrayAccess2() {
     })}
   })
 );
-  shared_ptr<string> config = make_shared<string>((*data)["configs"][[object Object]]);
+  shared_ptr<string> config = make_shared<string>((*data)["configs"][0]);
   return *config;
 }
 
 string Darabonba_Complex::Client::arrayAccess3(shared_ptr<ComplexRequest> request) {
-  shared_ptr<string> configVal = make_shared<string>((*request->configs->value)[[object Object]]);
+  shared_ptr<string> configVal = make_shared<string>((*request->configs->value)[0]);
   return *configVal;
 }
 
@@ -214,12 +214,12 @@ void Darabonba_Complex::Client::arrayAssign3(shared_ptr<ComplexRequest> request,
 }
 
 string Darabonba_Complex::Client::mapAccess(shared_ptr<ComplexRequest> request) {
-  shared_ptr<string> configInfo = make_shared<string>((*request->configs->extra)["[object Object]"]);
+  shared_ptr<string> configInfo = make_shared<string>((*request->configs->extra)["name"]);
   return *configInfo;
 }
 
 string Darabonba_Complex::Client::mapAccess2(shared_ptr<Darabonba_Import::Request> request) {
-  shared_ptr<string> configInfo = make_shared<string>((*request->configs->extra)["[object Object]"]);
+  shared_ptr<string> configInfo = make_shared<string>((*request->configs->extra)["name"]);
   return *configInfo;
 }
 
@@ -230,7 +230,7 @@ string Darabonba_Complex::Client::mapAccess3() {
     })}
   })
 );
-  return (*data)["configs"]["[object Object]"];
+  return (*data)["configs"]["value"];
 }
 
 void Darabonba_Complex::Client::mapAssign(shared_ptr<ComplexRequest> request, shared_ptr<string> name) {

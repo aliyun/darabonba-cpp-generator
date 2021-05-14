@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.7 2021-05-14
+
+- Fix access map.
+
 ## 1.0.6 2021-04-06
 
 - Fix Model self-reference.

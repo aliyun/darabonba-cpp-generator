@@ -16,7 +16,7 @@ vector<string> arrayData() {
 
 string arrayAccess() {
   shared_ptr<vector<string>> configs = make_shared<vector<string>>(arrayData());
-  shared_ptr<string> config = make_shared<string>((*configs)[[object Object]]);
+  shared_ptr<string> config = make_shared<string>((*configs)[0]);
   return *config;
 }
 

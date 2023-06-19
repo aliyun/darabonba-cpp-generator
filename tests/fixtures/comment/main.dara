@@ -12,7 +12,7 @@ type @a = [ string  ]
 */
 model Test1{
   test: string(description='test desc', name='test'), //model的test back comment
-  test2: string(description='test2 desc', name='test2', deprecated=true), //model的test2 back comment
+  test2: string(description='test2 desc', name='test2'), //model的test2 back comment
 }
 
 /**
@@ -29,13 +29,8 @@ model Test2{
   TestModel3
 */
 model Test3{
-  // model的test front comment
-  test: string(description='test desc', name='test'),
-
   // empty comment1
   // empy comment2
-
-  test1: string(description='test desc', name='test1'), //model的test back comment
 }
 
 /**
@@ -79,7 +74,7 @@ api testAPI(): void {
   staticFunc();
 } returns {
   // static async function call
-  testFunc('test',true);
+  testFunc();
   // return comment
    return;
 } runtime {
@@ -119,12 +114,9 @@ static function staticFunc(): void{
 }
 
 /**
-  * testFunc
-  * @param str description: string parameter
-  * @param val description: boolean parameter
-  * @return description for return
-  */
-static async function testFunc(str: string, val: boolean): void {
+  testFunc
+*/
+static async function testFunc(): void {
     // empty comment1
     // empty comment2
 }

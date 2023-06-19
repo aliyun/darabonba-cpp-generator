@@ -42,6 +42,10 @@ static async function print(reqeust: $Request, reqs: [ ComplexRequest ], respons
 api complex1(request: ComplexRequest, client: Source): Source.RuntimeObject {
   var name = 'complex';
   var mapVal = {test="ok"};
+  var moduleModelMapVal: map[string] Source.RuntimeObject = {};
+  var moduleMapVal: map[string] Source = {};
+  var modelMapVal: map[string] ComplexRequest = {};
+  var subModelMapVal: map[string] ComplexRequest.header = {};
   var version = `/${__module.version}${@pathname}`;
   var mapAccess = @API[version];
   __request.protocol = @protocol;
@@ -85,8 +89,9 @@ api Complex2(request: ComplexRequest, str: [ string ], val: map[string]string): 
     protocol = __request.protocol,
 
   });
-  val["test"];
   __request.body = Source.body();
+} returns {
+  return {};
 }
 
 api Complex3(request: ComplexRequest): ComplexRequest {
@@ -117,6 +122,11 @@ api Complex3(request: ComplexRequest): ComplexRequest {
   };
 }
 
+
+static function subConf(conf: Source.Request.configs): Source.Request.configs.subConf {
+  return conf.subConf;
+}
+
 static function array0(req: object): [ any ] {
   return [];
 }
@@ -142,10 +152,6 @@ static function arrayAccess2(): string {
 static function arrayAccess3(request: ComplexRequest): string {
   var configVal = request.configs.value[0];
   return configVal;
-}
-
-static function arrayAccess4(request: ComplexRequest, config: string, index: int16): void {
-  request.configs.value[index] = config;
 }
 
 static function arrayAssign(config: string): [ string ] {

@@ -1,85 +1,80 @@
 import Source;
 
-model M = {
+model M {
   subM: {}
-};
-
-model Class = {};
-
-model useBeforeDefineModel = {
-  m: MyModel,
-  subModel: {
-    useBeforeDefineModel: UseBeforeDefineModelOnSubModel
-  }
-};
-
-model UseBeforeDefineModelOnSubModel = {
-  m: MyModel,
 }
 
-model ComplexStruct {
-  aa?: string(name='aa', description='aaa'),
-  bb?: float(name='bb', description='b'),
-  cc?: SimpleStruct(name='cc'),
-  dd?: ComplexStruct(name='dd'),
-  ee?: TestType(name='ee'),
-}
-
-model SimpleStruct {
-  aa?: string(name='aa', description='a'),
-  bb?: float(name='bb', description='b'),
-}
-
-model TestType {
-  a?: float(name='a', description='aa'),
-  b?: [ 
-    {
-      c?: string(name='c', description='c'),
-    }
-  ](name='b', description='b'),
-}
-
-model MyModel = {
-  // keyword property
-  delete: string(name='Delete'),
+model MyModel {
   stringfield: string,
   bytesfield: bytes,
   stringarrayfield: [ string ],
   mapfield: map[string]string,
   name: string(name='realName'),
   submodel: {
-    stringfield: string,
+    stringfield: string
   },
-  submodelMap: map[string]MyModel.submodel,
-  mapModel: map[string]M,
-  subarraymodel: [ {} ],
+  subarraymodel: [
+    {
+    }
+  ],
+  longSubmodelTest: {
+    longSubmodelTest1: {
+      longSubmodelTest2: {
+        longSubmodelTest3: {
+          longSubmodelTest4: {
+            longSubmodelTest5: {
+              longSubmodelTest5: {
+                longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxSubmodelTest5: {
+                  stringfield: string,
+                  copy: {
+                    stringfield: string,
+                  }
+                },
+                longSubmodelTest5: {
+                  stringfield: string,
+                  copy: {
+                    stringfield: string,
+                  }
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   subarray: [ M ],
-  selfArray: [ MyModel ],
   maparray: [ map[string]any ],
+  modelArrayMap: map[string][ M ],
   moduleModelMap: map[string]Source.Request,
+  moduleModelArrayMap: map[string][ Source.Request ],
   subModelMap: map[string]M.subM,
   modelMap: map[string]M,
   moduleMap: map[string]Source,
   object: object,
+  numberfield: integer,
+  floatfield: float,
+  doublefield: double,
+  longfield: long,
   readable: readable,
-  writable: writable,
-  existModel: M,
   request: $Request,
-  complexList: [ [ string ] ],
-  complexMap: [ map[string]MyModel.submodel ],
-  numberfield: number,
-  integerField: integer,
-  floatField: float,
-  doubleField: double,
-  longField: long,
-  ulongField: ulong,
-  int8Field: int8,
-  int16Field: int16,
-  int32Field: int32,
-  int64Field: int64,
-  uint8Field: uint8,
-  uint16Field: uint16,
-  uint32Field: uint32,
-  uint64Field: uint64,
-  numberPattern?: int64(name='pattern', default=50, description='pattern', example=10, format='int64', maximum=100, minimum=0, pattern='[0-9]{1,3}'),
+  existModel: M,
+  moduleField: Source,
+  complexList: [ [ [ string ] ] ]
+};
+
+model INT = {
+  int8: int8,
+  uint8: uint8,
+  int16: int16,
+  uint16: uint16,
+  int32: int32,
+  uint32: uint32,
+  int64: int64,
+  uint64: uint64,
+  float: float,
+  double: double,
+  long: long,
+  number: number,
+  integer: integer,
 };

@@ -1,0 +1,83 @@
+
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+project(<% name %> VERSION "<% version %>")
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< General set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}_build")
+SET(CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}" "_d.dylib")
+message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
+
+if (CMAKE_CXX_COMPILER_LOADED)
+    message(STATUS "The C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
+    message(STATUS "The C++ compiler version is: ${CMAKE_CXX_COMPILER_VERSION}")
+endif ()
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif ()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Target set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #=
+set(headers
+        <% header %>)
+add_executable(${PROJECT_NAME}
+        <% source %>
+        ${headers})
+target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set_target_properties(${PROJECT_NAME}
+        PROPERTIES
+        POSITION_INDEPENDENT_CODE 1
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        OUTPUT_NAME "${PROJECT_NAME}"
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/exec/"
+        DEBUG_POSTFIX "_d"
+        PUBLIC_HEADER "${headers}"
+        MACOSX_RPATH ON
+        WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
+add_subdirectory(external)
+find_library(CURL_LIB curl)
+find_library(DARABONBA_CORE_LIB darabonba_core ${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
+<% dependencies %>
+if(CMAKE_HOST_WIN32)
+  ExternalProject_Get_Property(curl INSTALL_DIR)
+    set(curl_install_dir ${INSTALL_DIR})
+    add_dependencies(${PROJECT_NAME}
+            curl)
+    target_include_directories(${PROJECT_NAME}
+            PRIVATE	${curl_install_dir}/include)
+    target_link_libraries(${PROJECT_NAME}
+            Crypt32
+            Rpcrt4
+            Ws2_32
+            debug ${curl_install_dir}/lib/libcurl-d.lib
+            optimized ${curl_install_dir}/lib/libcurl.lib
+            <% WIN32_LIBS %>
+            )
+    target_compile_definitions(${PROJECT_NAME}
+            PRIVATE CURL_STATICLIB
+            _CRT_SECURE_NO_WARNINGS)
+elseif(APPLE)
+  find_library(CFLIB CoreFoundation)
+  <% dependencies %>
+  find_library(UTIL_LIB <% name %> ${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
+  target_link_libraries(${PROJECT_NAME} 
+      ${CFLIB}
+      ${CURL_LIB} 
+      ${DARABONBA_CORE_LIB}
+      <% LIBS %>)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE GUID_CFUUID)
+else()
+  target_link_libraries(${PROJECT_NAME} 
+      ${CURL_LIB} 
+      ${DARABONBA_CORE_LIB}
+      <% LIBS %>)
+endif()

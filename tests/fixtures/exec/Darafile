@@ -1,7 +1,0 @@
-{
-  "scope": "darabonba",
-  "name": "exec",
-  "version": "0.0.1",
-  "main": "./main.dara",
-  "exec": true
-}

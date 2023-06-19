@@ -2,14 +2,14 @@
   "name": "@darabonba/cpp-generator",
   "version": "1.0.7",
   "description": "The SDK generator for C++",
-  "main": "src/generator",
+  "main": "lib/generator",
   "directories": {
     "lib": "src"
   },
   "scripts": {
     "lint": "eslint --fix src/ tests/",
-    "test": "mocha --reporter spec --timeout 3000 tests/*.tests.js",
-    "test-cov": "nyc -r=lcov -r=html -r=text -r=json mocha -t 3000 -R spec tests/*.tests.js",
+    "test": "mocha --reporter spec --timeout 3000 tests/*.test.js",
+    "test-cov": "nyc -r=lcov -r=html -r=text -r=json mocha -t 3000 -R spec tests/*.test.js",
     "ci": "npm run lint && npm run test-cov && codecov"
   },
   "repository": {
@@ -19,8 +19,7 @@
   "author": "Alibaba Cloud OpenAPI Team",
   "license": "Apache-2.0",
   "dependencies": {
-    "@darabonba/parser": "^1.2",
-    "enum": "^3"
+    "@darabonba/parser": "^1.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",

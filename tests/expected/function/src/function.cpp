@@ -19,7 +19,9 @@ map<string, string> Darabonba_Function::Client::helloMap() {
   shared_ptr<map<string, string>> m = make_shared<map<string, string>>(map<string, string>());
   return Darabonba::Converter::merge(map<string, string>({
     {"key", "value"},
-    {"key-1", "value-1"}
+    {"key-1", "value-1"},
+    {"key-2", "value-2"},
+    {"\"\"", "value-3"}
   }), !m ? map<string, string>() : *m);
 }
 

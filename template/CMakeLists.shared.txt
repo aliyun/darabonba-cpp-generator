@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(<% name %> VERSION "<% version %>")
+project(<% name %> VERSION "1.0.0")
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< General set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 set(CMAKE_CXX_STANDARD 11)
@@ -23,15 +23,17 @@ endif ()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Target set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #=
-set(headers
-        <% header %>)
-add_library(${PROJECT_NAME}
-        SHARED
-        <% source %>
-        ${headers})
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+set(SOURCE_FILES
+        <% source %>)
+
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+        
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 set_target_properties(${PROJECT_NAME}
         PROPERTIES
         POSITION_INDEPENDENT_CODE 1
@@ -44,9 +46,8 @@ set_target_properties(${PROJECT_NAME}
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< External set up >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 add_subdirectory(external)
+find_package(OpenSSL REQUIRED)
 find_library(CURL_LIB curl)
-find_library(DARABONBA_CORE_LIB darabonba_core ${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
-<% dependencies %>
 if(CMAKE_HOST_WIN32)
   ExternalProject_Get_Property(curl INSTALL_DIR)
     set(curl_install_dir ${INSTALL_DIR})
@@ -55,31 +56,33 @@ if(CMAKE_HOST_WIN32)
     target_include_directories(${PROJECT_NAME}
             PRIVATE	${curl_install_dir}/include)
     target_link_libraries(${PROJECT_NAME}
+            OpenSSL::SSL OpenSSL::Crypto
             Crypt32
             Rpcrt4
             Ws2_32
             debug ${curl_install_dir}/lib/libcurl-d.lib
             optimized ${curl_install_dir}/lib/libcurl.lib
-            darabonba_core ${CMAKE_CURRENT_SOURCE_DIR}/deps/lib/libdarabonba_core.lib
-            <% WIN32_LIBS %>
+            darabonba_core
+            <% LIBS %>
             )
     target_compile_definitions(${PROJECT_NAME}
             PRIVATE CURL_STATICLIB
             _CRT_SECURE_NO_WARNINGS)
 elseif(APPLE)
   find_library(CFLIB CoreFoundation)
-  <% dependencies %>
   find_library(UTIL_LIB <% name %> ${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
   target_link_libraries(${PROJECT_NAME} 
+      OpenSSL::SSL OpenSSL::Crypto
       ${CFLIB}
       ${CURL_LIB} 
-      ${DARABONBA_CORE_LIB}
+      darabonba_core
       <% LIBS %>)
   target_compile_definitions(${PROJECT_NAME} PRIVATE GUID_CFUUID)
 else()
   target_link_libraries(${PROJECT_NAME} 
+      OpenSSL::SSL OpenSSL::Crypto
       ${CURL_LIB} 
-      ${DARABONBA_CORE_LIB}
+      darabonba_core
       <% LIBS %>)
 endif()
 

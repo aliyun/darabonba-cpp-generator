@@ -1,80 +1,84 @@
 import Source;
 
-model M {
+model M = {
   subM: {}
+};
+
+model Class = {};
+
+exception MainFile extends $Error {
+  size: number,
+  data: map[string]model,
+  model: {
+    str: string,
+    model: {
+      str: string
+    },
+  }
 }
 
-model MyModel {
+model MoMValues = {
+  name: string,
+}
+
+model MyModel = {
+  model: {
+    str: string,
+    model: {
+      str: string
+    },
+  },
   stringfield: string,
   bytesfield: bytes,
   stringarrayfield: [ string ],
   mapfield: map[string]string,
   name: string(name='realName'),
   submodel: {
-    stringfield: string
-  },
-  subarraymodel: [
-    {
-    }
-  ],
-  longSubmodelTest: {
-    longSubmodelTest1: {
-      longSubmodelTest2: {
-        longSubmodelTest3: {
-          longSubmodelTest4: {
-            longSubmodelTest5: {
-              longSubmodelTest5: {
-                longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxSubmodelTest5: {
-                  stringfield: string,
-                  copy: {
-                    stringfield: string,
-                  }
-                },
-                longSubmodelTest5: {
-                  stringfield: string,
-                  copy: {
-                    stringfield: string,
-                  }
-                },
-              },
-            },
-          },
-        },
-      },
+    stringfield: string,
+    model: {
+      str: string
     },
   },
+  submodelMap: map[string]MyModel.submodel,
+  mapModel: map[string]M,
+  subarraymodel: [ {} ],
   subarray: [ M ],
+  ssubarray: [[ M ]],
+  ssubmarray: [[ Source ]],
+  sssubmarray: [[ Source ]],
+  ssubmmarray: [[ Source.Request ]],
+  sssubmmarray: [[[ Source.Request ]]],
   maparray: [ map[string]any ],
-  modelArrayMap: map[string][ M ],
+  mapsubmarray: [ map[string]Source ],
   moduleModelMap: map[string]Source.Request,
-  moduleModelArrayMap: map[string][ Source.Request ],
+  arrModuleModelMap: [ map[string]Source.Request ],
+  arrsModuleModelMap: [[ map[string]Source.Request ]],
   subModelMap: map[string]M.subM,
   modelMap: map[string]M,
   moduleMap: map[string]Source,
   object: object,
-  numberfield: integer,
-  floatfield: float,
-  doublefield: double,
-  longfield: long,
   readable: readable,
-  request: $Request,
+  writable: writable,
   existModel: M,
-  moduleField: Source,
-  complexList: [ [ [ string ] ] ]
+  request: $Request,
+  complexList: [ [ string ] ],
+  numberfield: number,
+  integerField: integer,
+  floatField: float,
+  doubleField: double,
+  longField: long,
+  ulongField: ulong,
+  int8Field: int8,
+  int16Field: int16,
+  int32Field: int32,
+  int64Field: int64,
+  uint8Field: uint8,
+  uint16Field: uint16,
+  uint32Field: uint32,
+  uint64Field: uint64,
+  link?: string(name='link', example='http://*/*.png'),
 };
 
-model INT = {
-  int8: int8,
-  uint8: uint8,
-  int16: int16,
-  uint16: uint16,
-  int32: int32,
-  uint32: uint32,
-  int64: int64,
-  uint64: uint64,
-  float: float,
-  double: double,
-  long: long,
-  number: number,
-  integer: integer,
-};
+model model = {
+  str: string
+}

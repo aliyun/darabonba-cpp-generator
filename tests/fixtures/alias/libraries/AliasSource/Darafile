@@ -1,0 +1,26 @@
+{
+  "scope": "alibabacloud",
+  "name": "aliasSource",
+  "version": "0.0.1",
+  "main": "./main.dara",
+  "cpp": {
+    "namespace": "AliasSource",
+    "header": "darabonba/alias/source.hpp",
+    "className": "SourceClient"
+  },
+  "python": {
+    "package": "alias_source",
+    "clientName": "source_client",
+    "modelDirName": "Models"
+  },
+  "python2": {
+    "package": "alias_source",
+    "clientName": "source_client",
+    "modelDirName": "Models"
+  },
+  "releases": {
+    "cpp": "source:0.0.1",
+    "python": "source:0.0.1",
+    "python2": "source2:0.0.1"
+  }
+}

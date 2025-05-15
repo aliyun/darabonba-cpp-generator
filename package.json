@@ -1,6 +1,6 @@
 {
   "name": "@darabonba/cpp-generator",
-  "version": "1.0.7",
+  "version": "2.0.0-beta.10",
   "description": "The SDK generator for C++",
   "main": "lib/generator",
   "directories": {
@@ -19,7 +19,7 @@
   "author": "Alibaba Cloud OpenAPI Team",
   "license": "Apache-2.0",
   "dependencies": {
-    "@darabonba/parser": "^1.2"
+    "@darabonba/parser": "^2.1.9"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -34,11 +34,8 @@
     "pre-commit": "^1.2.2",
     "sinon": "^9.0.2"
   },
-  "pre-commit": {
-    "silent": false,
-    "run": [
-      "lint",
-      "test-cov"
-    ]
-  }
+  "files": [
+    "lib",
+    "template"
+  ]
 }

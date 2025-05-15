@@ -9,12 +9,7 @@
   "csharp": {
     "namespace": "Darabonba.import"
   },
-  "cpp": {
-    "namespace": "TestSource",
-    "header": "darabonba/source.hpp",
-    "className": "Source"
-  },
   "releases": {
-    "cpp": "darabonba/test:*"
+    "go": "github.com/aliyun/darabonba-go-generator/test"
   }
 }

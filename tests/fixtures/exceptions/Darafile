@@ -5,10 +5,5 @@
   "main": "./main.dara",
   "libraries": {
     "Source": "darabonba:Import:*"
-  },
-  "cpp": {
-    "namespace": "Darabonba::Test",
-    "header": "darabonba/model.hpp",
-    "className": "TestModel"
-}
+  }
 }

@@ -7,6 +7,7 @@ const assert = require('assert');
 const DSL = require('@darabonba/parser');
 
 let Generator = require('../lib/generator');
+const { release } = require('os');
 
 function check(mainFilePath, outputDir, expectedPath, pkgInfo = {}) {
   const generator = new Generator({
@@ -14,6 +15,7 @@ function check(mainFilePath, outputDir, expectedPath, pkgInfo = {}) {
     namespace: 'Darabonba',
     header: 'darabonba/test.hpp',
     cpp: {},
+    release: { cpp: 'darabonba/test:1.0.0' },
     ...pkgInfo
   });
 
@@ -31,7 +33,7 @@ describe('new Generator', function() {
       new Generator({});
     }, function(err) {
       assert.deepStrictEqual(err.message, 'Darafile -> cpp -> header should not empty, please add cpp option into Darafile.example:\n' +
-      '"cpp": {"header": "darabonba/core.hpp", "namespace": "Darabonba"}');
+      '"cpp": {"header": "darabonba/core.hpp", "namespace": "DARABONBA"}');
       return true;
     });
   });
@@ -56,7 +58,34 @@ describe('new Generator', function() {
   it('one api should ok', function () {
     const outputDir = path.join(__dirname, 'output/api');
     const mainFilePath = path.join(__dirname, 'fixtures/api/main.dara');
-    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/api/client.ts'));
+    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/api/Darafile'), 'utf8');
+    const pkg = JSON.parse(pkgContent);
+    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/api/client.ts'), {
+      pkgDir: path.join(__dirname, 'fixtures/api'),
+      ...pkg
+    });
+  });
+
+  it('alias should ok', function () {
+    const outputDir = path.join(__dirname, 'output/alias');
+    const mainFilePath = path.join(__dirname, 'fixtures/alias/main.dara');
+    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/alias/Darafile'), 'utf8');
+    const pkg = JSON.parse(pkgContent);
+    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/api/client.ts'), {
+      pkgDir: path.join(__dirname, 'fixtures/alias'),
+      ...pkg
+    });
+  });
+
+  it('builtin should ok', function () {
+    const outputDir = path.join(__dirname, 'output/builtin');
+    const mainFilePath = path.join(__dirname, 'fixtures/builtin/main.dara');
+    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/builtin/Darafile'), 'utf8');
+    const pkg = JSON.parse(pkgContent);
+    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/api/client.ts'), {
+      pkgDir: path.join(__dirname, 'fixtures/builtin'),
+      ...pkg
+    });
   });
 
   it('one function should ok', function () {
@@ -112,6 +141,17 @@ describe('new Generator', function() {
     const pkg = JSON.parse(pkgContent);
     check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/comment/client.ts'), {
       pkgDir: path.join(__dirname, 'fixtures/comment'),
+      ...pkg
+    });
+  });
+
+  it('multi should ok', function () {
+    const outputDir = path.join(__dirname, 'output/multi');
+    const mainFilePath = path.join(__dirname, 'fixtures/multi/main.dara');
+    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/multi/Darafile'), 'utf8');
+    const pkg = JSON.parse(pkgContent);
+    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/api/client.ts'), {
+      pkgDir: path.join(__dirname, 'fixtures/multi'),
       ...pkg
     });
   });

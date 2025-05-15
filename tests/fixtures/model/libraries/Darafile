@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "main": "./import.dara",
   "cpp": {
-    "namespace": "Test",
+    "namespace": "TestSource",
     "header": "darabonba/source.hpp",
     "className": "Source"
   },
@@ -12,6 +12,6 @@
     "namespace": "Darabonba.import"
   },
   "releases": {
-    "ts": "@scope/name:*"
+    "cpp": "darabonba/test:*"
   }
 }

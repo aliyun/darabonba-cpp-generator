@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.0.8 2025-01-13
+
+- Adjust field name for object.
+
 ## 1.0.7 2021-05-14
 
 - Fix access map.

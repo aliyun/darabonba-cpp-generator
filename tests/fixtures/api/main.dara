@@ -1,10 +1,10 @@
 init();
-
 api hello(): void {
   __request.method = 'GET';
   __request.pathname = '/';
   __request.headers = {
     host = 'www.test.com',
+    Cookie = "test",
   };
 } returns {
   return;
@@ -15,6 +15,7 @@ api helloRuntime(): void {
   __request.pathname = '/';
   __request.headers = {
     host = 'www.test.com',
+    Cookie = "test",
   };
 } returns {
   return;

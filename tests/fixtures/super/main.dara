@@ -1,7 +1,0 @@
-import Source;
-
-extends Source;
-
-init(config: Source.Config){
-  super(config);
-}

@@ -2,5 +2,19 @@
   "scope": "darabonba",
   "name": "import",
   "version": "0.0.1",
-  "main": "./import.dara"
+  "main": "./import.dara",
+  "java": {
+    "package": "com.import"
+  },
+  "csharp": {
+    "namespace": "Darabonba.import"
+  },
+  "cpp": {
+    "namespace": "TestSource",
+    "header": "darabonba/source.hpp",
+    "className": "Source"
+  },
+  "releases": {
+    "cpp": "darabonba/test:*"
+  }
 }

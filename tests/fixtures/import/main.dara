@@ -1,20 +1,17 @@
 import Source;
+import LocalSource;
 
 type @id = [ string ];
-type @str = string;
+type @STR = string;
 
 init(id: [ string ], str: string) {
     @id = id;
-    @str = str;
-    throw {
-        code = 'SomeError',
-        messge = 'ErrorMessage'
-    };
+    @STR = str;
 }
 
 static function Sample(client: Source): void {
     var runtime = new Source.RuntimeObject{};
-    var request = new Source.Request{
+    var request = new LocalSource.Request{
         accesskey = "accesskey",
         region = "region",
     };

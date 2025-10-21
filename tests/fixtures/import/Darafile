@@ -1,9 +1,10 @@
 {
   "scope": "darabonba",
-  "name": "import",
+  "name": "main",
   "version": "0.0.1",
   "main": "./main.dara",
   "libraries": {
-    "Source": "darabonba:Source:*"
+    "Source": "darabonba:Import:*",
+    "LocalSource": "./localLib"
   }
 }

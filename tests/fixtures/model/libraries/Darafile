@@ -3,13 +3,15 @@
   "name": "import",
   "version": "0.0.1",
   "main": "./import.dara",
-  "java": {
-    "package": "com.import"
+  "cpp": {
+    "namespace": "TestSource",
+    "header": "darabonba/source.hpp",
+    "className": "Source"
   },
   "csharp": {
     "namespace": "Darabonba.import"
   },
   "releases": {
-    "ts": "@scope/name:*"
+    "cpp": "darabonba/test:*"
   }
 }

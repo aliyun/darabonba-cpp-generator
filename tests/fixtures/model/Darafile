@@ -1,9 +1,14 @@
 {
   "scope": "darabonba",
-  "name": "model",
+  "name": "main",
   "version": "0.0.1",
   "main": "./main.dara",
   "libraries": {
     "Source": "darabonba:Import:*"
-  }
+  },
+  "cpp": {
+    "namespace": "Darabonba::Test",
+    "header": "darabonba/model.hpp",
+    "className": "TestModel"
+}
 }

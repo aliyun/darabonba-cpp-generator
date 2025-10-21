@@ -1,4 +1,0 @@
-@PACKAGE_INIT@
-
-include("${CMAKE_CURRENT_LIST_DIR}/darabonba_execTargets.cmake")
-check_required_components("darabonba_exec")

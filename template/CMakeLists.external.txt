@@ -1,0 +1,21 @@
+find_package(<% name %> QUIET)
+
+if(<% name %>_FOUND)
+  message(STATUS "Found <% name %> version ${<% name %>_VERSION}")
+else()
+  message(STATUS "<% name %> could not be located, Building <% name %> instead.")
+  include(FetchContent)
+
+  FetchContent_Declare(
+    _<% name %>
+    GIT_REPOSITORY <% link %>
+    GIT_TAG <% version %>
+    CMAKE_ARGS
+      -DENABLE_UNIT_TESTS:BOOL="0")
+
+  FetchContent_MakeAvailable(_<% name %>)
+  message(STATUS "Added <% name %> source : ${_<% name %>_SOURCE_DIR}")
+  message(STATUS "Added <% name %> binary : ${_<% name %>_BINARY_DIR}")
+
+  target_include_directories(${PROJECT_NAME} PRIVATE "${_<% name %>_SOURCE_DIR}/include")
+endif()

@@ -4,9 +4,14 @@
 	"version": "0.2.10",
 	"main": "./main.dara",
 	"releases": {
-		"go": "darabonba.com/multi/client:v1.0.0"
+		"go": "darabonba.com/multi/client:v1.0.0",
+		"cpp": "darabonba/test:1.0.0"
 	},
 	"libraries": {
 		"DARAUtil": "darabonba:Util:*"
+	},
+	"cpp": {
+		"namespace": "Darabonba",
+		"header": "darabonba/test.hpp"
 	}
 }

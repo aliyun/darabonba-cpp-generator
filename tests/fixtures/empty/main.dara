@@ -1,0 +1,6 @@
+model ModelEmpty = {
+  name: string,
+  str: string,
+  num: number,
+  bool: boolean,
+}

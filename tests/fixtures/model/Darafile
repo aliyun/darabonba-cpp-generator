@@ -10,5 +10,8 @@
     "namespace": "Darabonba::Test",
     "header": "darabonba/model.hpp",
     "className": "TestModel"
-}
+  },
+  "releases": {
+    "cpp": "darabonba/model:1.0.0"
+  }
 }

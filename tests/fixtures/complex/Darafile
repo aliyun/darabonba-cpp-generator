@@ -5,5 +5,12 @@
   "main": "./main.dara",
   "libraries": {
     "Source": "darabonba:Import:*"
+  },
+  "cpp": {
+    "namespace": "Darabonba",
+    "header": "darabonba/test.hpp"
+  },
+  "releases": {
+    "cpp": "darabonba/test:1.0.0"
   }
 }

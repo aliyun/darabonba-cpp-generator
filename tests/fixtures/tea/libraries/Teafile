@@ -15,6 +15,7 @@
     "namespace": "Darabonba.import"
   },
   "releases": {
-    "ts": "@scope/module:*"
+    "ts": "@scope/module:*",
+    "cpp": "darabonba_source:1.0.0"
   }
 }

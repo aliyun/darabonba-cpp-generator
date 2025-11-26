@@ -2,5 +2,13 @@
   "scope": "alibabacloud",
   "name": "main",
   "version": "0.0.1",
-  "main": "./main.dara"
+  "main": "./main.dara",
+  "libraries": {},
+  "cpp": {
+    "namespace": "Darabonba",
+    "header": "darabonba/test.hpp"
+  },
+  "releases": {
+    "cpp": "darabonba/test:1.0.0"
+  }
 }

@@ -1,0 +1,15 @@
+{
+  "scope": "darabonba",
+  "name": "main",
+  "version": "0.0.1",
+  "main": "./main.dara",
+  "libraries": {},
+  "cpp": {
+    "namespace": "Darabonba::Test",
+    "header": "darabonba/empty.hpp",
+    "className": "TestEmpty"
+  },
+  "releases": {
+    "cpp": "darabonba/empty:1.0.0"
+  }
+}

@@ -6,5 +6,12 @@
   "libraries": {
     "Source": "darabonba:Import:*",
     "LocalSource": "./localLib"
+  },
+  "cpp": {
+    "namespace": "Darabonba",
+    "header": "darabonba/test.hpp"
+  },
+  "releases": {
+    "cpp": "darabonba/test:1.0.0"
   }
 }

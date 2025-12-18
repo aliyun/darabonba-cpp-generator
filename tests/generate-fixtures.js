@@ -76,7 +76,18 @@ const testCases = [
     name: 'tea',
     mainFile: 'main.tea',
     configFile: 'Teafile'
+  },
+  {
+    name: 'nested',
+    mainFile: 'main.dara',
+    configFile: 'Darafile'
   }
+  // exceptions测试用例需要复杂的依赖配置，暂时跳过
+  // {
+  //   name: 'exceptions',
+  //   mainFile: 'main.dara',
+  //   configFile: 'Darafile'
+  // }
 ];
 
 function generateFixture(testCase) {

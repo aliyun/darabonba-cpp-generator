@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/_nested-testTargets.cmake")
+check_required_components("_nested-test")

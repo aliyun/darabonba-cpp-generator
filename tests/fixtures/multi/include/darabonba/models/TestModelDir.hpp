@@ -47,7 +47,7 @@ namespace Models
     inline     const Darabonba::Json & a() const { DARABONBA_GET(a_) };
     Darabonba::Json & a() { DARABONBA_GET(a_) };
     inline TestModelDIR& setA(const Darabonba::Json & a) { DARABONBA_SET_VALUE(a_, a) };
-    inline TestModelDIR& setA(Darabonba::Json & a) { DARABONBA_SET_RVALUE(a_, a) };
+    inline TestModelDIR& setA(Darabonba::Json && a) { DARABONBA_SET_RVALUE(a_, a) };
 
 
   protected:

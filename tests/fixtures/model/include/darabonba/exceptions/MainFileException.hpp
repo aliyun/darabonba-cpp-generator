@@ -34,9 +34,9 @@ namespace Exceptions
     inline const Darabonba::Test::Models::MainFileModel & model() const { DARABONBA_PTR_GET_CONST(model_, Darabonba::Test::Models::MainFileModel) };
     inline Darabonba::Test::Models::MainFileModel model() { DARABONBA_PTR_GET(model_, Darabonba::Test::Models::MainFileModel) };
   protected:
-    std::shared_ptr<int64_t> size_ = nullptr;
-    std::shared_ptr<map<string, Darabonba::Test::Models::Model>> data_ = nullptr;
-    std::shared_ptr<Darabonba::Test::Models::MainFileModel> model_ = nullptr;
+    shared_ptr<int64_t> size_ {};
+    shared_ptr<map<string, Darabonba::Test::Models::Model>> data_ {};
+    shared_ptr<Darabonba::Test::Models::MainFileModel> model_ {};
   };
   
   } // namespace Exceptions

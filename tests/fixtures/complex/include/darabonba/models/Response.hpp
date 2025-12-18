@@ -33,14 +33,14 @@ namespace Models
     // instance Field Functions 
     bool hasInstance() const { return this->instance_ != nullptr;};
     void deleteInstance() { this->instance_ = nullptr;};
-    inline const ComplexRequestPart & instance() const { DARABONBA_PTR_GET_CONST(instance_, ComplexRequestPart) };
-    inline ComplexRequestPart instance() { DARABONBA_PTR_GET(instance_, ComplexRequestPart) };
+    inline const ComplexRequestPart & getInstance() const { DARABONBA_PTR_GET_CONST(instance_, ComplexRequestPart) };
+    inline ComplexRequestPart getInstance() { DARABONBA_PTR_GET(instance_, ComplexRequestPart) };
     inline Response& setInstance(const ComplexRequestPart & instance) { DARABONBA_PTR_SET_VALUE(instance_, instance) };
     inline Response& setInstance(ComplexRequestPart && instance) { DARABONBA_PTR_SET_RVALUE(instance_, instance) };
 
 
   protected:
-    std::shared_ptr<ComplexRequestPart> instance_ = nullptr;
+    shared_ptr<ComplexRequestPart> instance_ {};
   };
 
   } // namespace Models

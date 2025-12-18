@@ -20,7 +20,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
     {"host" , "www.test.com"}
   }).get<map<string, string>>());
   if (true) {
-    request_.addHeader("host", "www.test2.com");
+    request_.getHeaders()["host"] = "www.test2.com";
   }
 
   auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);
@@ -34,7 +34,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
 
   Client::helloIf();
   !false;
-  string a = nullptr;
+  string a = "";
   a = "string";
   return ;
 }
@@ -69,7 +69,7 @@ void Client::helloWhile() {
 
 void Client::helloDeclare() {
   string hello = "world";
-  string helloNull = nullptr;
+  string helloNull = "";
   hello = "\"hehe\":\"\"";
 }
 } // namespace Darabonba

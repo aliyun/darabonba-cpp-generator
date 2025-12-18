@@ -25,7 +25,7 @@ namespace Exceptions
     inline const map<string, string> & data() const { DARABONBA_PTR_GET_CONST(data_, map<string, string>) };
     inline map<string, string> data() { DARABONBA_PTR_GET(data_, map<string, string>) };
   protected:
-    std::shared_ptr<map<string, string>> data_ = nullptr;
+    shared_ptr<map<string, string>> data_ {};
   };
   
   } // namespace Exceptions

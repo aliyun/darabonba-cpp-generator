@@ -21,11 +21,11 @@ Darabonba::Client::Client(){
 }
 
 
-FutrueGenerator<string> Client::test3() {
+FutureGenerator<string> Client::test3() {
   Generator<string> it = Util::Util::test1();
   for (string test : it) {
 string     __retrun = test;
-return Darbaonba::FutureGenerator<string>(__retrun);
+return Darabonba::FutureGenerator<string>(__retrun);
   }
 }
 

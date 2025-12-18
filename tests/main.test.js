@@ -228,4 +228,15 @@ describe('new Generator', function() {
       ...pkg
     });
   });
+
+  it('nested model and field conflict should ok', function () {
+    const outputDir = path.join(__dirname, 'output/nested');
+    const mainFilePath = path.join(__dirname, 'fixtures/nested/main.dara');
+    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/nested/Darafile'), 'utf8');
+    const pkg = JSON.parse(pkgContent);
+    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/nested'), {
+      pkgDir: path.join(__dirname, 'fixtures/nested'),
+      ...pkg
+    });
+  });
 });

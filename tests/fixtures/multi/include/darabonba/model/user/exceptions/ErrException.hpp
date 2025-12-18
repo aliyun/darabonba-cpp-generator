@@ -27,7 +27,7 @@ namespace Exceptions
     ErrException& operator=(ErrException &&) = default ;
     inline string msg() const { DARABONBA_PTR_GET_DEFAULT(msg_, "") };
   protected:
-    std::shared_ptr<string> msg_ = nullptr;
+    shared_ptr<string> msg_ {};
   };
   
   } // namespace Exceptions

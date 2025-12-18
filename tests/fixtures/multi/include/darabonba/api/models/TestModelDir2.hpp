@@ -34,12 +34,12 @@ namespace Models
     // test Field Functions 
     bool hasTest() const { return this->test_ != nullptr;};
     void deleteTest() { this->test_ = nullptr;};
-    inline int64_t test() const { DARABONBA_PTR_GET_DEFAULT(test_, 0) };
+    inline int64_t getTest() const { DARABONBA_PTR_GET_DEFAULT(test_, 0) };
     inline TestModelDir2& setTest(int64_t test) { DARABONBA_PTR_SET_VALUE(test_, test) };
 
 
   protected:
-    std::shared_ptr<int64_t> test_ = nullptr;
+    shared_ptr<int64_t> test_ {};
   };
 
   } // namespace Models

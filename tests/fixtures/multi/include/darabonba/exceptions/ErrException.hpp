@@ -23,7 +23,7 @@ namespace Exceptions
     ERRException& operator=(ERRException &&) = default ;
     inline int64_t test() const { DARABONBA_PTR_GET_DEFAULT(test_, 0) };
   protected:
-    std::shared_ptr<int64_t> test_ = nullptr;
+    shared_ptr<int64_t> test_ {};
   };
   
   } // namespace Exceptions
@@ -43,7 +43,7 @@ namespace Exceptions
     ErrException& operator=(ErrException &&) = default ;
     inline string test() const { DARABONBA_PTR_GET_DEFAULT(test_, "") };
   protected:
-    std::shared_ptr<string> test_ = nullptr;
+    shared_ptr<string> test_ {};
   };
   
   } // namespace Exceptions

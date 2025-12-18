@@ -37,12 +37,12 @@ namespace Models
     // maxAttemp Field Functions 
     bool hasMaxAttemp() const { return this->maxAttemp_ != nullptr;};
     void deleteMaxAttemp() { this->maxAttemp_ = nullptr;};
-    inline int64_t maxAttemp() const { DARABONBA_PTR_GET_DEFAULT(maxAttemp_, 0) };
+    inline int64_t getMaxAttemp() const { DARABONBA_PTR_GET_DEFAULT(maxAttemp_, 0) };
     inline BaseInfo& setMaxAttemp(int64_t maxAttemp) { DARABONBA_PTR_SET_VALUE(maxAttemp_, maxAttemp) };
 
 
   protected:
-    std::shared_ptr<int64_t> maxAttemp_ = nullptr;
+    shared_ptr<int64_t> maxAttemp_ {};
   };
 
   } // namespace Models

@@ -40,20 +40,20 @@ namespace Models
     // name Field Functions 
     bool hasName() const { return this->name_ != nullptr;};
     void deleteName() { this->name_ = nullptr;};
-    inline string name() const { DARABONBA_PTR_GET_DEFAULT(name_, "") };
+    inline string getName() const { DARABONBA_PTR_GET_DEFAULT(name_, "") };
     inline Info& setName(string name) { DARABONBA_PTR_SET_VALUE(name_, name) };
 
 
     // age Field Functions 
     bool hasAge() const { return this->age_ != nullptr;};
     void deleteAge() { this->age_ = nullptr;};
-    inline int32_t age() const { DARABONBA_PTR_GET_DEFAULT(age_, 0) };
+    inline int32_t getAge() const { DARABONBA_PTR_GET_DEFAULT(age_, 0) };
     inline Info& setAge(int32_t age) { DARABONBA_PTR_SET_VALUE(age_, age) };
 
 
   protected:
-    std::shared_ptr<string> name_ = nullptr;
-    std::shared_ptr<int32_t> age_ = nullptr;
+    shared_ptr<string> name_ {};
+    shared_ptr<int32_t> age_ {};
   };
 
   } // namespace Models

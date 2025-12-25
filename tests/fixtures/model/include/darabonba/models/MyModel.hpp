@@ -2,12 +2,10 @@
 #ifndef DARABONBA_MODELS_MYMODEL_HPP_
 #define DARABONBA_MODELS_MYMODEL_HPP_
 #include <darabonba/Core.hpp>
-#include <darabonba/models/MyModelModel.hpp>
 #include <vector>
 #include <map>
 #include <darabonba/models/MyModelSubmodel.hpp>
 #include <darabonba/models/M.hpp>
-#include <darabonba/models/MyModelSubarraymodel.hpp>
 #include <darabonba/source.hpp>
 #include <darabonba/models/MSubM.hpp>
 #include <darabonba/http/Request.hpp>
@@ -170,6 +168,182 @@ namespace Models
     };
     virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
     virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+    class Subarraymodel : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Subarraymodel& obj) { 
+      };
+      friend void from_json(const Darabonba::Json& j, Subarraymodel& obj) { 
+      };
+      Subarraymodel() = default ;
+      Subarraymodel(const Subarraymodel &) = default ;
+      Subarraymodel(Subarraymodel &&) = default ;
+      Subarraymodel(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Subarraymodel() = default ;
+      Subarraymodel& operator=(const Subarraymodel &) = default ;
+      Subarraymodel& operator=(Subarraymodel &&) = default ;
+      virtual void validate() const override {
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      virtual bool empty() const override { return ; };
+    };
+
+    class Submodel : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Submodel& obj) { 
+        DARABONBA_PTR_TO_JSON(stringfield, stringfield_);
+        DARABONBA_PTR_TO_JSON(model, model_);
+      };
+      friend void from_json(const Darabonba::Json& j, Submodel& obj) { 
+        DARABONBA_PTR_FROM_JSON(stringfield, stringfield_);
+        DARABONBA_PTR_FROM_JSON(model, model_);
+      };
+      Submodel() = default ;
+      Submodel(const Submodel &) = default ;
+      Submodel(Submodel &&) = default ;
+      Submodel(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Submodel() = default ;
+      Submodel& operator=(const Submodel &) = default ;
+      Submodel& operator=(Submodel &&) = default ;
+      virtual void validate() const override {
+          DARABONBA_VALIDATE_REQUIRED(stringfield_);
+          DARABONBA_VALIDATE_REQUIRED(model_);
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      class Model : public Darabonba::Model {
+      public:
+        friend void to_json(Darabonba::Json& j, const Model& obj) { 
+          DARABONBA_PTR_TO_JSON(str, str_);
+        };
+        friend void from_json(const Darabonba::Json& j, Model& obj) { 
+          DARABONBA_PTR_FROM_JSON(str, str_);
+        };
+        Model() = default ;
+        Model(const Model &) = default ;
+        Model(Model &&) = default ;
+        Model(const Darabonba::Json & obj) { from_json(obj, *this); };
+        virtual ~Model() = default ;
+        Model& operator=(const Model &) = default ;
+        Model& operator=(Model &&) = default ;
+        virtual void validate() const override {
+            DARABONBA_VALIDATE_REQUIRED(str_);
+        };
+        virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+        virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+        virtual bool empty() const override { return this->str_ == nullptr; };
+        // str Field Functions 
+        bool hasStr() const { return this->str_ != nullptr;};
+        void deleteStr() { this->str_ = nullptr;};
+        inline string str() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
+        inline Model& setStr(string str) { DARABONBA_PTR_SET_VALUE(str_, str) };
+
+
+      protected:
+        std::shared_ptr<string> str_ = nullptr;
+      };
+
+      virtual bool empty() const override { return this->stringfield_ == nullptr
+        && this->model_ == nullptr; };
+      // stringfield Field Functions 
+      bool hasStringfield() const { return this->stringfield_ != nullptr;};
+      void deleteStringfield() { this->stringfield_ = nullptr;};
+      inline string stringfield() const { DARABONBA_PTR_GET_DEFAULT(stringfield_, "") };
+      inline Submodel& setStringfield(string stringfield) { DARABONBA_PTR_SET_VALUE(stringfield_, stringfield) };
+
+
+      // model Field Functions 
+      bool hasModel() const { return this->model_ != nullptr;};
+      void deleteModel() { this->model_ = nullptr;};
+      inline const Submodel::Model & model() const { DARABONBA_PTR_GET_CONST(model_, Submodel::Model) };
+      inline Submodel::Model model() { DARABONBA_PTR_GET(model_, Submodel::Model) };
+      inline Submodel& setModel(const Submodel::Model & model) { DARABONBA_PTR_SET_VALUE(model_, model) };
+      inline Submodel& setModel(Submodel::Model && model) { DARABONBA_PTR_SET_RVALUE(model_, model) };
+
+
+    protected:
+      std::shared_ptr<string> stringfield_ = nullptr;
+      std::shared_ptr<Submodel::Model> model_ = nullptr;
+    };
+
+    class Model : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Model& obj) { 
+        DARABONBA_PTR_TO_JSON(str, str_);
+        DARABONBA_PTR_TO_JSON(model, model_);
+      };
+      friend void from_json(const Darabonba::Json& j, Model& obj) { 
+        DARABONBA_PTR_FROM_JSON(str, str_);
+        DARABONBA_PTR_FROM_JSON(model, model_);
+      };
+      Model() = default ;
+      Model(const Model &) = default ;
+      Model(Model &&) = default ;
+      Model(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Model() = default ;
+      Model& operator=(const Model &) = default ;
+      Model& operator=(Model &&) = default ;
+      virtual void validate() const override {
+          DARABONBA_VALIDATE_REQUIRED(str_);
+          DARABONBA_VALIDATE_REQUIRED(model_);
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      class ModelItem : public Darabonba::Model {
+      public:
+        friend void to_json(Darabonba::Json& j, const ModelItem& obj) { 
+          DARABONBA_PTR_TO_JSON(str, str_);
+        };
+        friend void from_json(const Darabonba::Json& j, ModelItem& obj) { 
+          DARABONBA_PTR_FROM_JSON(str, str_);
+        };
+        ModelItem() = default ;
+        ModelItem(const ModelItem &) = default ;
+        ModelItem(ModelItem &&) = default ;
+        ModelItem(const Darabonba::Json & obj) { from_json(obj, *this); };
+        virtual ~ModelItem() = default ;
+        ModelItem& operator=(const ModelItem &) = default ;
+        ModelItem& operator=(ModelItem &&) = default ;
+        virtual void validate() const override {
+            DARABONBA_VALIDATE_REQUIRED(str_);
+        };
+        virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+        virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+        virtual bool empty() const override { return this->str_ == nullptr; };
+        // str Field Functions 
+        bool hasStr() const { return this->str_ != nullptr;};
+        void deleteStr() { this->str_ = nullptr;};
+        inline string str() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
+        inline ModelItem& setStr(string str) { DARABONBA_PTR_SET_VALUE(str_, str) };
+
+
+      protected:
+        std::shared_ptr<string> str_ = nullptr;
+      };
+
+      virtual bool empty() const override { return this->str_ == nullptr
+        && this->model_ == nullptr; };
+      // str Field Functions 
+      bool hasStr() const { return this->str_ != nullptr;};
+      void deleteStr() { this->str_ = nullptr;};
+      inline string str() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
+      inline Model& setStr(string str) { DARABONBA_PTR_SET_VALUE(str_, str) };
+
+
+      // model Field Functions 
+      bool hasModel() const { return this->model_ != nullptr;};
+      void deleteModel() { this->model_ = nullptr;};
+      inline const Model::ModelItem & model() const { DARABONBA_PTR_GET_CONST(model_, Model::ModelItem) };
+      inline Model::ModelItem model() { DARABONBA_PTR_GET(model_, Model::ModelItem) };
+      inline Model& setModel(const Model::ModelItem & model) { DARABONBA_PTR_SET_VALUE(model_, model) };
+      inline Model& setModel(Model::ModelItem && model) { DARABONBA_PTR_SET_RVALUE(model_, model) };
+
+
+    protected:
+      std::shared_ptr<string> str_ = nullptr;
+      std::shared_ptr<Model::ModelItem> model_ = nullptr;
+    };
+
     virtual bool empty() const override { return this->model_ == nullptr
         && this->stringfield_ == nullptr && this->bytesfield_ == nullptr && this->stringarrayfield_ == nullptr && this->mapfield_ == nullptr && this->name_ == nullptr
         && this->submodel_ == nullptr && this->submodelMap_ == nullptr && this->mapModel_ == nullptr && this->subarraymodel_ == nullptr && this->subarray_ == nullptr
@@ -183,10 +357,10 @@ namespace Models
     // model Field Functions 
     bool hasModel() const { return this->model_ != nullptr;};
     void deleteModel() { this->model_ = nullptr;};
-    inline const MyModelModel & model() const { DARABONBA_PTR_GET_CONST(model_, MyModelModel) };
-    inline MyModelModel model() { DARABONBA_PTR_GET(model_, MyModelModel) };
-    inline MyModel& setModel(const MyModelModel & model) { DARABONBA_PTR_SET_VALUE(model_, model) };
-    inline MyModel& setModel(MyModelModel && model) { DARABONBA_PTR_SET_RVALUE(model_, model) };
+    inline const MyModel::Model & model() const { DARABONBA_PTR_GET_CONST(model_, MyModel::Model) };
+    inline MyModel::Model model() { DARABONBA_PTR_GET(model_, MyModel::Model) };
+    inline MyModel& setModel(const MyModel::Model & model) { DARABONBA_PTR_SET_VALUE(model_, model) };
+    inline MyModel& setModel(MyModel::Model && model) { DARABONBA_PTR_SET_RVALUE(model_, model) };
 
 
     // stringfield Field Functions 
@@ -231,10 +405,10 @@ namespace Models
     // submodel Field Functions 
     bool hasSubmodel() const { return this->submodel_ != nullptr;};
     void deleteSubmodel() { this->submodel_ = nullptr;};
-    inline const MyModelSubmodel & submodel() const { DARABONBA_PTR_GET_CONST(submodel_, MyModelSubmodel) };
-    inline MyModelSubmodel submodel() { DARABONBA_PTR_GET(submodel_, MyModelSubmodel) };
-    inline MyModel& setSubmodel(const MyModelSubmodel & submodel) { DARABONBA_PTR_SET_VALUE(submodel_, submodel) };
-    inline MyModel& setSubmodel(MyModelSubmodel && submodel) { DARABONBA_PTR_SET_RVALUE(submodel_, submodel) };
+    inline const MyModel::Submodel & submodel() const { DARABONBA_PTR_GET_CONST(submodel_, MyModel::Submodel) };
+    inline MyModel::Submodel submodel() { DARABONBA_PTR_GET(submodel_, MyModel::Submodel) };
+    inline MyModel& setSubmodel(const MyModel::Submodel & submodel) { DARABONBA_PTR_SET_VALUE(submodel_, submodel) };
+    inline MyModel& setSubmodel(MyModel::Submodel && submodel) { DARABONBA_PTR_SET_RVALUE(submodel_, submodel) };
 
 
     // submodelMap Field Functions 
@@ -258,10 +432,10 @@ namespace Models
     // subarraymodel Field Functions 
     bool hasSubarraymodel() const { return this->subarraymodel_ != nullptr;};
     void deleteSubarraymodel() { this->subarraymodel_ = nullptr;};
-    inline const vector<MyModelSubarraymodel> & subarraymodel() const { DARABONBA_PTR_GET_CONST(subarraymodel_, vector<MyModelSubarraymodel>) };
-    inline vector<MyModelSubarraymodel> subarraymodel() { DARABONBA_PTR_GET(subarraymodel_, vector<MyModelSubarraymodel>) };
-    inline MyModel& setSubarraymodel(const vector<MyModelSubarraymodel> & subarraymodel) { DARABONBA_PTR_SET_VALUE(subarraymodel_, subarraymodel) };
-    inline MyModel& setSubarraymodel(vector<MyModelSubarraymodel> && subarraymodel) { DARABONBA_PTR_SET_RVALUE(subarraymodel_, subarraymodel) };
+    inline const vector<MyModel::Subarraymodel> & subarraymodel() const { DARABONBA_PTR_GET_CONST(subarraymodel_, vector<MyModel::Subarraymodel>) };
+    inline vector<MyModel::Subarraymodel> subarraymodel() { DARABONBA_PTR_GET(subarraymodel_, vector<MyModel::Subarraymodel>) };
+    inline MyModel& setSubarraymodel(const vector<MyModel::Subarraymodel> & subarraymodel) { DARABONBA_PTR_SET_VALUE(subarraymodel_, subarraymodel) };
+    inline MyModel& setSubarraymodel(vector<MyModel::Subarraymodel> && subarraymodel) { DARABONBA_PTR_SET_RVALUE(subarraymodel_, subarraymodel) };
 
 
     // subarray Field Functions 
@@ -548,16 +722,16 @@ namespace Models
 
 
   protected:
-    std::shared_ptr<MyModelModel> model_ = nullptr;
+    std::shared_ptr<MyModel::Model> model_ = nullptr;
     std::shared_ptr<string> stringfield_ = nullptr;
     Darabonba::Bytes bytesfield_ = nullptr;
     std::shared_ptr<vector<string>> stringarrayfield_ = nullptr;
     std::shared_ptr<map<string, string>> mapfield_ = nullptr;
     std::shared_ptr<string> name_ = nullptr;
-    std::shared_ptr<MyModelSubmodel> submodel_ = nullptr;
+    std::shared_ptr<MyModel::Submodel> submodel_ = nullptr;
     std::shared_ptr<map<string, MyModelSubmodel>> submodelMap_ = nullptr;
     std::shared_ptr<map<string, M>> mapModel_ = nullptr;
-    std::shared_ptr<vector<MyModelSubarraymodel>> subarraymodel_ = nullptr;
+    std::shared_ptr<vector<MyModel::Subarraymodel>> subarraymodel_ = nullptr;
     std::shared_ptr<vector<M>> subarray_ = nullptr;
     std::shared_ptr<vector<vector<M>>> ssubarray_ = nullptr;
     std::shared_ptr<vector<vector<shared_ptr<TestSource::Source>>>> ssubmarray_ = nullptr;

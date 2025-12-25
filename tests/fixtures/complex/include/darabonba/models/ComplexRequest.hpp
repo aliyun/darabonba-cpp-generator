@@ -3,13 +3,10 @@
 #define DARABONBA_MODELS_COMPLEXREQUEST_HPP_
 #include <darabonba/Core.hpp>
 #include <vector>
-#include <darabonba/models/ComplexRequestHeader.hpp>
-#include <darabonba/models/ComplexRequestConfigs.hpp>
+#include <map>
 #include <darabonba/http/Request.hpp>
 #include <darabonba/http/MCurlResponse.hpp>
-#include <map>
 #include <darabonba/source.hpp>
-#include <darabonba/models/ComplexRequestPart.hpp>
 using namespace std;
 using json = nlohmann::json;
 namespace Darabonba
@@ -164,6 +161,137 @@ namespace Models
     };
     virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
     virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+    class Part : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Part& obj) { 
+        DARABONBA_PTR_TO_JSON(PartNumber, partNumber_);
+      };
+      friend void from_json(const Darabonba::Json& j, Part& obj) { 
+        DARABONBA_PTR_FROM_JSON(PartNumber, partNumber_);
+      };
+      Part() = default ;
+      Part(const Part &) = default ;
+      Part(Part &&) = default ;
+      Part(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Part() = default ;
+      Part& operator=(const Part &) = default ;
+      Part& operator=(Part &&) = default ;
+      virtual void validate() const override {
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      virtual bool empty() const override { return this->partNumber_ == nullptr; };
+      // partNumber Field Functions 
+      bool hasPartNumber() const { return this->partNumber_ != nullptr;};
+      void deletePartNumber() { this->partNumber_ = nullptr;};
+      inline string partNumber() const { DARABONBA_PTR_GET_DEFAULT(partNumber_, "") };
+      inline Part& setPartNumber(string partNumber) { DARABONBA_PTR_SET_VALUE(partNumber_, partNumber) };
+
+
+    protected:
+      // PartNumber
+      std::shared_ptr<string> partNumber_ = nullptr;
+    };
+
+    class Configs : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Configs& obj) { 
+        DARABONBA_PTR_TO_JSON(key, key_);
+        DARABONBA_PTR_TO_JSON(value, value_);
+        DARABONBA_PTR_TO_JSON(extra, extra_);
+      };
+      friend void from_json(const Darabonba::Json& j, Configs& obj) { 
+        DARABONBA_PTR_FROM_JSON(key, key_);
+        DARABONBA_PTR_FROM_JSON(value, value_);
+        DARABONBA_PTR_FROM_JSON(extra, extra_);
+      };
+      Configs() = default ;
+      Configs(const Configs &) = default ;
+      Configs(Configs &&) = default ;
+      Configs(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Configs() = default ;
+      Configs& operator=(const Configs &) = default ;
+      Configs& operator=(Configs &&) = default ;
+      virtual void validate() const override {
+          DARABONBA_VALIDATE_REQUIRED(key_);
+          DARABONBA_VALIDATE_REQUIRED(value_);
+          DARABONBA_VALIDATE_REQUIRED(extra_);
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      virtual bool empty() const override { return this->key_ == nullptr
+        && this->value_ == nullptr && this->extra_ == nullptr; };
+      // key Field Functions 
+      bool hasKey() const { return this->key_ != nullptr;};
+      void deleteKey() { this->key_ = nullptr;};
+      inline string key() const { DARABONBA_PTR_GET_DEFAULT(key_, "") };
+      inline Configs& setKey(string key) { DARABONBA_PTR_SET_VALUE(key_, key) };
+
+
+      // value Field Functions 
+      bool hasValue() const { return this->value_ != nullptr;};
+      void deleteValue() { this->value_ = nullptr;};
+      inline const vector<string> & value() const { DARABONBA_PTR_GET_CONST(value_, vector<string>) };
+      inline vector<string> value() { DARABONBA_PTR_GET(value_, vector<string>) };
+      inline Configs& setValue(const vector<string> & value) { DARABONBA_PTR_SET_VALUE(value_, value) };
+      inline Configs& setValue(vector<string> && value) { DARABONBA_PTR_SET_RVALUE(value_, value) };
+
+
+      // extra Field Functions 
+      bool hasExtra() const { return this->extra_ != nullptr;};
+      void deleteExtra() { this->extra_ = nullptr;};
+      inline const map<string, string> & extra() const { DARABONBA_PTR_GET_CONST(extra_, map<string, string>) };
+      inline map<string, string> extra() { DARABONBA_PTR_GET(extra_, map<string, string>) };
+      inline Configs& setExtra(const map<string, string> & extra) { DARABONBA_PTR_SET_VALUE(extra_, extra) };
+      inline Configs& setExtra(map<string, string> && extra) { DARABONBA_PTR_SET_RVALUE(extra_, extra) };
+
+
+    protected:
+      std::shared_ptr<string> key_ = nullptr;
+      std::shared_ptr<vector<string>> value_ = nullptr;
+      std::shared_ptr<map<string, string>> extra_ = nullptr;
+    };
+
+    class Header : public Darabonba::Model {
+    public:
+      friend void to_json(Darabonba::Json& j, const Header& obj) { 
+        DARABONBA_PTR_TO_JSON(Content, content_);
+      };
+      friend void from_json(const Darabonba::Json& j, Header& obj) { 
+        DARABONBA_PTR_FROM_JSON(Content, content_);
+      };
+      Header() = default ;
+      Header(const Header &) = default ;
+      Header(Header &&) = default ;
+      Header(const Darabonba::Json & obj) { from_json(obj, *this); };
+      virtual ~Header() = default ;
+      Header& operator=(const Header &) = default ;
+      Header& operator=(Header &&) = default ;
+      virtual void validate() const override {
+          DARABONBA_VALIDATE_REQUIRED(content_);
+      };
+      virtual void fromMap(const Darabonba::Json &obj) override { from_json(obj, *this); validate(); };
+      virtual Darabonba::Json toMap() const override { Darabonba::Json obj; to_json(obj, *this); return obj; };
+      virtual bool empty() const override { return this->content_ == nullptr; };
+      // content Field Functions 
+      bool hasContent() const { return this->content_ != nullptr;};
+      void deleteContent() { this->content_ = nullptr;};
+      inline string content() const { DARABONBA_PTR_GET_DEFAULT(content_, "") };
+      inline Header& setContent(string content) { DARABONBA_PTR_SET_VALUE(content_, content) };
+
+
+    protected:
+      // The ID of the security group to which you want to assign the instance. Instances in the same security group can communicate with each other. The maximum number of instances that a security group can contain depends on the type of the security group. For more information, see the "Security group limits" section in [Limits](https://help.aliyun.com/document_detail/25412.html#SecurityGroupQuota).
+      // 
+      // >Notice:  The network type of the new instance must be the same as that of the security group specified by the `SecurityGroupId` parameter. For example, if the specified security group is of the VPC type, the new instance is also of the VPC type and you must specify `VSwitchId`.
+      // 
+      // If you do not use `LaunchTemplateId` or `LaunchTemplateName` to specify a launch template, you must specify SecurityGroupId. Take note of the following items:
+      // 
+      // *   You can set `SecurityGroupId` to specify a single security group or set `SecurityGroupIds.N` to specify one or more security groups. However, you cannot specify both `SecurityGroupId` and `SecurityGroupIds.N`.
+      // *   If `NetworkInterface.N.InstanceType` is set to `Primary`, you cannot specify `SecurityGroupId` or `SecurityGroupIds.N` but can specify `NetworkInterface.N.SecurityGroupId` or `NetworkInterface.N.SecurityGroupIds.N`.
+      std::shared_ptr<string> content_ = nullptr;
+    };
+
     virtual bool empty() const override { return this->accessKey_ == nullptr
         && this->body_ == nullptr && this->strs_ == nullptr && this->mapList_ == nullptr && this->header_ == nullptr && this->configs_ == nullptr
         && this->num_ == nullptr && this->i64_ == nullptr && this->f64_ == nullptr && this->b_ == nullptr && this->f32_ == nullptr
@@ -209,19 +337,19 @@ namespace Models
     // header Field Functions 
     bool hasHeader() const { return this->header_ != nullptr;};
     void deleteHeader() { this->header_ = nullptr;};
-    inline const ComplexRequestHeader & header() const { DARABONBA_PTR_GET_CONST(header_, ComplexRequestHeader) };
-    inline ComplexRequestHeader header() { DARABONBA_PTR_GET(header_, ComplexRequestHeader) };
-    inline ComplexRequest& setHeader(const ComplexRequestHeader & header) { DARABONBA_PTR_SET_VALUE(header_, header) };
-    inline ComplexRequest& setHeader(ComplexRequestHeader && header) { DARABONBA_PTR_SET_RVALUE(header_, header) };
+    inline const ComplexRequest::Header & header() const { DARABONBA_PTR_GET_CONST(header_, ComplexRequest::Header) };
+    inline ComplexRequest::Header header() { DARABONBA_PTR_GET(header_, ComplexRequest::Header) };
+    inline ComplexRequest& setHeader(const ComplexRequest::Header & header) { DARABONBA_PTR_SET_VALUE(header_, header) };
+    inline ComplexRequest& setHeader(ComplexRequest::Header && header) { DARABONBA_PTR_SET_RVALUE(header_, header) };
 
 
     // configs Field Functions 
     bool hasConfigs() const { return this->configs_ != nullptr;};
     void deleteConfigs() { this->configs_ = nullptr;};
-    inline const ComplexRequestConfigs & configs() const { DARABONBA_PTR_GET_CONST(configs_, ComplexRequestConfigs) };
-    inline ComplexRequestConfigs configs() { DARABONBA_PTR_GET(configs_, ComplexRequestConfigs) };
-    inline ComplexRequest& setConfigs(const ComplexRequestConfigs & configs) { DARABONBA_PTR_SET_VALUE(configs_, configs) };
-    inline ComplexRequest& setConfigs(ComplexRequestConfigs && configs) { DARABONBA_PTR_SET_RVALUE(configs_, configs) };
+    inline const ComplexRequest::Configs & configs() const { DARABONBA_PTR_GET_CONST(configs_, ComplexRequest::Configs) };
+    inline ComplexRequest::Configs configs() { DARABONBA_PTR_GET(configs_, ComplexRequest::Configs) };
+    inline ComplexRequest& setConfigs(const ComplexRequest::Configs & configs) { DARABONBA_PTR_SET_VALUE(configs_, configs) };
+    inline ComplexRequest& setConfigs(ComplexRequest::Configs && configs) { DARABONBA_PTR_SET_RVALUE(configs_, configs) };
 
 
     // num Field Functions 
@@ -410,7 +538,7 @@ namespace Models
     inline     const Darabonba::Json & any() const { DARABONBA_GET(any_) };
     Darabonba::Json & any() { DARABONBA_GET(any_) };
     inline ComplexRequest& setAny(const Darabonba::Json & any) { DARABONBA_SET_VALUE(any_, any) };
-    inline ComplexRequest& setAny(Darabonba::Json & any) { DARABONBA_SET_RVALUE(any_, any) };
+    inline ComplexRequest& setAny(Darabonba::Json && any) { DARABONBA_SET_RVALUE(any_, any) };
 
 
     // byt Field Functions 
@@ -528,10 +656,10 @@ namespace Models
     // part Field Functions 
     bool hasPart() const { return this->part_ != nullptr;};
     void deletePart() { this->part_ = nullptr;};
-    inline const vector<ComplexRequestPart> & part() const { DARABONBA_PTR_GET_CONST(part_, vector<ComplexRequestPart>) };
-    inline vector<ComplexRequestPart> part() { DARABONBA_PTR_GET(part_, vector<ComplexRequestPart>) };
-    inline ComplexRequest& setPart(const vector<ComplexRequestPart> & part) { DARABONBA_PTR_SET_VALUE(part_, part) };
-    inline ComplexRequest& setPart(vector<ComplexRequestPart> && part) { DARABONBA_PTR_SET_RVALUE(part_, part) };
+    inline const vector<ComplexRequest::Part> & part() const { DARABONBA_PTR_GET_CONST(part_, vector<ComplexRequest::Part>) };
+    inline vector<ComplexRequest::Part> part() { DARABONBA_PTR_GET(part_, vector<ComplexRequest::Part>) };
+    inline ComplexRequest& setPart(const vector<ComplexRequest::Part> & part) { DARABONBA_PTR_SET_VALUE(part_, part) };
+    inline ComplexRequest& setPart(vector<ComplexRequest::Part> && part) { DARABONBA_PTR_SET_RVALUE(part_, part) };
 
 
   protected:
@@ -543,8 +671,8 @@ namespace Models
     // mapList
     std::shared_ptr<vector<Darabonba::Json>> mapList_ = nullptr;
     // header
-    std::shared_ptr<ComplexRequestHeader> header_ = nullptr;
-    std::shared_ptr<ComplexRequestConfigs> configs_ = nullptr;
+    std::shared_ptr<ComplexRequest::Header> header_ = nullptr;
+    std::shared_ptr<ComplexRequest::Configs> configs_ = nullptr;
     std::shared_ptr<int64_t> num_ = nullptr;
     std::shared_ptr<int64_t> i64_ = nullptr;
     std::shared_ptr<double> f64_ = nullptr;
@@ -588,7 +716,7 @@ namespace Models
     // test keywords
     std::shared_ptr<string> str_ = nullptr;
     // Part
-    std::shared_ptr<vector<ComplexRequestPart>> part_ = nullptr;
+    std::shared_ptr<vector<ComplexRequest::Part>> part_ = nullptr;
   };
 
   } // namespace Models

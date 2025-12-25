@@ -1,0 +1,9 @@
+{
+  "name": "nested-test",
+  "version": "1.0.0",
+  "main": "./main.dara",
+  "cpp": {
+    "header": "darabonba/nested.hpp",
+    "namespace": "Darabonba::Nested"
+  }
+}

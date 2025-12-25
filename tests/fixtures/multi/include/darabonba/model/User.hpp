@@ -15,7 +15,7 @@ namespace User
   class Client {
     public:
       Client() {}
-      static FutrueGenerator<string> test();
+      static FutureGenerator<string> test();
   };
 } // namespace Darabonba
 } // namespace Model

@@ -35,13 +35,13 @@ namespace Models
     // test Field Functions 
     bool hasTest() const { return this->test_ != nullptr;};
     void deleteTest() { this->test_ = nullptr;};
-    inline string test() const { DARABONBA_PTR_GET_DEFAULT(test_, "") };
+    inline string getTest() const { DARABONBA_PTR_GET_DEFAULT(test_, "") };
     inline Test& setTest(string test) { DARABONBA_PTR_SET_VALUE(test_, test) };
 
 
   protected:
     // Alichange app id 
-    std::shared_ptr<string> test_ = nullptr;
+    shared_ptr<string> test_ {};
   };
 
   } // namespace Models

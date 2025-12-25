@@ -34,12 +34,12 @@ namespace Models
     // str Field Functions 
     bool hasStr() const { return this->str_ != nullptr;};
     void deleteStr() { this->str_ = nullptr;};
-    inline string str() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
+    inline string getStr() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
     inline Model& setStr(string str) { DARABONBA_PTR_SET_VALUE(str_, str) };
 
 
   protected:
-    std::shared_ptr<string> str_ = nullptr;
+    shared_ptr<string> str_ {};
   };
 
   } // namespace Models

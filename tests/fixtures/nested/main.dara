@@ -1,0 +1,40 @@
+/**
+ * 测试嵌套模型和字段名冲突场景
+ */
+
+// 测试用例1: hasXxx字段名冲突
+model HasFieldConflict {
+  hasConfig?: int32(description='测试has开头的字段'),
+  config?: string(description='普通配置字段'),
+}
+
+// 测试用例2: 嵌套模型名与父类名相同
+model ParentModel {
+  name?: string,
+  parentModel?: {
+    id?: string,
+    value?: int32,
+  }(description='嵌套类名ParentModel与父类同名'),
+}
+
+// 测试用例3: 多层嵌套
+model OuterModel {
+  data?: {
+    items?: [ {
+      name?: string,
+      value?: int32,
+    } ],
+  },
+}
+
+// 测试用例4: 综合场景 - has字段 + 嵌套模型
+model ComplexModel {
+  hasRecord?: boolean,
+  record?: {
+    id?: string,
+    record?: [ {
+      time?: string,
+      data?: string,
+    } ],
+  },
+}

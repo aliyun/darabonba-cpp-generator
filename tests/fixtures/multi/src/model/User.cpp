@@ -13,12 +13,12 @@ namespace Model
 namespace User
 {
 
-FutrueGenerator<string> Client::test() {
+FutureGenerator<string> Client::test() {
   Client::test();
   Generator<string> it = UtilUtil::test1();
   for (string test : it) {
 string     __retrun = test;
-return Darbaonba::FutureGenerator<string>(__retrun);
+return Darabonba::FutureGenerator<string>(__retrun);
   }
 }
 } // namespace Darabonba

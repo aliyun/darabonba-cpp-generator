@@ -39,24 +39,24 @@ namespace Models
     // test Field Functions 
     bool hasTest() const { return this->test_ != nullptr;};
     void deleteTest() { this->test_ = nullptr;};
-    inline string test() const { DARABONBA_PTR_GET_DEFAULT(test_, "") };
+    inline string getTest() const { DARABONBA_PTR_GET_DEFAULT(test_, "") };
     inline Test2& setTest(string test) { DARABONBA_PTR_SET_VALUE(test_, test) };
 
 
     // test2 Field Functions 
     bool hasTest2() const { return this->test2_ != nullptr;};
     void deleteTest2() { this->test2_ = nullptr;};
-    inline string test2() const { DARABONBA_PTR_GET_DEFAULT(test2_, "") };
+    inline string getTest2() const { DARABONBA_PTR_GET_DEFAULT(test2_, "") };
     inline Test2& setTest2(string test2) { DARABONBA_PTR_SET_VALUE(test2_, test2) };
 
 
   protected:
     // model的test front comment
     // test desc
-    std::shared_ptr<string> test_ = nullptr;
+    shared_ptr<string> test_ {};
     // model的test front comment
     // test2 desc
-    std::shared_ptr<string> test2_ = nullptr;
+    shared_ptr<string> test2_ {};
   };
 
   } // namespace Models

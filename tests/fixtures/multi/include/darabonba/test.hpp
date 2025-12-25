@@ -13,7 +13,7 @@ namespace Darabonba
     public:
 
       Client();
-      FutrueGenerator<string> test3();
+      FutureGenerator<string> test3();
 
       int64_t test4();
     protected:

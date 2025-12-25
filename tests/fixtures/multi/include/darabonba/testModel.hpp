@@ -3,5 +3,6 @@
 #define DARABONBA_TESTMODEL_HPP_
 #include <darabonba/Core.hpp>
 #include <darabonba/models/TestModelDir.hpp>
+#include <darabonba/models/TestModelDIR.hpp>
 
 #endif

@@ -59,37 +59,37 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
       map<string, ComplexRequestHeader> subModelMapVal = {};
       map<string, ComplexRequest> reqMap = nullptr;
       map<string, string> mapString = json({
-        {"str" , request.accessKey()}
+        {"str" , request.getAccessKey()}
       }).get<map<string, string>>();
       int32_t inte = 1;
       int32_t a = 1;
-      int32_t b = nullptr;
+      int32_t b = 0;
       b = a;
       int32_t c = a;
       Client::intToInt32(a);
       json mapVal = json({
         {"read" , read},
         {"test" , "{\"test\":\"ok\"}"},
-        {"b" , request.b()},
-        {"num" , request.num()},
-        {"u16" , request.u16()},
-        {"u32" , request.u32()},
-        {"u64" , request.u64()},
-        {"u16List" , request.uint16List()},
-        {"u32List" , request.uint32List()},
-        {"u64List" , request.uint64List()},
-        {"i64List" , request.int64List()},
-        {"i16List" , request.int16List()},
-        {"i32List" , request.int32List()},
-        {"intList" , request.intList()},
-        {"stringList" , request.stringList()},
-        {"i32" , request.i32()},
-        {"booleantList" , request.booleantList()},
-        {"floatList" , request.floatList()},
-        {"float64List" , request.f64List()},
-        {"f32" , request.f32()},
-        {"f64" , request.f64()},
-        {"i64" , request.i64()}
+        {"b" , request.getB()},
+        {"num" , request.getNum()},
+        {"u16" , request.getU16()},
+        {"u32" , request.getU32()},
+        {"u64" , request.getU64()},
+        {"u16List" , request.getUint16List()},
+        {"u32List" , request.getUint32List()},
+        {"u64List" , request.getUint64List()},
+        {"i64List" , request.getInt64List()},
+        {"i16List" , request.getInt16List()},
+        {"i32List" , request.getInt32List()},
+        {"intList" , request.getIntList()},
+        {"stringList" , request.getStringList()},
+        {"i32" , request.getI32()},
+        {"booleantList" , request.getBooleantList()},
+        {"floatList" , request.getFloatList()},
+        {"float64List" , request.getF64List()},
+        {"f32" , request.getF32()},
+        {"f64" , request.getF64()},
+        {"i64" , request.getI64()}
       });
       bool abool = true;
       ComplexRequest req = ComplexRequest(json({
@@ -187,21 +187,21 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
         anyMap[item] = "test";
         break;
       }
-      this->_Strs = request.strs();
+      this->_Strs = request.getStrs();
       this->_protocol = "test";
       _endpointMap.at(_protocol);
       _endpointMap["test"] = "ok";
       request.setStrs(_Strs);
       request_.setProtocol(_protocol);
-      request_.setPort(request.num());
+      request_.setPort(request.getNum());
       request_.setMethod("GET");
       request_.setPathname(DARA_STRING_TEMPLATE("/" , _pathname));
       request_.setQuery(json({
         {"date" , "2019"},
-        {"name" , request_.method()}
+        {"name" , request_.getMethod()}
       }).get<map<string, string>>());
-      json tmp = Darabonba::Core::merge(request_.query(),
-        request_.headers(),
+      json tmp = Darabonba::Core::merge(request_.getQuery(),
+        request_.getHeaders(),
         request_
       );
       _lastRequest = make_shared<Darabonba::Http::Request>(request_);
@@ -253,7 +253,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
   request_.setPathname("/");
   request_.setQuery(json({
     {"date" , "2019"},
-    {"protocol" , request_.protocol()}
+    {"protocol" , request_.getProtocol()}
   }).get<map<string, string>>());
   auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);
   shared_ptr<Darabonba::Http::MCurlResponse> response_ = futureResp_.get();
@@ -326,17 +326,17 @@ Darabonba::RuntimeOptions runtime_(json({}));
 
   Darabonba::Http::MCurlResponse resp = response_;
   Request req = Request(json({
-    {"accesskey" , request.accessKey()},
-    {"region" , resp.statusMessage()}
+    {"accesskey" , request.getAccessKey()},
+    {"region" , resp.getStatusMessage()}
   }).get<map<string, string>>());
   Client::array0(request.toMap());
   req.setAccesskey("accesskey");
-  req.setAccesskey(request.accessKey());
+  req.setAccesskey(request.getAccessKey());
   Client::printNull();
   throwsFunc();
   response_->statusCode();
   Source::array(request.toMap(), "1");
-  return json(Darabonba::Core::merge(request_.query()
+  return json(Darabonba::Core::merge(request_.getQuery()
   ).get<map<string, string>>()).get<ComplexRequest>();
 }
 
@@ -361,7 +361,7 @@ void Client::assignWithArray() {
   vector<string> list = nullptr;
   list = vector<string>()
     .push_back("test");
-  string str = nullptr;
+  string str = "";
   str = throwsFunc();
 }
 
@@ -383,7 +383,7 @@ vector<string> Client::exprFunc() {
     {"client" , nullptr},
     {"strs" , Client::array1()},
     {"str" , DARA_STRING_TEMPLATE("string" , num)},
-    {"str1" , DARA_STRING_TEMPLATE("string" , req.accessKey())}
+    {"str1" , DARA_STRING_TEMPLATE("string" , req.getAccessKey())}
   });
   return nullptr;
 }
@@ -537,7 +537,7 @@ string Client::arrayAccess3(const ComplexRequest &request) {
   Request req = Request();
   Client::arrayAccess4(vector<Request>()
     .push_back(req));
-  string configVal = request.configs().value().at(0);
+  string configVal = request.getConfigs().getValue().at(0);
   return configVal;
 }
 
@@ -566,16 +566,16 @@ vector<string> Client::arrayAssign2(const string &config) {
 }
 
 void Client::arrayAssign3(const ComplexRequest &request, const string &config) {
-  request.configs().value().at(0) = config;
+  request.getConfigs().getValue().at(0) = config;
 }
 
 string Client::mapAccess(const ComplexRequest &request) {
-  string configInfo = request.configs().extra().at("name");
+  string configInfo = request.getConfigs().getExtra().at("name");
   return configInfo;
 }
 
 string Client::mapAccess2(const Request &request) {
-  string configInfo = request.configs().extra().at("name");
+  string configInfo = request.getConfigs().getExtra().at("name");
   return configInfo;
 }
 
@@ -590,19 +590,19 @@ string Client::mapAccess3() {
 
 string Client::mapAccess4(const ComplexRequest &request) {
   string key = "name";
-  Request model = request.modelMap().at(key);
-  string configInfo = request.configs().extra().at(key);
+  Request model = request.getModelMap().at(key);
+  string configInfo = request.getConfigs().getExtra().at(key);
   return configInfo;
 }
 
 void Client::mapAssign(const ComplexRequest &request, const string &name) {
-  request.configs().extra()["name"] = name;
+  request.getConfigs().getExtra()["name"] = name;
   string key = "name";
   name = key;
-  request.configs().extra()[key] = name;
-  name = request.configs().extra().at("name");
-  request.map()[key] = name;
-  request.numMap()[key] = 1;
+  request.getConfigs().getExtra()[key] = name;
+  name = request.getConfigs().getExtra().at("name");
+  request.getMap()[key] = name;
+  request.getNumMap()[key] = 1;
 }
 
 string Client::arrayimport2(const vector<Request> &request) {
@@ -661,13 +661,13 @@ void Client::multiTryCatch(const int64_t &a) {
     }
 
   } catch (const Err1Exception err) {
-    DaraLogger::log(err.name());
+    DaraLogger::log(err.getName());
   } catch (const Err2Exception err) {
-    DaraLogger::log(err.name());
+    DaraLogger::log(err.getName());
   } catch (const Err3Exception err) {
-    DaraLogger::log(err.name());
+    DaraLogger::log(err.getName());
   } catch (const Darabonba::Exception err) {
-    DaraLogger::log(err.name());
+    DaraLogger::log(err.getName());
   } finally {
     string final = "ok";
   }  

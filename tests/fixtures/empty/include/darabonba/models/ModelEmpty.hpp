@@ -44,36 +44,36 @@ namespace Models
     // name Field Functions 
     bool hasName() const { return this->name_ != nullptr;};
     void deleteName() { this->name_ = nullptr;};
-    inline string name() const { DARABONBA_PTR_GET_DEFAULT(name_, "") };
+    inline string getName() const { DARABONBA_PTR_GET_DEFAULT(name_, "") };
     inline ModelEmpty& setName(string name) { DARABONBA_PTR_SET_VALUE(name_, name) };
 
 
     // str Field Functions 
     bool hasStr() const { return this->str_ != nullptr;};
     void deleteStr() { this->str_ = nullptr;};
-    inline string str() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
+    inline string getStr() const { DARABONBA_PTR_GET_DEFAULT(str_, "") };
     inline ModelEmpty& setStr(string str) { DARABONBA_PTR_SET_VALUE(str_, str) };
 
 
     // num Field Functions 
     bool hasNum() const { return this->num_ != nullptr;};
     void deleteNum() { this->num_ = nullptr;};
-    inline int64_t num() const { DARABONBA_PTR_GET_DEFAULT(num_, 0) };
+    inline int64_t getNum() const { DARABONBA_PTR_GET_DEFAULT(num_, 0) };
     inline ModelEmpty& setNum(int64_t num) { DARABONBA_PTR_SET_VALUE(num_, num) };
 
 
     // bool Field Functions 
     bool hasBool() const { return this->bool_ != nullptr;};
     void deleteBool() { this->bool_ = nullptr;};
-    inline bool _bool() const { DARABONBA_PTR_GET_DEFAULT(bool_, false) };
+    inline bool getBool() const { DARABONBA_PTR_GET_DEFAULT(bool_, false) };
     inline ModelEmpty& setBool(bool _bool) { DARABONBA_PTR_SET_VALUE(bool_, _bool) };
 
 
   protected:
-    std::shared_ptr<string> name_ = nullptr;
-    std::shared_ptr<string> str_ = nullptr;
-    std::shared_ptr<int64_t> num_ = nullptr;
-    std::shared_ptr<bool> bool_ = nullptr;
+    shared_ptr<string> name_ {};
+    shared_ptr<string> str_ {};
+    shared_ptr<int64_t> num_ {};
+    shared_ptr<bool> bool_ {};
   };
 
   } // namespace Models

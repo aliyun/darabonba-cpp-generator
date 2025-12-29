@@ -6,3 +6,4 @@ runtime/
 output/
 .DS_Store
 .nyc_output/
+package-lock.json

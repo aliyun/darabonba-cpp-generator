@@ -198,10 +198,10 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
       request_.setPathname(DARA_STRING_TEMPLATE("/" , _pathname));
       request_.setQuery(json({
         {"date" , "2019"},
-        {"name" , request_.getMethod()}
+        {"name" , request_.method()}
       }).get<map<string, string>>());
-      json tmp = Darabonba::Core::merge(request_.getQuery(),
-        request_.getHeaders(),
+      json tmp = Darabonba::Core::merge(request_.query(),
+        request_.headers(),
         request_
       );
       _lastRequest = make_shared<Darabonba::Http::Request>(request_);
@@ -253,7 +253,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
   request_.setPathname("/");
   request_.setQuery(json({
     {"date" , "2019"},
-    {"protocol" , request_.getProtocol()}
+    {"protocol" , request_.protocol()}
   }).get<map<string, string>>());
   auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);
   shared_ptr<Darabonba::Http::MCurlResponse> response_ = futureResp_.get();
@@ -327,7 +327,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
   Darabonba::Http::MCurlResponse resp = response_;
   Request req = Request(json({
     {"accesskey" , request.getAccessKey()},
-    {"region" , resp.getStatusMessage()}
+    {"region" , resp.statusMessage()}
   }).get<map<string, string>>());
   Client::array0(request.toMap());
   req.setAccesskey("accesskey");
@@ -336,7 +336,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
   throwsFunc();
   response_->statusCode();
   Source::array(request.toMap(), "1");
-  return json(Darabonba::Core::merge(request_.getQuery()
+  return json(Darabonba::Core::merge(request_.query()
   ).get<map<string, string>>()).get<ComplexRequest>();
 }
 
@@ -667,7 +667,7 @@ void Client::multiTryCatch(const int64_t &a) {
   } catch (const Err3Exception err) {
     DaraLogger::log(err.getName());
   } catch (const Darabonba::Exception err) {
-    DaraLogger::log(err.getName());
+    DaraLogger::log(err.name());
   } finally {
     string final = "ok";
   }  

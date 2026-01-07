@@ -6,6 +6,6 @@
 #include <darabonba/models/Class.hpp>
 #include <darabonba/models/MoMValues.hpp>
 #include <darabonba/models/MyModel.hpp>
-#include <darabonba/models/Model.hpp>
+#include <darabonba/models/model.hpp>
 
 #endif

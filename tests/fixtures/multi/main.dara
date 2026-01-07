@@ -14,6 +14,11 @@ model TestModelDIR  {
     a: any,
 }
 
+model TestModelOIDC {
+    TEST: string,
+    OIDCName: string
+}
+
 exception err {
     test: string,
 }

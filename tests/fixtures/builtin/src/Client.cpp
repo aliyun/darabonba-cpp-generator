@@ -1,5 +1,6 @@
 #include <darabonba/Core.hpp>
 #include <darabonba/test.hpp>
+#include <darabonba/encode/Encoder.hpp>
 #include <darabonba/Bytes.hpp>
 #include <darabonba/Date.hpp>
 #include <darabonba/File.hpp>
@@ -10,7 +11,6 @@
 #include <cmath>
 #include <darabonba/Stream.hpp>
 #include <darabonba/http/URL.hpp>
-#include <darabonba/encode/Encoder.hpp>
 #include <darabonba/XML.hpp>
 #include <darabonba/Convert.hpp>
 using namespace std;

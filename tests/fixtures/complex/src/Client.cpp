@@ -40,9 +40,9 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
   });
-  while (Darabonba::allowRetry(runtime_.retryOptions(), _context)) {
+  while (Darabonba::allowRetry(runtime_.getRetryOptions(), _context)) {
     if (_retriesAttempted > 0) {
-      int _backoffTime = Darabonba::getBackoffTime(runtime_.retryOptions(), _context);
+      int _backoffTime = Darabonba::getBackoffTime(runtime_.getRetryOptions(), _context);
       if (_backoffTime > 0) {
         Darabonba::sleep(_backoffTime);
       }
@@ -198,10 +198,10 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
       request_.setPathname(DARA_STRING_TEMPLATE("/" , _pathname));
       request_.setQuery(json({
         {"date" , "2019"},
-        {"name" , request_.method()}
+        {"name" , request_.getMethod()}
       }).get<map<string, string>>());
-      json tmp = Darabonba::Core::merge(request_.query(),
-        request_.headers(),
+      json tmp = Darabonba::Core::merge(request_.getQuery(),
+        request_.getHeaders(),
         request_
       );
       _lastRequest = make_shared<Darabonba::Http::Request>(request_);
@@ -234,7 +234,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
     }
   }
 
-  throw *_context.exception();
+  throw *_context.getException();
 }
 
 Darabonba::Json Client::Complex2(const ComplexRequest &request, const vector<string> &str, const map<string, string> &val) {
@@ -253,7 +253,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
   request_.setPathname("/");
   request_.setQuery(json({
     {"date" , "2019"},
-    {"protocol" , request_.protocol()}
+    {"protocol" , request_.getProtocol()}
   }).get<map<string, string>>());
   auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);
   shared_ptr<Darabonba::Http::MCurlResponse> response_ = futureResp_.get();
@@ -270,9 +270,9 @@ json Client::ComplexMap() {
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
   });
-  while (Darabonba::allowRetry(runtime_.retryOptions(), _context)) {
+  while (Darabonba::allowRetry(runtime_.getRetryOptions(), _context)) {
     if (_retriesAttempted > 0) {
-      int _backoffTime = Darabonba::getBackoffTime(runtime_.retryOptions(), _context);
+      int _backoffTime = Darabonba::getBackoffTime(runtime_.getRetryOptions(), _context);
       if (_backoffTime > 0) {
         Darabonba::sleep(_backoffTime);
       }
@@ -295,7 +295,7 @@ json Client::ComplexMap() {
     }
   }
 
-  throw *_context.exception();
+  throw *_context.getException();
 }
 
 ComplexRequest Client::Complex3(const ComplexRequest &request, const string &name) {
@@ -327,16 +327,16 @@ Darabonba::RuntimeOptions runtime_(json({}));
   Darabonba::Http::MCurlResponse resp = response_;
   Request req = Request(json({
     {"accesskey" , request.getAccessKey()},
-    {"region" , resp.statusMessage()}
+    {"region" , resp.getStatusMessage()}
   }).get<map<string, string>>());
   Client::array0(request.toMap());
   req.setAccesskey("accesskey");
   req.setAccesskey(request.getAccessKey());
   Client::printNull();
   throwsFunc();
-  response_->statusCode();
+  response_->getStatusCode();
   Source::array(request.toMap(), "1");
-  return json(Darabonba::Core::merge(request_.query()
+  return json(Darabonba::Core::merge(request_.getQuery()
   ).get<map<string, string>>()).get<ComplexRequest>();
 }
 
@@ -667,7 +667,7 @@ void Client::multiTryCatch(const int64_t &a) {
   } catch (const Err3Exception err) {
     DaraLogger::log(err.getName());
   } catch (const Darabonba::Exception err) {
-    DaraLogger::log(err.name());
+    DaraLogger::log(err.getName());
   } finally {
     string final = "ok";
   }  

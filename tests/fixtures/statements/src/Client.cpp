@@ -20,7 +20,7 @@ Darabonba::RuntimeOptions runtime_(json({}));
     {"host" , "www.test.com"}
   }).get<map<string, string>>());
   if (true) {
-    request_.headers()["host"] = "www.test2.com";
+    request_.getHeaders()["host"] = "www.test2.com";
   }
 
   auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);

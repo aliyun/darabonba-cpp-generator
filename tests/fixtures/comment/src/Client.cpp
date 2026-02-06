@@ -36,7 +36,6 @@ void Client::testAPI() {
 
   shared_ptr<Darabonba::Http::Request> _lastRequest = nullptr;
   shared_ptr<Darabonba::Http::MCurlResponse> _lastResponse = nullptr;
-  Darabonba::Exception _lastException;
   int _retriesAttempted = 0;
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
@@ -71,7 +70,7 @@ void Client::testAPI() {
       Client::testFunc();
       // return comment
       return ;
-    } catch (const Darabonba::Exception& ex) {
+    } catch (const Darabonba::DaraException& ex) {
       _context = Darabonba::Policy::RetryPolicyContext(json({
         {"retriesAttempted" , _retriesAttempted},
         {"lastRequest" , _lastRequest},
@@ -82,7 +81,7 @@ void Client::testAPI() {
     }
   }
 
-  throw *_context.getException();
+  throw Darabonba::UnretryableException(_context);
 }
 
 void Client::testAPI2() {
@@ -93,7 +92,6 @@ void Client::testAPI2() {
 
   shared_ptr<Darabonba::Http::Request> _lastRequest = nullptr;
   shared_ptr<Darabonba::Http::MCurlResponse> _lastResponse = nullptr;
-  Darabonba::Exception _lastException;
   int _retriesAttempted = 0;
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
@@ -125,7 +123,7 @@ void Client::testAPI2() {
       _lastResponse  = response_;
 
       // empty return comment
-    } catch (const Darabonba::Exception& ex) {
+    } catch (const Darabonba::DaraException& ex) {
       _context = Darabonba::Policy::RetryPolicyContext(json({
         {"retriesAttempted" , _retriesAttempted},
         {"lastRequest" , _lastRequest},
@@ -136,7 +134,7 @@ void Client::testAPI2() {
     }
   }
 
-  throw *_context.getException();
+  throw Darabonba::UnretryableException(_context);
 }
 
 void Client::staticFunc() {

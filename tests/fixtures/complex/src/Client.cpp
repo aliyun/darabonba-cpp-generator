@@ -35,7 +35,6 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
 
   shared_ptr<Darabonba::Http::Request> _lastRequest = nullptr;
   shared_ptr<Darabonba::Http::MCurlResponse> _lastResponse = nullptr;
-  Darabonba::Exception _lastException;
   int _retriesAttempted = 0;
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
@@ -223,7 +222,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
       return json({}).get<RuntimeObject>();
       Complex3(nullptr, "test");
       return nullptr;
-    } catch (const Darabonba::Exception& ex) {
+    } catch (const Darabonba::DaraException& ex) {
       _context = Darabonba::Policy::RetryPolicyContext(json({
         {"retriesAttempted" , _retriesAttempted},
         {"lastRequest" , _lastRequest},
@@ -234,7 +233,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
     }
   }
 
-  throw *_context.getException();
+  throw Darabonba::UnretryableException(_context);
 }
 
 Darabonba::Json Client::Complex2(const ComplexRequest &request, const vector<string> &str, const map<string, string> &val) {
@@ -265,7 +264,6 @@ json Client::ComplexMap() {
 
   shared_ptr<Darabonba::Http::Request> _lastRequest = nullptr;
   shared_ptr<Darabonba::Http::MCurlResponse> _lastResponse = nullptr;
-  Darabonba::Exception _lastException;
   int _retriesAttempted = 0;
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
@@ -284,7 +282,7 @@ json Client::ComplexMap() {
       auto futureResp_ = Darabonba::Core::doAction(request_, runtime_);
       shared_ptr<Darabonba::Http::MCurlResponse> response_ = futureResp_.get();
       _lastResponse  = response_;
-    } catch (const Darabonba::Exception& ex) {
+    } catch (const Darabonba::DaraException& ex) {
       _context = Darabonba::Policy::RetryPolicyContext(json({
         {"retriesAttempted" , _retriesAttempted},
         {"lastRequest" , _lastRequest},
@@ -295,7 +293,7 @@ json Client::ComplexMap() {
     }
   }
 
-  throw *_context.getException();
+  throw Darabonba::UnretryableException(_context);
 }
 
 ComplexRequest Client::Complex3(const ComplexRequest &request, const string &name) {
@@ -391,7 +389,7 @@ vector<string> Client::exprFunc() {
 void Client::printNull() {
   try {
     string str = templateString();
-  } catch (const Darabonba::Exception e) {
+  } catch (const std::exception e) {
   } finally {
     string final = "ok";
   }  
@@ -400,7 +398,7 @@ void Client::printNull() {
 Request Client::testTryWithComplexReturnType() {
   try {
     string str = templateString();
-  } catch (const Darabonba::Exception e) {
+  } catch (const std::exception e) {
   } finally {
     string final = "ok";
   }  
@@ -410,7 +408,7 @@ Request Client::testTryWithComplexReturnType() {
 Request Client::testTryWithComplexReturnTypeWithOutCat() {
   try {
     string str = templateString();
-  } catch (const Darabonba::Exception e) {
+  } catch (const std::exception e) {
     string sim = "a";
   } finally {
     string final = "ok";
@@ -666,7 +664,7 @@ void Client::multiTryCatch(const int64_t &a) {
     DaraLogger::log(err.getName());
   } catch (const Err3Exception err) {
     DaraLogger::log(err.getName());
-  } catch (const Darabonba::Exception err) {
+  } catch (const std::exception err) {
     DaraLogger::log(err.getName());
   } finally {
     string final = "ok";

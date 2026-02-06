@@ -35,7 +35,6 @@ void Client::helloRuntime() {
 
   shared_ptr<Darabonba::Http::Request> _lastRequest = nullptr;
   shared_ptr<Darabonba::Http::MCurlResponse> _lastResponse = nullptr;
-  Darabonba::Exception _lastException;
   int _retriesAttempted = 0;
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
@@ -62,7 +61,7 @@ void Client::helloRuntime() {
       _lastResponse  = response_;
 
       return ;
-    } catch (const Darabonba::Exception& ex) {
+    } catch (const Darabonba::DaraException& ex) {
       _context = Darabonba::Policy::RetryPolicyContext(json({
         {"retriesAttempted" , _retriesAttempted},
         {"lastRequest" , _lastRequest},
@@ -73,7 +72,7 @@ void Client::helloRuntime() {
     }
   }
 
-  throw *_context.getException();
+  throw Darabonba::UnretryableException(_context);
 }
 
 } // namespace Darabonba

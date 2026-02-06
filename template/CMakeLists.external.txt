@@ -16,6 +16,4 @@ else()
   FetchContent_MakeAvailable(_<% name %>)
   message(STATUS "Added <% name %> source : ${_<% name %>_SOURCE_DIR}")
   message(STATUS "Added <% name %> binary : ${_<% name %>_BINARY_DIR}")
-
-  target_include_directories(${PROJECT_NAME} PRIVATE "${_<% name %>_SOURCE_DIR}/include")
 endif()

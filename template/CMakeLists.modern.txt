@@ -93,7 +93,7 @@ target_link_libraries(${PROJECT_NAME}
         OpenSSL::SSL
         OpenSSL::Crypto
         darabonba_core
-        <% LIBS %>
+<% LIBS %>
 )
 
 # Windows compatibility

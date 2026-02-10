@@ -16,6 +16,11 @@ namespace Exceptions
 {
   class MainFileException : public Darabonba::Exception {
   public:
+    friend void to_json(Darabonba::Json& j, const MainFileException& obj) { 
+      DARABONBA_PTR_TO_JSON(size, size_);
+      DARABONBA_PTR_TO_JSON(data, data_);
+      DARABONBA_PTR_TO_JSON(model, model_);
+    };
     friend void from_json(const Darabonba::Json& j, MainFileException& obj) { 
       DARABONBA_PTR_FROM_JSON(size, size_);
       DARABONBA_PTR_FROM_JSON(data, data_);

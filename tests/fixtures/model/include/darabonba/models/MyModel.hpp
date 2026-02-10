@@ -171,8 +171,10 @@ namespace Models
     class Subarraymodel : public Darabonba::Model {
     public:
       friend void to_json(Darabonba::Json& j, const Subarraymodel& obj) { 
+        (void)j; (void)obj; 
       };
       friend void from_json(const Darabonba::Json& j, Subarraymodel& obj) { 
+        (void)j; (void)obj; 
       };
       Subarraymodel() = default ;
       Subarraymodel(const Subarraymodel &) = default ;

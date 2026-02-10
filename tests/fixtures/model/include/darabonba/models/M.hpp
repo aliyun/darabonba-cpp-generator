@@ -33,8 +33,10 @@ namespace Models
     class SubM : public Darabonba::Model {
     public:
       friend void to_json(Darabonba::Json& j, const SubM& obj) { 
+        (void)j; (void)obj; 
       };
       friend void from_json(const Darabonba::Json& j, SubM& obj) { 
+        (void)j; (void)obj; 
       };
       SubM() = default ;
       SubM(const SubM &) = default ;

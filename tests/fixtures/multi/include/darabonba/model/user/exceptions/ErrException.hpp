@@ -15,6 +15,9 @@ namespace Exceptions
 {
   class ErrException : public Darabonba::Exception {
   public:
+    friend void to_json(Darabonba::Json& j, const ErrException& obj) { 
+      DARABONBA_PTR_TO_JSON(msg, msg_);
+    };
     friend void from_json(const Darabonba::Json& j, ErrException& obj) { 
       DARABONBA_PTR_FROM_JSON(msg, msg_);
     };

@@ -7,3 +7,5 @@ output/
 .DS_Store
 .nyc_output/
 package-lock.json
+products/
+tests/temp-output

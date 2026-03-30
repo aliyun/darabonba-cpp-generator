@@ -8,9 +8,9 @@
   },
   "cpp": {
     "namespace": "Darabonba",
-    "header": "darabonba/test.hpp"
+    "header": "darabonba/comment.hpp"
   },
   "releases": {
-    "cpp": "darabonba/test:1.0.0"
+    "cpp": "darabonba/comment:1.0.0"
   }
 }

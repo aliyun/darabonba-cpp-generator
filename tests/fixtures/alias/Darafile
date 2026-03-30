@@ -23,9 +23,9 @@
   },
   "cpp": {
     "namespace": "Darabonba",
-    "header": "darabonba/test.hpp"
+    "header": "darabonba/alias.hpp"
   },
   "releases": {
-    "cpp": "darabonba/test:1.0.0"
+    "cpp": "darabonba/alias:1.0.0"
   }
 }

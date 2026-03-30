@@ -71,13 +71,13 @@ find_package(CURL REQUIRED)
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Target Setup >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 set(SOURCE_FILES
     src/Client.cpp
-        src/model/User.cpp
-        src/lib/Util.cpp
-        src/lib/Util.cpp
-        src/Api.cpp
-        src/model/User.cpp
-        src/lib/Util.cpp
-        src/lib/Util.cpp
+    src/model/User.cpp
+    src/lib/Util.cpp
+    src/lib/Util.cpp
+    src/Api.cpp
+    src/model/User.cpp
+    src/lib/Util.cpp
+    src/lib/Util.cpp
 )
 
 # Create library target
@@ -101,7 +101,6 @@ target_link_libraries(${PROJECT_NAME}
         OpenSSL::Crypto
         darabonba_core
         alibabacloud-sdk-cpp/dara-util
-            
 )
 
 # Windows compatibility

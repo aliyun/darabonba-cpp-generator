@@ -1,8 +1,7 @@
 #include <darabonba/Core.hpp>
-#include <darabonba/test.hpp>
+#include <darabonba/alias.hpp>
 #include <darabonba/import.hpp>
 #include <darabonba/srouce.hpp>
-#include <darabonba/alias.hpp>
 #include <darabonba/alias/source.hpp>
 #include <darabonba/alias/symbol.hpp>
 using namespace std;

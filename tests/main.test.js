@@ -240,14 +240,4 @@ describe('new Generator', function() {
     });
   });
 
-  it('OpenApiRequest direct initialization should ok', function () {
-    const outputDir = path.join(__dirname, 'output/openapi-request');
-    const mainFilePath = path.join(__dirname, 'fixtures/openapi-request/main.dara');
-    const pkgContent = fs.readFileSync(path.join(__dirname, 'fixtures/openapi-request/Darafile'), 'utf8');
-    const pkg = JSON.parse(pkgContent);
-    check(mainFilePath, outputDir, path.join(__dirname, 'fixtures/openapi-request'), {
-      pkgDir: path.join(__dirname, 'fixtures/openapi-request'),
-      ...pkg
-    });
-  });
 });

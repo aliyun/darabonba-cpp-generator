@@ -216,7 +216,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
         .push_back("1")
         .push_back("2"), nullptr);
       hello(nullptr, nullptr, nullptr);
-      return json({}).get<RuntimeObject>();
+      return fromMap<RuntimeObject>({});
       Complex3(nullptr, "test");
       return nullptr;
     } catch (const Darabonba::DaraException& ex) {
@@ -326,8 +326,8 @@ Darabonba::RuntimeOptions runtime_(json({}));
   throwsFunc();
   response_->getStatusCode();
   Source::array(request.toMap(), "1");
-  return json(Darabonba::Core::merge(request_.getQuery()
-  ).get<map<string, string>>()).get<ComplexRequest>();
+  return fromMap<ComplexRequest>(Darabonba::Core::merge(request_.getQuery()
+  ).get<map<string, string>>());
 }
 
 void Client::noReturn() {

@@ -9,3 +9,4 @@ output/
 package-lock.json
 products/
 tests/temp-output
+real_tests/

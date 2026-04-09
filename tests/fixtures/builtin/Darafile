@@ -6,9 +6,9 @@
   "libraries": {},
   "cpp": {
     "namespace": "Darabonba",
-    "header": "darabonba/test.hpp"
+    "header": "darabonba/builtin.hpp"
   },
   "releases": {
-    "cpp": "darabonba/test:1.0.0"
+    "cpp": "darabonba/builtin:1.0.0"
   }
 }

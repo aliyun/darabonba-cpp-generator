@@ -1,5 +1,5 @@
 #include <darabonba/Core.hpp>
-#include <darabonba/test.hpp>
+#include <darabonba/complex.hpp>
 #include <darabonba/source.hpp>
 #include <darabonba/policy/Retry.hpp>
 #include <darabonba/Runtime.hpp>
@@ -38,7 +38,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
   });
-  while (Darabonba::allowRetry(runtime_.getRetryOptions(), _context)) {
+  while (Darabonba::shouldRetry(runtime_.getRetryOptions(), _context)) {
     if (_retriesAttempted > 0) {
       int _backoffTime = Darabonba::getBackoffTime(runtime_.getRetryOptions(), _context);
       if (_backoffTime > 0) {
@@ -216,7 +216,7 @@ RuntimeObject Client::Complex1(const ComplexRequest &request, const shared_ptr<S
         .push_back("1")
         .push_back("2"), nullptr);
       hello(nullptr, nullptr, nullptr);
-      return json({}).get<RuntimeObject>();
+      return fromMap<RuntimeObject>({});
       Complex3(nullptr, "test");
       return nullptr;
     } catch (const Darabonba::DaraException& ex) {
@@ -263,7 +263,7 @@ json Client::ComplexMap() {
   Darabonba::Policy::RetryPolicyContext _context = json({
     {"retriesAttempted" , _retriesAttempted}
   });
-  while (Darabonba::allowRetry(runtime_.getRetryOptions(), _context)) {
+  while (Darabonba::shouldRetry(runtime_.getRetryOptions(), _context)) {
     if (_retriesAttempted > 0) {
       int _backoffTime = Darabonba::getBackoffTime(runtime_.getRetryOptions(), _context);
       if (_backoffTime > 0) {
@@ -326,8 +326,8 @@ Darabonba::RuntimeOptions runtime_(json({}));
   throwsFunc();
   response_->getStatusCode();
   Source::array(request.toMap(), "1");
-  return json(Darabonba::Core::merge(request_.getQuery()
-  ).get<map<string, string>>()).get<ComplexRequest>();
+  return fromMap<ComplexRequest>(Darabonba::Core::merge(request_.getQuery()
+  ).get<map<string, string>>());
 }
 
 void Client::noReturn() {

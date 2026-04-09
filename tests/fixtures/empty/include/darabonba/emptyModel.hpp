@@ -2,6 +2,6 @@
 #ifndef DARABONBA_EMPTYMODEL_HPP_
 #define DARABONBA_EMPTYMODEL_HPP_
 #include <darabonba/Core.hpp>
-#include <darabonba/models/ModelEmpty.hpp>
+#include <darabonba/empty/models/ModelEmpty.hpp>
 
 #endif

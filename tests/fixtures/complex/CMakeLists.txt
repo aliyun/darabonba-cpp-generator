@@ -94,7 +94,6 @@ target_link_libraries(${PROJECT_NAME}
         OpenSSL::Crypto
         darabonba_core
         darabonba/test
-            
 )
 
 # Windows compatibility

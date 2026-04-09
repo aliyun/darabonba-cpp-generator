@@ -9,9 +9,9 @@
   },
   "cpp": {
     "namespace": "Darabonba",
-    "header": "darabonba/test.hpp"
+    "header": "darabonba/import.hpp"
   },
   "releases": {
-    "cpp": "darabonba/test:1.0.0"
+    "cpp": "darabonba/import:1.0.0"
   }
 }

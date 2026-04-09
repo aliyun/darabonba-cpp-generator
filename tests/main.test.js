@@ -239,4 +239,5 @@ describe('new Generator', function() {
       ...pkg
     });
   });
+
 });
